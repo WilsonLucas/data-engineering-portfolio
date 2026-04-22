@@ -1,0 +1,1848 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wilson Lucas &middot; Portfólio 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0f1a;
+  --surface: #111827;
+  --surface2: #1a2236;
+  --surface-elevated: #1e293b;
+  --border: rgba(0, 180, 255, 0.08);
+  --border-bright: rgba(0, 180, 255, 0.20);
+  --text: #e8edf5;
+  --text-dim: #6b7fa0;
+  --accent: #00b4ff;
+  --accent-dim: rgba(0, 180, 255, 0.10);
+  --navy: #0B1F3A;
+  --gold: #d4a017;
+  --gold-dim: rgba(212, 160, 23, 0.10);
+  --orange: #ef9000;
+  --orange-dim: rgba(239, 144, 0, 0.10);
+  --green: #3fb950;
+  --green-dim: rgba(63, 185, 80, 0.10);
+  --red: #f85149;
+  --red-dim: rgba(248, 81, 73, 0.10);
+  --blue: #60a5fa;
+  --blue-dim: rgba(96, 165, 250, 0.10);
+  --purple: #a78bfa;
+  --purple-dim: rgba(167, 139, 250, 0.10);
+  --cyan: #22d3ee;
+  --cyan-dim: rgba(34, 211, 238, 0.10);
+  --code-bg: #060b14;
+  --code-text: #c8d8e8;
+  --font-display: 'Instrument Serif', serif;
+  --font-body: 'Inter', sans-serif;
+  --font-editorial: 'Newsreader', serif;
+  --font-mono: 'Fira Code', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body { height: 100%; overflow: hidden; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+  position: relative;
+}
+
+body::after {
+  content: '';
+  position: fixed; inset: 0; z-index: 9999; pointer-events: none; opacity: 0.03;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+}
+
+/* ===== IDENTITY BAR (Wilson Lucas) ===== */
+.wl-bar {
+  position: fixed; top: 3px; left: 0; right: 0; height: 44px; z-index: 99;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 clamp(20px, 3vw, 48px);
+  background: rgba(10,15,26,0.85); border-bottom: 1px solid var(--border);
+  font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase;
+}
+.wl-bar__left { color: var(--accent); font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.wl-bar__center {
+  color: var(--gold); font-weight: 500; font-style: italic; letter-spacing: 0.08em;
+  text-transform: none; font-family: var(--font-editorial); font-size: 0.82rem;
+}
+.wl-bar__right { color: var(--text-dim); display: flex; align-items: center; gap: 6px; }
+
+/* ===== NAV CHROME ===== */
+.deck-progress {
+  position: fixed; top: 0; left: 0; height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--gold));
+  z-index: 100; transition: width 0.3s ease; pointer-events: none;
+}
+.deck-dots {
+  position: fixed; right: clamp(12px,2vw,24px); top: 50%;
+  transform: translateY(-50%); display: flex; flex-direction: column; gap: 6px;
+  z-index: 100; padding: 7px; background: rgba(10,15,26,0.6);
+  border-radius: 20px; backdrop-filter: blur(8px);
+}
+.deck-dot {
+  width: 7px; height: 7px; border-radius: 50%; background: var(--text-dim);
+  opacity: 0.3; border: none; padding: 0; cursor: pointer; transition: all 0.2s;
+}
+.deck-dot:hover { opacity: 0.6; }
+.deck-dot.active { opacity: 1; transform: scale(1.5); background: var(--accent); box-shadow: 0 0 8px rgba(0,180,255,0.4); }
+.deck-counter {
+  position: fixed; bottom: clamp(12px,2vh,24px); right: clamp(12px,2vw,24px);
+  font-family: var(--font-mono); font-size: 12px; color: var(--text-dim); z-index: 100;
+}
+.deck-hints {
+  position: fixed; bottom: clamp(12px,2vh,24px); left: 50%;
+  transform: translateX(-50%); font-family: var(--font-mono); font-size: 11px;
+  color: var(--text-dim); opacity: 0.5; z-index: 100; transition: opacity 0.5s;
+}
+.deck-hints.faded { opacity: 0; pointer-events: none; }
+
+/* ===== DECK ===== */
+.deck {
+  height: 100dvh; overflow-y: auto; scroll-snap-type: y mandatory;
+  scroll-behavior: smooth; position: relative; z-index: 1;
+}
+
+.slide {
+  height: 100dvh; scroll-snap-align: start; overflow: hidden; position: relative;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: clamp(60px, 8vh, 90px) clamp(36px, 6vw, 96px) clamp(32px, 4vh, 48px);
+  isolation: isolate; opacity: 0; transform: translateY(40px) scale(0.98);
+  transition: opacity 0.6s cubic-bezier(0.16,1,0.3,1), transform 0.6s cubic-bezier(0.16,1,0.3,1);
+}
+.slide.visible { opacity: 1; transform: none; }
+
+.slide .reveal {
+  opacity: 0; transform: translateY(24px);
+  transition: opacity 0.5s cubic-bezier(0.16,1,0.3,1), transform 0.5s cubic-bezier(0.16,1,0.3,1);
+}
+.slide.visible .reveal { opacity: 1; transform: none; }
+.slide.visible .reveal:nth-child(1) { transition-delay: 0.1s; }
+.slide.visible .reveal:nth-child(2) { transition-delay: 0.2s; }
+.slide.visible .reveal:nth-child(3) { transition-delay: 0.3s; }
+.slide.visible .reveal:nth-child(4) { transition-delay: 0.4s; }
+.slide.visible .reveal:nth-child(5) { transition-delay: 0.5s; }
+.slide.visible .reveal:nth-child(6) { transition-delay: 0.6s; }
+.slide.visible .reveal:nth-child(7) { transition-delay: 0.7s; }
+.slide.visible .reveal:nth-child(8) { transition-delay: 0.8s; }
+.slide.visible .reveal:nth-child(9) { transition-delay: 0.9s; }
+.slide.visible .reveal:nth-child(10) { transition-delay: 1.0s; }
+
+/* ===== SLIDE TYPES ===== */
+.slide--title { justify-content: center; align-items: center; text-align: center; }
+.slide--divider { justify-content: center; align-items: center; text-align: center; }
+.slide--quote { justify-content: center; align-items: center; text-align: center; }
+
+.slide__decor { position: absolute; pointer-events: none; z-index: 0; }
+
+.slide__subtitle {
+  font-family: var(--font-mono); font-size: clamp(11px,1.4vw,14px);
+  color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.2em;
+}
+
+.slide__display {
+  font-family: var(--font-display); font-style: italic;
+  line-height: 1.05; letter-spacing: -0.02em;
+  font-size: clamp(56px, 10vw, 120px);
+}
+
+.slide__heading {
+  font-family: var(--font-display); font-style: italic;
+  font-size: clamp(36px, 6vw, 64px); line-height: 1.1; letter-spacing: -0.02em;
+}
+
+.slide__body {
+  font-family: var(--font-editorial); font-style: italic;
+  font-size: clamp(1.05rem, 1.8vw, 1.4rem); color: var(--text-dim); line-height: 1.55;
+}
+
+.slide__ghost {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+  font-family: var(--font-display); font-style: italic;
+  font-size: clamp(260px, 42vw, 520px); font-weight: 400;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--gold) 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; opacity: 0.04;
+  line-height: 1; pointer-events: none; z-index: 0; letter-spacing: -0.05em;
+}
+
+/* ===== QUOTE ===== */
+.slide__quote-mark {
+  font-family: var(--font-display); font-style: italic;
+  font-size: clamp(120px, 20vw, 280px); line-height: 0.8; opacity: 0.08;
+  color: var(--accent); margin-bottom: clamp(-40px, -5vh, -20px);
+}
+blockquote {
+  font-family: var(--font-editorial); font-style: italic;
+  font-size: clamp(1.6rem, 3.4vw, 2.6rem); line-height: 1.3;
+  max-width: 20ch; margin: 0 auto; color: var(--text);
+}
+blockquote strong { color: var(--accent); font-weight: 500; }
+
+/* ===== SHIMMER ===== */
+@keyframes shimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+.shimmer-text {
+  background: linear-gradient(90deg, var(--accent), #fff, var(--gold), #fff, var(--accent));
+  background-size: 300% 100%;
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 6s ease infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0,180,255,0.15); }
+  50% { box-shadow: 0 0 32px 4px rgba(0,180,255,0.18); }
+}
+
+@keyframes pulse-gold {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(212,160,23,0.15); }
+  50% { box-shadow: 0 0 32px 4px rgba(212,160,23,0.2); }
+}
+
+@keyframes flow-right {
+  from { stroke-dashoffset: 24; }
+  to { stroke-dashoffset: 0; }
+}
+.flow-r {
+  stroke-dasharray: 12 12;
+  animation: flow-right 1.2s linear infinite;
+}
+
+@keyframes bar-fill { from { width: 0; } }
+
+/* ===== TAGS ===== */
+.tag {
+  font-family: var(--font-mono); font-size: 0.68rem; font-weight: 600;
+  padding: 0.22rem 0.65rem; border-radius: 6px; letter-spacing: 0.05em;
+  display: inline-flex; align-items: center; gap: 0.3rem;
+}
+.tag-accent { background: var(--accent-dim); color: var(--accent); }
+.tag-gold   { background: var(--gold-dim); color: var(--gold); }
+.tag-green  { background: var(--green-dim); color: var(--green); }
+.tag-blue   { background: var(--blue-dim); color: var(--blue); }
+.tag-purple { background: var(--purple-dim); color: var(--purple); }
+.tag-red    { background: var(--red-dim); color: var(--red); }
+.tag-orange { background: var(--orange-dim); color: var(--orange); }
+.tag-cyan   { background: var(--cyan-dim); color: var(--cyan); }
+.tag-dim    { background: rgba(107,127,160,0.10); color: var(--text-dim); }
+
+/* ===== STATS ===== */
+.stats-row {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: clamp(14px,2vw,24px); margin-top: clamp(20px,3vh,36px);
+}
+.stat-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; text-align: center;
+  padding: clamp(22px,3.5vh,40px) clamp(16px,2.5vw,28px);
+  position: relative; overflow: hidden;
+}
+.stat-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: var(--accent);
+}
+.stat-card.gold::before { background: var(--gold); }
+.stat-card.green::before { background: var(--green); }
+.stat-card.purple::before { background: var(--purple); }
+.stat-card.orange::before { background: var(--orange); }
+.stat-val {
+  font-family: var(--font-display); font-style: italic;
+  font-size: clamp(42px,7vw,80px); line-height: 1; letter-spacing: -0.03em;
+  color: var(--accent);
+}
+.stat-card.gold .stat-val { color: var(--gold); }
+.stat-card.green .stat-val { color: var(--green); }
+.stat-card.purple .stat-val { color: var(--purple); }
+.stat-card.orange .stat-val { color: var(--orange); }
+.stat-lbl {
+  font-family: var(--font-mono); font-size: clamp(10px,1.1vw,12px);
+  color: var(--text-dim); margin-top: 0.6rem;
+  text-transform: uppercase; letter-spacing: 1.5px;
+}
+
+/* ===== TIER CARDS ===== */
+.tier-row {
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: clamp(14px,1.8vw,22px); margin-top: clamp(20px,3vh,32px);
+}
+.tier-row.cols-3 { grid-template-columns: repeat(3, 1fr); }
+.tier-row.cols-4 { grid-template-columns: repeat(4, 1fr); }
+.tier-row.cols-2x2 {
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+}
+.tier-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 16px; padding: clamp(20px,3vh,32px);
+  position: relative; overflow: hidden;
+  display: flex; flex-direction: column;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.tier-card h4 {
+  font-family: var(--font-display); font-size: clamp(1.3rem,2vw,1.65rem);
+  font-style: italic; margin-bottom: 0.3rem;
+}
+.tier-card .tier-sub {
+  font-family: var(--font-mono); font-size: 0.7rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  margin-bottom: 0.8rem; color: var(--text-dim);
+}
+.tier-card p {
+  font-family: var(--font-editorial); font-style: italic;
+  font-size: clamp(0.88rem, 1.2vw, 1rem); color: var(--text-dim); line-height: 1.55;
+}
+
+/* ===== BOTTOM BAR ===== */
+.bottom-bar {
+  margin-top: auto; padding-top: clamp(14px,2vh,22px);
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  gap: clamp(16px,3vw,32px);
+}
+.bottom-bar p {
+  font-family: var(--font-editorial);
+  font-size: clamp(0.95rem, 1.4vw, 1.15rem); font-style: italic;
+  color: var(--text-dim); line-height: 1.5; flex: 1;
+}
+.bottom-bar strong { color: var(--accent); font-weight: 500; }
+.bottom-bar__tags {
+  display: flex; gap: 0.5rem; flex-shrink: 0;
+}
+
+/* ===== DIVIDER ===== */
+.divider-wrap { position: relative; z-index: 1; }
+
+/* ===== CARD ANATOMY (colored stacked rows) ===== */
+.anatomy-row {
+  padding: clamp(12px,1.8vh,18px) clamp(14px,1.8vw,22px);
+  border-radius: 12px; display: flex; align-items: center; gap: 1rem;
+}
+.anatomy-row__num {
+  font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700;
+  padding: 0.3rem 0.7rem; background: rgba(0,0,0,0.3);
+  border-radius: 6px; color: #fff; flex-shrink: 0;
+}
+.anatomy-row__title {
+  font-family: var(--font-display); font-size: clamp(1rem,1.35vw,1.2rem);
+  font-style: italic; color: #fff; flex-shrink: 0;
+}
+.anatomy-row__desc {
+  font-family: var(--font-mono); font-size: clamp(0.7rem,0.92vw,0.8rem);
+  color: var(--text); opacity: 0.7; margin-left: auto; text-align: right;
+}
+
+/* ===== CODE BLOCK ===== */
+.code-block {
+  background: var(--code-bg); border: 1px solid var(--border);
+  border-radius: 10px; padding: 0.9rem 1.1rem;
+  font-family: var(--font-mono); font-size: 0.78rem; line-height: 1.55;
+  color: var(--code-text);
+}
+.code-block .kw { color: var(--purple); }
+.code-block .fn { color: var(--accent); }
+.code-block .str { color: var(--green); }
+.code-block .num { color: var(--gold); }
+.code-block .dim { color: var(--text-dim); }
+
+/* ===== BIG STAT BLOCK ===== */
+.big-stat {
+  font-family: var(--font-display); font-style: italic;
+  font-size: clamp(60px, 10vw, 130px); line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+/* ===== TIMELINE GRID ===== */
+.timeline-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: clamp(14px,2vw,24px); margin-top: clamp(16px,3vh,28px); position: relative;
+}
+.timeline-grid::before {
+  content: ''; position: absolute; top: 18px; left: 6%; right: 6%;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent), var(--green), var(--gold), var(--purple));
+  border-radius: 2px; opacity: 0.6;
+}
+.tl-col { text-align: center; position: relative; padding-top: 44px; }
+.tl-dot {
+  width: 16px; height: 16px; border-radius: 50%; border: 3px solid;
+  position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+  z-index: 1; background: var(--bg);
+}
+.tl-year {
+  font-family: var(--font-display); font-style: italic;
+  font-size: clamp(1.2rem,1.8vw,1.55rem);
+}
+.tl-title {
+  font-family: var(--font-display); font-style: italic;
+  font-size: clamp(0.95rem,1.25vw,1.1rem); margin-top: 0.2rem;
+}
+.tl-desc {
+  font-family: var(--font-editorial); font-size: clamp(0.72rem,0.92vw,0.82rem);
+  color: var(--text-dim); font-style: italic; margin-top: 0.3rem;
+}
+.tl-detail {
+  font-family: var(--font-editorial); font-style: italic; font-size: clamp(0.7rem,0.88vw,0.8rem);
+  color: var(--text-dim); line-height: 1.55; padding-top: 0.5rem;
+  margin-top: 0.5rem; border-top: 1px solid var(--border); text-align: left;
+}
+.tl-stat {
+  font-family: var(--font-mono); font-size: 0.62rem;
+  padding: 0.2rem 0.5rem; border-radius: 4px;
+  display: inline-block; margin-top: 0.5rem; font-weight: 600;
+}
+
+/* ===== CONTACT CARD ===== */
+.contact-row {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: clamp(14px, 2vw, 24px); margin-top: clamp(24px, 4vh, 40px);
+}
+.contact-card {
+  background: linear-gradient(135deg, var(--surface) 0%, rgba(0,180,255,0.04) 100%);
+  border: 1px solid var(--border-bright); border-radius: 16px;
+  padding: clamp(22px,3vh,32px); display: flex; flex-direction: column;
+  align-items: flex-start; gap: 0.6rem; text-align: left;
+}
+.contact-card__icon {
+  width: clamp(38px,4.5vw,48px); height: clamp(38px,4.5vw,48px);
+  border-radius: 10px; background: rgba(0,180,255,0.08);
+  border: 1px solid rgba(0,180,255,0.25);
+  display: flex; align-items: center; justify-content: center;
+}
+.contact-card__label {
+  font-family: var(--font-mono); font-size: 0.68rem;
+  color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.15em;
+}
+.contact-card__value {
+  font-family: var(--font-display); font-style: italic;
+  font-size: clamp(0.9rem, 1.3vw, 1.1rem); color: var(--accent);
+  word-break: break-all; line-height: 1.35;
+}
+.contact-card__note {
+  font-family: var(--font-editorial); font-size: clamp(0.72rem, 0.9vw, 0.82rem);
+  color: var(--text-dim); font-style: italic;
+}
+</style>
+</head>
+<body>
+
+<!-- WILSON LUCAS IDENTITY BAR -->
+<div class="wl-bar">
+  <div class="wl-bar__left">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h18v18H3zM3 9h18M9 21V9"/></svg>
+    WILSON LUCAS &middot; ENGENHEIRO DE DADOS SÊNIOR
+  </div>
+  <div class="wl-bar__center">Arquiteturas &middot; Pipelines &middot; Governança</div>
+  <div class="wl-bar__right">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18"/></svg>
+    PORTFÓLIO &middot; 2026
+  </div>
+</div>
+
+<!-- NAV CHROME -->
+<div class="deck-progress" id="progress"></div>
+<nav class="deck-dots" id="dots"></nav>
+<div class="deck-counter" id="counter"></div>
+<div class="deck-hints" id="hints">&larr; &rarr; ou scroll</div>
+
+<div class="deck" id="deck">
+
+<!-- ===================================================================== -->
+<!-- SLIDE 1 — CAPA                                                        -->
+<!-- ===================================================================== -->
+<section class="slide slide--title">
+  <svg class="slide__decor" style="top:50px;left:24px;" width="220" height="220" viewBox="0 0 200 200">
+    <line x1="0" y1="0" x2="0" y2="70" stroke="var(--accent)" stroke-width="2" opacity="0.18"/>
+    <line x1="0" y1="0" x2="70" y2="0" stroke="var(--accent)" stroke-width="2" opacity="0.18"/>
+  </svg>
+  <svg class="slide__decor" style="bottom:24px;right:24px;" width="220" height="220" viewBox="0 0 200 200">
+    <line x1="200" y1="130" x2="200" y2="200" stroke="var(--gold)" stroke-width="2" opacity="0.18"/>
+    <line x1="130" y1="200" x2="200" y2="200" stroke="var(--gold)" stroke-width="2" opacity="0.18"/>
+  </svg>
+
+  <div class="reveal" style="margin-bottom:clamp(10px,1.8vh,18px);">
+    <span class="tag tag-gold" style="letter-spacing:0.2em;">PORTFÓLIO &middot; 2026</span>
+  </div>
+
+  <h1 class="reveal slide__display" style="font-size:clamp(72px,12vw,160px); margin-bottom:clamp(8px,1.2vh,14px);">
+    <span class="shimmer-text">Wilson Lucas</span>
+  </h1>
+
+  <p class="reveal" style="font-family:var(--font-editorial); font-style:italic; font-size:clamp(22px,3vw,38px); color:var(--text-dim); margin-bottom:clamp(24px,4vh,40px);">
+    Engenheiro de Dados Sênior
+  </p>
+
+  <div class="reveal" style="display:flex; gap:0.6rem; justify-content:center; flex-wrap:wrap; max-width:780px; margin:0 auto;">
+    <span class="tag tag-accent">Azure Databricks</span>
+    <span class="tag tag-cyan">Delta Lake</span>
+    <span class="tag tag-gold">Unity Catalog</span>
+    <span class="tag tag-purple">PySpark</span>
+    <span class="tag tag-green">10+ anos</span>
+  </div>
+
+  <div class="reveal" style="margin-top:clamp(32px,5vh,56px);">
+    <p style="font-family:var(--font-mono); font-size:0.68rem; color:var(--text-dim); letter-spacing:0.2em; text-transform:uppercase;">
+      Financial Services &middot; Healthcare &middot; Setor Público &middot; Corporativo
+    </p>
+  </div>
+</section>
+
+<!-- ===================================================================== -->
+<!-- SLIDE 2 — PERFIL RESUMIDO (stat-cards)                                -->
+<!-- ===================================================================== -->
+<section class="slide">
+  <div class="reveal">
+    <p class="slide__subtitle">PERFIL PROFISSIONAL</p>
+  </div>
+  <h2 class="reveal slide__heading" style="margin-top:clamp(8px,1.2vh,14px);">
+    10+ anos construindo <span style="color:var(--accent);">plataformas de dados</span>
+  </h2>
+  <p class="reveal slide__body" style="margin-top:clamp(12px,2vh,20px); max-width:78ch;">
+    Consultoria itinerante em ambientes de alta complexidade &mdash; financeiro, saúde, público e corporativo. Entrego arquiteturas Medallion end-to-end, com rastreabilidade, homologação byte-a-byte e governança embutida na própria pipeline.
+  </p>
+
+  <div class="stats-row reveal">
+    <div class="stat-card">
+      <div class="stat-val">10+</div>
+      <div class="stat-lbl">ANOS DE EXPERIÊNCIA</div>
+      <p style="font-family:var(--font-editorial); font-style:italic; font-size:clamp(0.85rem,1.1vw,1rem); color:var(--text-dim); margin-top:clamp(8px,1.2vh,14px); line-height:1.5;">
+        De Oracle legado a data lakehouse moderno, mantendo o mesmo rigor em cada camada.
+      </p>
+    </div>
+    <div class="stat-card gold">
+      <div class="stat-val">4</div>
+      <div class="stat-lbl">SETORES PROFUNDOS</div>
+      <p style="font-family:var(--font-editorial); font-style:italic; font-size:clamp(0.85rem,1.1vw,1rem); color:var(--text-dim); margin-top:clamp(8px,1.2vh,14px); line-height:1.5;">
+        Financial Services, Saúde Suplementar, Setor Público e Corporativo SAP.
+      </p>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-val">433+</div>
+      <div class="stat-lbl">TABELAS CATALOGADAS</div>
+      <p style="font-family:var(--font-editorial); font-style:italic; font-size:clamp(0.85rem,1.1vw,1rem); color:var(--text-dim); margin-top:clamp(8px,1.2vh,14px); line-height:1.5;">
+        Bronze no Unity Catalog em apenas um dos projetos &mdash; ordem de magnitude recorrente.
+      </p>
+    </div>
+  </div>
+
+  <div class="reveal bottom-bar">
+    <p>
+      Da <strong>confiabilidade de dados de missão crítica</strong> ao <strong>data lakehouse moderno</strong>: o mesmo rigor técnico aplicado em cada etapa. Cada projeto entrega arquitetura documentável, homologada e pronta para sustentação por times futuros.
+    </p>
+    <div class="bottom-bar__tags">
+      <span class="tag tag-accent">Consultoria</span>
+      <span class="tag tag-gold">End-to-end</span>
+      <span class="tag tag-green">Missão crítica</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================================== -->
+<!-- SLIDE 3 — CONFIDENCIALIDADE (callout)                                 -->
+<!-- ===================================================================== -->
+<section class="slide">
+  <div class="reveal" style="display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; max-width:900px; margin:0 auto; flex:1;">
+
+    <div style="width:clamp(64px,7vw,96px); height:clamp(64px,7vw,96px); border-radius:50%; background:var(--gold-dim); border:2px solid rgba(212,160,23,0.3); display:flex; align-items:center; justify-content:center; margin-bottom:clamp(20px,3vh,32px); animation:pulse-gold 4s ease-in-out infinite;">
+      <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+    </div>
+
+    <p class="slide__subtitle" style="margin-bottom:clamp(10px,1.5vh,16px);">NOTA DE CONFIDENCIALIDADE</p>
+
+    <h2 class="slide__heading">
+      Clientes <span style="color:var(--gold);">anonimizados por NDA</span>
+    </h2>
+
+    <p style="font-family:var(--font-editorial); font-style:italic; font-size:clamp(1.1rem,1.8vw,1.4rem); color:var(--text-dim); line-height:1.55; margin-top:clamp(20px,3vh,32px); max-width:68ch;">
+      Os case studies documentam <strong style="color:var(--accent); font-weight:500;">arquitetura, decisões técnicas e padrões aplicados</strong>, sem expor código proprietário, dados sensíveis ou informações identificáveis de clientes.
+    </p>
+
+    <p style="font-family:var(--font-editorial); font-style:italic; font-size:clamp(0.95rem,1.3vw,1.1rem); color:var(--text-dim); line-height:1.55; margin-top:clamp(14px,2vh,20px); max-width:68ch; opacity:0.85;">
+      Descritores setoriais substituem nomes: <em>seguradora nacional</em>, <em>operadora de saúde</em>, <em>setor público &middot; apoio a MPE</em>, <em>corporativo de grande porte</em>.
+    </p>
+
+    <div style="display:flex; gap:0.6rem; justify-content:center; flex-wrap:wrap; margin-top:clamp(24px,3.5vh,36px);">
+      <span class="tag tag-gold">NDA vigente</span>
+      <span class="tag tag-accent">Padrões documentados</span>
+      <span class="tag tag-green">Sem dados sensíveis</span>
+    </div>
+
+  </div>
+</section>
+
+<!-- ===================================================================== -->
+<!-- SLIDE 4 — STACK TÉCNICA (6 linhas coloridas)                  -->
+<!-- ===================================================================== -->
+<section class="slide">
+  <div class="reveal">
+    <p class="slide__subtitle">STACK TÉCNICA</p>
+  </div>
+  <h2 class="reveal slide__heading" style="margin-top:clamp(8px,1.2vh,14px);">
+    Seis camadas de <span style="color:var(--accent);">competência profunda</span>
+  </h2>
+
+  <div class="reveal" style="display:flex; flex-direction:column; gap:clamp(8px,1.2vh,12px); margin-top:clamp(18px,3vh,28px);">
+
+    <div class="anatomy-row" style="background:linear-gradient(135deg, rgba(0,180,255,0.15), rgba(0,180,255,0.05));">
+      <span class="anatomy-row__num">01</span>
+      <span class="anatomy-row__title">Cloud e Data Lakehouse</span>
+      <span class="anatomy-row__desc">Azure Databricks &middot; Azure Synapse &middot; ADLS Gen2 &middot; Delta Lake &middot; Unity Catalog</span>
+    </div>
+
+    <div class="anatomy-row" style="background:linear-gradient(135deg, rgba(96,165,250,0.15), rgba(96,165,250,0.05));">
+      <span class="anatomy-row__num">02</span>
+      <span class="anatomy-row__title">Orquestração e Ingestão</span>
+      <span class="anatomy-row__desc">Azure Data Factory &middot; Databricks CLI v0.297+</span>
+    </div>
+
+    <div class="anatomy-row" style="background:linear-gradient(135deg, rgba(212,160,23,0.15), rgba(212,160,23,0.05));">
+      <span class="anatomy-row__num">03</span>
+      <span class="anatomy-row__title">Processamento e Linguagens</span>
+      <span class="anatomy-row__desc">PySpark &middot; Spark SQL &middot; Python &middot; T-SQL &middot; PL/SQL</span>
+    </div>
+
+    <div class="anatomy-row" style="background:linear-gradient(135deg, rgba(167,139,250,0.15), rgba(167,139,250,0.05));">
+      <span class="anatomy-row__num">04</span>
+      <span class="anatomy-row__title">Camada Semântica e BI</span>
+      <span class="anatomy-row__desc">SAP Datasphere &middot; TDV &middot; SAP HANA &middot; Power BI</span>
+    </div>
+
+    <div class="anatomy-row" style="background:linear-gradient(135deg, rgba(63,185,80,0.15), rgba(63,185,80,0.05));">
+      <span class="anatomy-row__num">05</span>
+      <span class="anatomy-row__title">Ferramentas Legadas e ETL</span>
+      <span class="anatomy-row__desc">Oracle &middot; SQL Server &middot; SSIS &middot; Informatica PowerCenter &middot; PDI &middot; SAS</span>
+    </div>
+
+    <div class="anatomy-row" style="background:linear-gradient(135deg, rgba(239,144,0,0.15), rgba(239,144,0,0.05));">
+      <span class="anatomy-row__num">06</span>
+      <span class="anatomy-row__title">Qualidade e Governança</span>
+      <span class="anatomy-row__desc">Homologação byte-a-byte &middot; SAP Information Steward &middot; Knime</span>
+    </div>
+
+  </div>
+
+  <div class="reveal bottom-bar">
+    <p>
+      Proficiência <strong>vertical</strong> (Oracle/SSIS legado até Databricks/Unity Catalog moderno) combinada com proficiência <strong>horizontal</strong> (orquestração, processamento, governança). É o que permite executar migrações de plataforma sem quebrar o contrato de dados.
+    </p>
+    <div class="bottom-bar__tags">
+      <span class="tag tag-accent">Azure</span>
+      <span class="tag tag-purple">SAP</span>
+      <span class="tag tag-gold">Multi-cloud</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================================== -->
+<!-- SLIDE 5 — 4 CASE STUDIES OVERVIEW (tier-cards 2x2)                    -->
+<!-- ===================================================================== -->
+<section class="slide">
+  <div class="reveal">
+    <p class="slide__subtitle">CASE STUDIES</p>
+  </div>
+  <h2 class="reveal slide__heading" style="margin-top:clamp(8px,1.2vh,14px);">
+    Quatro projetos, uma <span style="color:var(--accent);">disciplina compartilhada</span>
+  </h2>
+
+  <div class="reveal tier-row cols-2x2" style="margin-top:clamp(18px,2.5vh,28px);">
+
+    <!-- CASE 01 CYAN -->
+    <div class="tier-card" style="border-left:3px solid var(--accent);"
+      onmouseenter="this.style.borderColor='rgba(0,180,255,0.3)';this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 28px rgba(0,180,255,0.08)'"
+      onmouseleave="this.style.borderColor='';this.style.borderLeftColor='var(--accent)';this.style.transform='none';this.style.boxShadow='none'">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.4rem;">
+        <span class="tier-sub" style="color:var(--accent); margin-bottom:0;">CASE 01 &middot; FINANCIAL SERVICES</span>
+        <span class="tag tag-accent">Seguradora nacional</span>
+      </div>
+      <h4 style="color:var(--accent);">Controller-driven Medallion</h4>
+      <p style="margin-top:0.3rem;">
+        Arquitetura Medallion completa com <strong style="color:var(--text);">controller layer</strong> no Unity Catalog. Pipeline parametrizada por 4 tabelas Delta &mdash; N tabelas novas, zero alteração de código.
+      </p>
+      <div style="display:flex; gap:0.4rem; flex-wrap:wrap; margin-top:auto; padding-top:clamp(10px,1.5vh,14px);">
+        <span class="tag tag-accent">433 Bronze</span>
+        <span class="tag tag-cyan">17 Silver</span>
+        <span class="tag tag-gold">MERGE ACID</span>
+      </div>
+    </div>
+
+    <!-- CASE 02 GREEN -->
+    <div class="tier-card" style="border-left:3px solid var(--green);"
+      onmouseenter="this.style.borderColor='rgba(63,185,80,0.3)';this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 28px rgba(63,185,80,0.08)'"
+      onmouseleave="this.style.borderColor='';this.style.borderLeftColor='var(--green)';this.style.transform='none';this.style.boxShadow='none'">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.4rem;">
+        <span class="tier-sub" style="color:var(--green); margin-bottom:0;">CASE 02 &middot; PEOPLE ANALYTICS / RH</span>
+        <span class="tag tag-green">Operadora de saúde</span>
+      </div>
+      <h4 style="color:var(--green);">Folha de Pagamento 40M+ Linhas</h4>
+      <p style="margin-top:0.3rem;">
+        Oito tabelas fato entregues sobre 12+ anos de histórico. <strong style="color:var(--text);">16 bloqueios técnicos</strong> diagnosticados e resolvidos &mdash; decimal BR, duplicatas legítimas, FSCK REPAIR.
+      </p>
+      <div style="display:flex; gap:0.4rem; flex-wrap:wrap; margin-top:auto; padding-top:clamp(10px,1.5vh,14px);">
+        <span class="tag tag-green">8 fatos</span>
+        <span class="tag tag-cyan">40M+ linhas</span>
+        <span class="tag tag-gold">16 BLs</span>
+        <span class="tag tag-dim">2013&ndash;2026</span>
+      </div>
+    </div>
+
+    <!-- CASE 03 GOLD -->
+    <div class="tier-card" style="border-left:3px solid var(--gold);"
+      onmouseenter="this.style.borderColor='rgba(212,160,23,0.3)';this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 28px rgba(212,160,23,0.08)'"
+      onmouseleave="this.style.borderColor='';this.style.borderLeftColor='var(--gold)';this.style.transform='none';this.style.boxShadow='none'">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.4rem;">
+        <span class="tier-sub" style="color:var(--gold); margin-bottom:0;">CASE 03 &middot; SETOR PÚBLICO</span>
+        <span class="tag tag-gold">Apoio a MPE</span>
+      </div>
+      <h4 style="color:var(--gold);">Homologação Byte-a-Byte</h4>
+      <p style="margin-top:0.3rem;">
+        Validação <strong style="color:var(--text);">sem amostragem</strong> entre procedures T-SQL legadas e PySpark, via Synapse Serverless SQL + OPENROWSET. CLI própria <code style="font-family:var(--font-mono); color:var(--gold);">SynapseCheck</code>.
+      </p>
+      <div style="display:flex; gap:0.4rem; flex-wrap:wrap; margin-top:auto; padding-top:clamp(10px,1.5vh,14px);">
+        <span class="tag tag-gold">4,1M PKs</span>
+        <span class="tag tag-accent">76 colunas</span>
+        <span class="tag tag-green">CLI sc</span>
+      </div>
+    </div>
+
+    <!-- CASE 04 PURPLE -->
+    <div class="tier-card" style="border-left:3px solid var(--purple);"
+      onmouseenter="this.style.borderColor='rgba(167,139,250,0.3)';this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 28px rgba(167,139,250,0.08)'"
+      onmouseleave="this.style.borderColor='';this.style.borderLeftColor='var(--purple)';this.style.transform='none';this.style.boxShadow='none'">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.4rem;">
+        <span class="tier-sub" style="color:var(--purple); margin-bottom:0;">CASE 04 &middot; CORPORATIVO</span>
+        <span class="tag tag-purple">Grande porte</span>
+      </div>
+      <h4 style="color:var(--purple);">Migração Camada Semântica</h4>
+      <p style="margin-top:0.3rem;">
+        Modernização em dois estágios: <strong style="color:var(--text);">Oracle &rarr; TDV &rarr; SAP Datasphere</strong>. Preservação do contrato de dados por domínio &mdash; nenhum consumidor percebeu diferença.
+      </p>
+      <div style="display:flex; gap:0.4rem; flex-wrap:wrap; margin-top:auto; padding-top:clamp(10px,1.5vh,14px);">
+        <span class="tag tag-purple">3 plataformas</span>
+        <span class="tag tag-orange">Incremental</span>
+        <span class="tag tag-gold">SAP HANA</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="reveal bottom-bar">
+    <p>
+      Cada case representa uma <strong>classe distinta de problema</strong>: governança via controller, dados legados com quirks, homologação auditada, migração sem ruptura. A disciplina compartilhada é a mesma: rigor, rastreabilidade e documentação.
+    </p>
+    <div class="bottom-bar__tags">
+      <span class="tag tag-accent">4 setores</span>
+      <span class="tag tag-gold">1 disciplina</span>
+      <span class="tag tag-green">Reproduzível</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================================== -->
+<!-- SLIDE 6 — DIVIDER "Case Studies"                                      -->
+<!-- ===================================================================== -->
+<section class="slide slide--divider">
+  <div class="slide__ghost">01</div>
+  <div class="divider-wrap">
+    <p class="reveal slide__subtitle" style="margin-bottom:clamp(14px,2vh,22px);">SEÇÃO 01</p>
+    <h2 class="reveal slide__display" style="font-size:clamp(56px,10vw,120px);">
+      <span class="shimmer-text">Case Studies</span>
+    </h2>
+    <p class="reveal slide__body" style="margin-top:clamp(16px,2.5vh,28px); max-width:58ch; margin-left:auto; margin-right:auto;">
+      Quatro projetos detalhados &mdash; arquitetura, decisões e métricas.
+    </p>
+    <div class="reveal" style="margin-top:clamp(20px,3vh,32px); display:flex; gap:0.6rem; justify-content:center; flex-wrap:wrap;">
+      <span class="tag tag-accent">Financial Services</span>
+      <span class="tag tag-green">People Analytics</span>
+      <span class="tag tag-gold">Setor Público</span>
+      <span class="tag tag-purple">Corporativo SAP</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================================== -->
+<!-- SLIDE 7 — CASE 1: CONTROLLER-DRIVEN MEDALLION (SVG)                   -->
+<!-- ===================================================================== -->
+<section class="slide">
+  <div class="reveal" style="display:flex; align-items:center; justify-content:space-between; gap:1rem;">
+    <div>
+      <p class="slide__subtitle" style="color:var(--accent);">CASE 01 &middot; FINANCIAL SERVICES</p>
+      <h2 class="slide__heading" style="margin-top:clamp(6px,0.8vh,10px); font-size:clamp(30px,5vw,52px);">
+        Controller-driven <span style="color:var(--accent);">Medallion</span>
+      </h2>
+    </div>
+    <span class="tag tag-accent">Seguradora nacional &middot; NDA</span>
+  </div>
+
+  <div class="reveal" style="margin-top:clamp(14px,2.2vh,22px); flex:1; display:flex; align-items:center; justify-content:center;">
+    <svg viewBox="0 0 1100 460" style="width:100%; max-height:clamp(320px,52vh,440px);">
+      <defs>
+        <filter id="arch-glow-c1"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        <linearGradient id="flow-c1" x1="0%" x2="100%"><stop offset="0%" stop-color="#60a5fa" stop-opacity=".7"/><stop offset="100%" stop-color="#00b4ff" stop-opacity=".7"/></linearGradient>
+        <marker id="arr-c1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#00b4ff"/></marker>
+      </defs>
+
+      <!-- Row label -->
+      <text x="20" y="40" font-family="'Fira Code',monospace" font-size="11" fill="#6b7fa0" letter-spacing="2">INGESTÃO &rarr; LAKEHOUSE</text>
+
+      <!-- STAGE 1: SQL Server -->
+      <rect x="30" y="100" width="200" height="120" rx="14" fill="rgba(96,165,250,0.08)" stroke="#60a5fa" stroke-width="1.8" filter="url(#arch-glow-c1)"/>
+      <text x="130" y="135" text-anchor="middle" font-family="'Instrument Serif',serif" font-style="italic" font-size="18" fill="#60a5fa">SQL Server</text>
+      <text x="130" y="158" text-anchor="middle" font-family="'Fira Code',monospace" font-size="11" fill="#c8d8e8">on-premises</text>
+      <text x="130" y="182" text-anchor="middle" font-family="'Newsreader',serif" font-style="italic" font-size="12" fill="#c8d8e8">433 tabelas-fonte</text>
+      <text x="130" y="202" text-anchor="middle" font-family="'Fira Code',monospace" font-size="10" fill="#6b7fa0">ADF + Key Vault</text>
+
+      <!-- Arrow 1 -->
+      <path d="M230,160 L290,160" stroke="url(#flow-c1)" stroke-width="3" class="flow-r" fill="none" marker-end="url(#arr-c1)"/>
+
+      <!-- STAGE 2: Landing -->
+      <rect x="290" y="100" width="190" height="120" rx="14" fill="rgba(239,144,0,0.08)" stroke="#ef9000" stroke-width="1.8"/>
+      <text x="385" y="135" text-anchor="middle" font-family="'Instrument Serif',serif" font-style="italic" font-size="18" fill="#ef9000">Landing</text>
+      <text x="385" y="158" text-anchor="middle" font-family="'Fira Code',monospace" font-size="11" fill="#c8d8e8">ADLS Gen2</text>
+      <text x="385" y="182" text-anchor="middle" font-family="'Newsreader',serif" font-style="italic" font-size="12" fill="#c8d8e8">arquivos brutos CSV</text>
+      <text x="385" y="202" text-anchor="middle" font-family="'Fira Code',monospace" font-size="10" fill="#6b7fa0">zona imutável</text>
+
+      <!-- Arrow 2 -->
+      <path d="M480,160 L540,160" stroke="url(#flow-c1)" stroke-width="3" class="flow-r" fill="none" marker-end="url(#arr-c1)"/>
+
+      <!-- STAGE 3: Bronze -->
+      <rect x="540" y="100" width="190" height="120" rx="14" fill="rgba(212,160,23,0.08)" stroke="#d4a017" stroke-width="1.8"/>
+      <text x="635" y="135" text-anchor="middle" font-family="'Instrument Serif',serif" font-style="italic" font-size="18" fill="#d4a017">Bronze</text>
+      <text x="635" y="158" text-anchor="middle" font-family="'Fira Code',monospace" font-size="11" fill="#c8d8e8">Delta Lake</text>
+      <text x="635" y="182" text-anchor="middle" font-family="'Newsreader',serif" font-style="italic" font-size="12" fill="#c8d8e8">schema idêntico &agrave; fonte</text>
+      <text x="635" y="202" text-anchor="middle" font-family="'Fira Code',monospace" font-size="10" fill="#6b7fa0">433 tabelas Delta</text>
+
+      <!-- Arrow 3 -->
+      <path d="M730,160 L790,160" stroke="url(#flow-c1)" stroke-width="3" class="flow-r" fill="none" marker-end="url(#arr-c1)"/>
+
+      <!-- STAGE 4: Silver -->
+      <rect x="790" y="100" width="200" height="120" rx="14" fill="rgba(0,180,255,0.1)" stroke="#00b4ff" stroke-width="2" filter="url(#arch-glow-c1)"/>
+      <text x="890" y="135" text-anchor="middle" font-family="'Instrument Serif',serif" font-style="italic" font-size="18" fill="#00b4ff">Silver</text>
+      <text x="890" y="158" text-anchor="middle" font-family="'Fira Code',monospace" font-size="11" fill="#c8d8e8">MERGE ACID</text>
+      <text x="890" y="182" text-anchor="middle" font-family="'Newsreader',serif" font-style="italic" font-size="12" fill="#c8d8e8">regras de negócio</text>
+      <text x="890" y="202" text-anchor="middle" font-family="'Fira Code',monospace" font-size="10" fill="#6b7fa0">17 homologadas</text>
+
+      <!-- Connection to controller (down) -->
+      <path d="M510,280 C510,260 510,240 510,230" stroke="#d4a017" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.5"/>
+      <path d="M510,300 L510,340" stroke="#d4a017" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.5"/>
+
+      <!-- CONTROLLER LAYER BOX -->
+      <rect x="180" y="320" width="760" height="120" rx="16" fill="rgba(212,160,23,0.04)" stroke="#d4a017" stroke-width="1.5" stroke-dasharray="6 4"/>
+      <text x="560" y="346" text-anchor="middle" font-family="'Fira Code',monospace" font-size="10" fill="#d4a017" letter-spacing="2">CONTROLLER LAYER &middot; 4 TABELAS DELTA</text>
+
+      <!-- Controller table 1 -->
+      <rect x="205" y="360" width="170" height="64" rx="10" fill="rgba(212,160,23,0.08)" stroke="#d4a017" stroke-width="1.2"/>
+      <text x="290" y="382" text-anchor="middle" font-family="'Fira Code',monospace" font-size="11" font-weight="700" fill="#d4a017">source_to_lake</text>
+      <text x="290" y="402" text-anchor="middle" font-family="'Newsreader',serif" font-style="italic" font-size="11" fill="#c8d8e8">399 registros</text>
+      <text x="290" y="418" text-anchor="middle" font-family="'Fira Code',monospace" font-size="10" fill="#6b7fa0">extração paralela</text>
+
+      <!-- Controller table 2 -->
+      <rect x="390" y="360" width="170" height="64" rx="10" fill="rgba(212,160,23,0.08)" stroke="#d4a017" stroke-width="1.2"/>
+      <text x="475" y="382" text-anchor="middle" font-family="'Fira Code',monospace" font-size="11" font-weight="700" fill="#d4a017">landing_to_bronze</text>
+      <text x="475" y="402" text-anchor="middle" font-family="'Newsreader',serif" font-style="italic" font-size="11" fill="#c8d8e8">360 registros</text>
+      <text x="475" y="418" text-anchor="middle" font-family="'Fira Code',monospace" font-size="10" fill="#6b7fa0">conversão Delta</text>
+
+      <!-- Controller table 3 -->
+      <rect x="575" y="360" width="170" height="64" rx="10" fill="rgba(212,160,23,0.08)" stroke="#d4a017" stroke-width="1.2"/>
+      <text x="660" y="382" text-anchor="middle" font-family="'Fira Code',monospace" font-size="11" font-weight="700" fill="#d4a017">silver_notebooks</text>
+      <text x="660" y="402" text-anchor="middle" font-family="'Newsreader',serif" font-style="italic" font-size="11" fill="#c8d8e8">24 registros</text>
+      <text x="660" y="418" text-anchor="middle" font-family="'Fira Code',monospace" font-size="10" fill="#6b7fa0">paralelismo por seq</text>
+
+      <!-- Controller table 4 -->
+      <rect x="760" y="360" width="170" height="64" rx="10" fill="rgba(212,160,23,0.08)" stroke="#d4a017" stroke-width="1.2"/>
+      <text x="845" y="382" text-anchor="middle" font-family="'Fira Code',monospace" font-size="11" font-weight="700" fill="#d4a017">bckup_source</text>
+      <text x="845" y="402" text-anchor="middle" font-family="'Newsreader',serif" font-style="italic" font-size="11" fill="#c8d8e8">snapshot vers.</text>
+      <text x="845" y="418" text-anchor="middle" font-family="'Fira Code',monospace" font-size="10" fill="#6b7fa0">rollback/auditoria</text>
+
+      <!-- Connector lines from controller to silver box -->
+      <line x1="475" y1="360" x2="475" y2="310" stroke="#d4a017" stroke-width="1.2" opacity="0.3"/>
+      <line x1="475" y1="310" x2="890" y2="310" stroke="#d4a017" stroke-width="1.2" opacity="0.3" stroke-dasharray="3 3"/>
+      <line x1="890" y1="310" x2="890" y2="225" stroke="#d4a017" stroke-width="1.2" opacity="0.3"/>
+
+    </svg>
+  </div>
+
+  <div class="reveal bottom-bar" style="padding:clamp(10px,1.5vh,16px) clamp(16px,2vw,24px); background:linear-gradient(135deg, var(--surface) 0%, rgba(0,180,255,0.03) 100%); border:1px solid var(--border-bright); border-radius:14px; box-shadow:0 4px 24px rgba(0,0,0,0.2);">
+    <p>
+      A <strong>controller layer</strong> separa <em>lógica de execução</em> (notebooks) de <em>configuração</em> (tabelas Delta de controle). Adicionar uma nova tabela é inserir uma linha &mdash; não tocar em código.
+    </p>
+    <div class="bottom-bar__tags">
+      <span class="tag tag-accent">433 Bronze</span>
+      <span class="tag tag-cyan">17 Silver</span>
+      <span class="tag tag-gold">45 &rarr; 18 min</span>
+      <span class="tag tag-green">0 inconsistência</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================================== -->
+<!-- SLIDE 8 — CASE 2: FOLHA DE PAGAMENTO 40M+ (pipeline + stats)          -->
+<!-- ===================================================================== -->
+<section class="slide">
+  <div class="reveal" style="display:flex; align-items:center; justify-content:space-between; gap:1rem;">
+    <div>
+      <p class="slide__subtitle" style="color:var(--green);">CASE 02 &middot; PEOPLE ANALYTICS / RH</p>
+      <h2 class="slide__heading" style="margin-top:clamp(6px,0.8vh,10px); font-size:clamp(30px,5vw,52px);">
+        Folha de Pagamento <span style="color:var(--green);">40M+ linhas</span>
+      </h2>
+    </div>
+    <span class="tag tag-green">Operadora de saúde &middot; NDA</span>
+  </div>
+
+  <!-- 5-STAGE PIPELINE -->
+  <div class="reveal" style="margin-top:clamp(16px,2.5vh,24px);">
+    <svg viewBox="0 0 1000 220" style="width:100%; max-height:clamp(180px,28vh,240px);">
+      <defs>
+        <filter id="p2-glow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        <linearGradient id="flow-c2" x1="0%" x2="100%"><stop offset="0%" stop-color="#3fb950" stop-opacity=".7"/><stop offset="100%" stop-color="#60a5fa" stop-opacity=".7"/></linearGradient>
+        <marker id="arr-c2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#60a5fa"/></marker>
+      </defs>
+
+      <!-- Stage 1: Fonte RH -->
+      <rect x="10" y="60" width="175" height="110" rx="12" fill="rgba(248,81,73,0.06)" stroke="#f85149" stroke-width="1.5"/>
+      <text x="97" y="40" text-anchor="middle" font-family="'Fira Code',monospace" font-size="10" fill="#f85149" font-weight="700">FONTE LEGADA</text>
+      <text x="97" y="95" text-anchor="middle" font-family="'Instrument Serif',serif" font-style="italic" font-size="17" fill="#f85149">Sistema RH</text>
+      <text x="97" y="118" text-anchor="middle" font-family="'Fira Code',monospace" font-size="10" fill="#c8d8e8">.txt ISO-8859-1</text>
+      <text x="97" y="135" text-anchor="middle" font-family="'Fira Code',monospace" font-size="10" fill="#c8d8e8">pipe + decimal BR</text>
+      <text x="97" y="157" text-anchor="middle" font-family="'Newsreader',serif" font-style="italic" font-size="11" fill="#6b7fa0">2013&ndash;2026</text>
+
+      <path d="M185,115 L215,115" stroke="url(#flow-c2)" stroke-width="2.5" class="flow-r" fill="none" marker-end="url(#arr-c2)"/>
+
+      <!-- Stage 2: Transient / Raw -->
+      <rect x="215" y="60" width="170" height="110" rx="12" fill="rgba(239,144,0,0.06)" stroke="#ef9000" stroke-width="1.5"/>
+      <text x="300" y="40" text-anchor="middle" font-family="'Fira Code',monospace" font-size="10" fill="#ef9000" font-weight="700">STAGE 01</text>
+      <text x="300" y="95" text-anchor="middle" font-family="'Instrument Serif',serif" font-style="italic" font-size="17" fill="#ef9000">Transient/Raw</text>
+      <text x="300" y="118" text-anchor="middle" font-family="'Fira Code',monospace" font-size="10" fill="#c8d8e8">ADLS Gen2</text>
+      <text x="300" y="138" text-anchor="middle" font-family="'Newsreader',serif" font-style="italic" font-size="11" fill="#c8d8e8">preservação bruta</text>
+
+      <path d="M385,115 L415,115" stroke="url(#flow-c2)" stroke-width="2.5" class="flow-r" fill="none" marker-end="url(#arr-c2)"/>
+
+      <!-- Stage 3: Trusted -->
+      <rect x="415" y="60" width="170" height="110" rx="12" fill="rgba(212,160,23,0.08)" stroke="#d4a017" stroke-width="1.5"/>
+      <text x="500" y="40" text-anchor="middle" font-family="'Fira Code',monospace" font-size="10" fill="#d4a017" font-weight="700">STAGE 02</text>
+      <text x="500" y="95" text-anchor="middle" font-family="'Instrument Serif',serif" font-style="italic" font-size="17" fill="#d4a017">Trusted (Bronze)</text>
+      <text x="500" y="118" text-anchor="middle" font-family="'Fira Code',monospace" font-size="10" fill="#c8d8e8">Delta tipado</text>
+      <text x="500" y="138" text-anchor="middle" font-family="'Newsreader',serif" font-style="italic" font-size="11" fill="#c8d8e8">encoding + decimal fix</text>
+
+      <path d="M585,115 L615,115" stroke="url(#flow-c2)" stroke-width="2.5" class="flow-r" fill="none" marker-end="url(#arr-c2)"/>
+
+      <!-- Stage 4: Refined -->
+      <rect x="615" y="60" width="175" height="110" rx="12" fill="rgba(63,185,80,0.1)" stroke="#3fb950" stroke-width="1.8" filter="url(#p2-glow)"/>
+      <text x="702" y="40" text-anchor="middle" font-family="'Fira Code',monospace" font-size="10" fill="#3fb950" font-weight="700">STAGE 03</text>
+      <text x="702" y="95" text-anchor="middle" font-family="'Instrument Serif',serif" font-style="italic" font-size="17" fill="#3fb950">Refined</text>
+      <text x="702" y="118" text-anchor="middle" font-family="'Fira Code',monospace" font-size="10" fill="#c8d8e8">8 tabelas fato</text>
+      <text x="702" y="138" text-anchor="middle" font-family="'Newsreader',serif" font-style="italic" font-size="11" fill="#c8d8e8">partition_date</text>
+
+      <path d="M790,115 L820,115" stroke="url(#flow-c2)" stroke-width="2.5" class="flow-r" fill="none" marker-end="url(#arr-c2)"/>
+
+      <!-- Stage 5: Synapse / Power BI -->
+      <rect x="820" y="60" width="170" height="110" rx="12" fill="rgba(96,165,250,0.08)" stroke="#60a5fa" stroke-width="1.5"/>
+      <text x="905" y="40" text-anchor="middle" font-family="'Fira Code',monospace" font-size="10" fill="#60a5fa" font-weight="700">STAGE 04</text>
+      <text x="905" y="95" text-anchor="middle" font-family="'Instrument Serif',serif" font-style="italic" font-size="17" fill="#60a5fa">Synapse + BI</text>
+      <text x="905" y="118" text-anchor="middle" font-family="'Fira Code',monospace" font-size="10" fill="#c8d8e8">Serverless SQL</text>
+      <text x="905" y="138" text-anchor="middle" font-family="'Newsreader',serif" font-style="italic" font-size="11" fill="#c8d8e8">Power BI views</text>
+
+    </svg>
+  </div>
+
+  <!-- STATS ROW -->
+  <div class="reveal stats-row" style="margin-top:clamp(14px,2vh,22px);">
+    <div class="stat-card green">
+      <div class="stat-val">40M+</div>
+      <div class="stat-lbl">LINHAS PROCESSADAS</div>
+      <p style="font-family:var(--font-editorial); font-style:italic; font-size:clamp(0.8rem,1rem,0.95rem); color:var(--text-dim); margin-top:clamp(6px,1vh,10px); line-height:1.45;">
+        23,8M em benefícios, 10,8M em pagamentos, restante distribuído.
+      </p>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val">8</div>
+      <div class="stat-lbl">TABELAS FATO</div>
+      <p style="font-family:var(--font-editorial); font-style:italic; font-size:clamp(0.8rem,1rem,0.95rem); color:var(--text-dim); margin-top:clamp(6px,1vh,10px); line-height:1.45;">
+        Pagamentos, rescisões, encargos, benefícios, jornada, endividamento, horas extras.
+      </p>
+    </div>
+    <div class="stat-card gold">
+      <div class="stat-val">16</div>
+      <div class="stat-lbl">BLOQUEIOS RESOLVIDOS</div>
+      <p style="font-family:var(--font-editorial); font-style:italic; font-size:clamp(0.8rem,1rem,0.95rem); color:var(--text-dim); margin-top:clamp(6px,1vh,10px); line-height:1.45;">
+        Decimal BR, duplicatas legítimas, FSCK REPAIR, autoMerge, timezone GMT-3.
+      </p>
+    </div>
+  </div>
+
+  <div class="reveal bottom-bar">
+    <p>
+      O desafio não era o <em>volume</em> &mdash; era a <strong>qualidade da fonte</strong>. Dados de sistema RH brasileiro acumulam quirks: encoding ISO-8859-1, decimal com vírgula, duplicatas legítimas que quebram MERGE ingênuo.
+    </p>
+    <div class="bottom-bar__tags">
+      <span class="tag tag-green">8 fatos</span>
+      <span class="tag tag-gold">12+ anos</span>
+      <span class="tag tag-accent">Power BI</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================================== -->
+<!-- SLIDE 9 — CASE 3: HOMOLOGAÇÃO BYTE-A-BYTE (method + CLI) -->
+<!-- ===================================================================== -->
+<section class="slide">
+  <div class="reveal" style="display:flex; align-items:center; justify-content:space-between; gap:1rem;">
+    <div>
+      <p class="slide__subtitle" style="color:var(--gold);">CASE 03 &middot; SETOR PÚBLICO &middot; MPE</p>
+      <h2 class="slide__heading" style="margin-top:clamp(6px,0.8vh,10px); font-size:clamp(30px,5vw,52px);">
+        Homologação <span style="color:var(--gold);">byte-a-byte</span>
+      </h2>
+    </div>
+    <span class="tag tag-gold">Setor público &middot; MPE &middot; NDA</span>
+  </div>
+
+  <div class="reveal" style="margin-top:clamp(14px,2vh,20px); flex:1; display:grid; grid-template-columns:1.1fr 0.9fr; gap:clamp(16px,2vw,24px); align-items:stretch;">
+
+    <!-- LEFT: 3 METHOD BLOCKS -->
+    <div style="display:flex; flex-direction:column; gap:clamp(10px,1.5vh,14px);">
+
+      <div style="background:linear-gradient(135deg, var(--surface) 0%, rgba(0,180,255,0.04) 100%); border:1px solid rgba(0,180,255,0.2); border-radius:14px; padding:clamp(14px,2vh,20px) clamp(16px,2vw,22px);">
+        <div style="display:flex; align-items:center; gap:0.8rem; margin-bottom:0.5rem;">
+          <div style="width:36px; height:36px; border-radius:10px; background:var(--accent-dim); border:1px solid rgba(0,180,255,0.3); display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-weight:700; color:var(--accent);">01</div>
+          <h4 style="font-family:var(--font-display); font-style:italic; font-size:clamp(1.05rem,1.5vw,1.3rem); color:var(--accent);">Universo</h4>
+        </div>
+        <p style="font-family:var(--font-editorial); font-style:italic; font-size:clamp(0.85rem,1.1vw,1rem); color:var(--text-dim); line-height:1.5;">
+          <strong style="color:var(--text); font-weight:500;">FULL OUTER JOIN</strong> entre lake e espelho sobre PKs. Nem mais, nem menos: mesmo universo de registros.
+        </p>
+        <span class="tag tag-accent" style="margin-top:0.6rem; display:inline-block;">4,1M+ PKs validados</span>
+      </div>
+
+      <div style="background:linear-gradient(135deg, var(--surface) 0%, rgba(212,160,23,0.04) 100%); border:1px solid rgba(212,160,23,0.2); border-radius:14px; padding:clamp(14px,2vh,20px) clamp(16px,2vw,22px);">
+        <div style="display:flex; align-items:center; gap:0.8rem; margin-bottom:0.5rem;">
+          <div style="width:36px; height:36px; border-radius:10px; background:var(--gold-dim); border:1px solid rgba(212,160,23,0.3); display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-weight:700; color:var(--gold);">02</div>
+          <h4 style="font-family:var(--font-display); font-style:italic; font-size:clamp(1.05rem,1.5vw,1.3rem); color:var(--gold);">Diff por Coluna</h4>
+        </div>
+        <p style="font-family:var(--font-editorial); font-style:italic; font-size:clamp(0.85rem,1.1vw,1rem); color:var(--text-dim); line-height:1.5;">
+          Cada coluna classificada: <strong style="color:var(--text); font-weight:500;">null-vs-valor, valor-vs-null, valor-vs-valor</strong>. Zero amostragem.
+        </p>
+        <span class="tag tag-gold" style="margin-top:0.6rem; display:inline-block;">76 colunas &middot; 21 PASS absoluto</span>
+      </div>
+
+      <div style="background:linear-gradient(135deg, var(--surface) 0%, rgba(63,185,80,0.04) 100%); border:1px solid rgba(63,185,80,0.2); border-radius:14px; padding:clamp(14px,2vh,20px) clamp(16px,2vw,22px);">
+        <div style="display:flex; align-items:center; gap:0.8rem; margin-bottom:0.5rem;">
+          <div style="width:36px; height:36px; border-radius:10px; background:var(--green-dim); border:1px solid rgba(63,185,80,0.3); display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-weight:700; color:var(--green);">03</div>
+          <h4 style="font-family:var(--font-display); font-style:italic; font-size:clamp(1.05rem,1.5vw,1.3rem); color:var(--green);">Causa Raiz</h4>
+        </div>
+        <p style="font-family:var(--font-editorial); font-style:italic; font-size:clamp(0.85rem,1.1vw,1rem); color:var(--text-dim); line-height:1.5;">
+          Para cada FAIL, distribuição dos pares (valor legado &rarr; valor novo). <strong style="color:var(--text); font-weight:500;">OPENROWSET</strong> cross-env &mdash; dev lê prod sem mover byte.
+        </p>
+        <span class="tag tag-green" style="margin-top:0.6rem; display:inline-block;">55 colunas documentadas</span>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: CLI SynapseCheck -->
+    <div style="background:var(--code-bg); border:1px solid var(--border-bright); border-radius:14px; padding:clamp(16px,2.2vh,22px); display:flex; flex-direction:column;">
+      <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:clamp(10px,1.5vh,14px); padding-bottom:clamp(8px,1.2vh,12px); border-bottom:1px solid var(--border);">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+        <p style="font-family:var(--font-mono); font-size:0.82rem; color:var(--accent); font-weight:600;">SynapseCheck &middot; <code>sc</code></p>
+        <span class="tag tag-accent" style="margin-left:auto;">CLI Python read-only</span>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:clamp(6px,1vh,10px); font-family:var(--font-mono); font-size:clamp(0.75rem,0.95vw,0.88rem);">
+        <div><span style="color:var(--green);">$</span> <span style="color:var(--accent);">sc config</span><br><span style="color:var(--text-dim); font-size:0.72rem; padding-left:1.2rem;">&raquo; valida setup e conectividade</span></div>
+        <div><span style="color:var(--green);">$</span> <span style="color:var(--accent);">sc storage</span> <span style="color:var(--gold);">"&lt;path&gt;"</span><br><span style="color:var(--text-dim); font-size:0.72rem; padding-left:1.2rem;">&raquo; lista paths ADLS</span></div>
+        <div><span style="color:var(--green);">$</span> <span style="color:var(--accent);">sc inspect</span> <span style="color:var(--gold);">&lt;tabela&gt;</span><br><span style="color:var(--text-dim); font-size:0.72rem; padding-left:1.2rem;">&raquo; schema Delta via _delta_log</span></div>
+        <div><span style="color:var(--green);">$</span> <span style="color:var(--accent);">sc tables</span><br><span style="color:var(--text-dim); font-size:0.72rem; padding-left:1.2rem;">&raquo; tabelas do registry</span></div>
+        <div><span style="color:var(--green);">$</span> <span style="color:var(--accent);">sc notebooks</span><br><span style="color:var(--text-dim); font-size:0.72rem; padding-left:1.2rem;">&raquo; lista notebooks Synapse</span></div>
+        <div><span style="color:var(--green);">$</span> <span style="color:var(--accent);">sc status</span> <span style="color:var(--purple);">-d</span> <span style="color:var(--gold);">7</span><br><span style="color:var(--text-dim); font-size:0.72rem; padding-left:1.2rem;">&raquo; pipeline runs últimos 7 dias</span></div>
+      </div>
+      <p style="font-family:var(--font-editorial); font-style:italic; font-size:0.82rem; color:var(--text-dim); margin-top:auto; padding-top:clamp(10px,1.5vh,14px); border-top:1px solid var(--border); line-height:1.45;">
+        <strong style="color:var(--accent); font-weight:500;">Inovação:</strong> <code style="font-family:var(--font-mono); color:var(--accent);">sc inspect</code> lê schema Delta direto do <code style="font-family:var(--font-mono); color:var(--accent);">_delta_log</code> &mdash; sem startup de cluster.
+      </p>
+    </div>
+
+  </div>
+
+  <div class="reveal bottom-bar">
+    <p>
+      Dev lê prod via <strong>OPENROWSET + AAD passthrough</strong>, sem mover dados. Validação completa do universo &mdash; não amostragem. Para stakeholders que assinam go-live, é evidência auditada, não estimativa.
+    </p>
+    <div class="bottom-bar__tags">
+      <span class="tag tag-gold">4,1M PKs</span>
+      <span class="tag tag-accent">0 bytes copiados</span>
+      <span class="tag tag-green">Read-only</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================================== -->
+<!-- SLIDE 10 — CASE 4: MIGRAÇÃO CAMADA SEMÂNTICA      -->
+<!-- ===================================================================== -->
+<section class="slide">
+  <div class="reveal" style="display:flex; align-items:center; justify-content:space-between; gap:1rem;">
+    <div>
+      <p class="slide__subtitle" style="color:var(--purple);">CASE 04 &middot; CORPORATIVO GRANDE PORTE</p>
+      <h2 class="slide__heading" style="margin-top:clamp(6px,0.8vh,10px); font-size:clamp(30px,5vw,52px);">
+        Migração <span style="color:var(--purple);">camada semântica</span>
+      </h2>
+    </div>
+    <span class="tag tag-purple">Corporativo &middot; NDA</span>
+  </div>
+
+  <div class="reveal" style="margin-top:clamp(14px,2.2vh,22px); flex:1; display:flex; align-items:center; justify-content:center;">
+    <svg viewBox="0 0 1050 380" style="width:100%; max-height:clamp(280px,48vh,400px);">
+      <defs>
+        <filter id="p4-glow"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        <linearGradient id="flow-c4" x1="0%" x2="100%"><stop offset="0%" stop-color="#ef9000" stop-opacity=".7"/><stop offset="50%" stop-color="#d4a017" stop-opacity=".7"/><stop offset="100%" stop-color="#a78bfa" stop-opacity=".7"/></linearGradient>
+        <marker id="arr-c4" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#a78bfa"/></marker>
+      </defs>
+
+      <text x="30" y="40" font-family="'Fira Code',monospace" font-size="11" fill="#6b7fa0" letter-spacing="2">MIGRAÇÃO EM 2 ESTÁGIOS &middot; INCREMENTAL POR DOMÍNIO</text>
+
+      <!-- STAGE 1: Oracle legado -->
+      <rect x="30" y="80" width="260" height="200" rx="16" fill="rgba(239,144,0,0.06)" stroke="#ef9000" stroke-width="1.8" filter="url(#p4-glow)"/>
+      <text x="160" y="115" text-anchor="middle" font-family="'Instrument Serif',serif" font-style="italic" font-size="22" fill="#ef9000">Oracle</text>
+      <text x="160" y="140" text-anchor="middle" font-family="'Fira Code',monospace" font-size="11" fill="#c8d8e8">on-premises</text>
+      <text x="160" y="168" text-anchor="middle" font-family="'Newsreader',serif" font-style="italic" font-size="12" fill="#c8d8e8">Múltiplos schemas</text>
+      <text x="160" y="188" text-anchor="middle" font-family="'Newsreader',serif" font-style="italic" font-size="12" fill="#c8d8e8">heterogêneos + SAP HANA</text>
+      <text x="160" y="220" text-anchor="middle" font-family="'Fira Code',monospace" font-size="10" fill="#6b7fa0" letter-spacing="1">DÉCADAS DE OPERAÇÃO</text>
+      <text x="160" y="242" text-anchor="middle" font-family="'Fira Code',monospace" font-size="10" fill="#6b7fa0" letter-spacing="1">REGRAS ACUMULADAS</text>
+      <text x="160" y="264" text-anchor="middle" font-family="'Fira Code',monospace" font-size="10" fill="#6b7fa0" letter-spacing="1">MISSÃO CRÍTICA</text>
+
+      <!-- Arrow 1 -->
+      <path d="M290,180 L370,180" stroke="url(#flow-c4)" stroke-width="3" class="flow-r" fill="none" marker-end="url(#arr-c4)"/>
+      <text x="330" y="165" text-anchor="middle" font-family="'Fira Code',monospace" font-size="10" fill="#d4a017" letter-spacing="1.5">ESTÁGIO 1</text>
+      <text x="330" y="205" text-anchor="middle" font-family="'Newsreader',serif" font-style="italic" font-size="11" fill="#c8d8e8">consolidação</text>
+
+      <!-- STAGE 2: TDV -->
+      <rect x="370" y="80" width="260" height="200" rx="16" fill="rgba(212,160,23,0.08)" stroke="#d4a017" stroke-width="1.8" filter="url(#p4-glow)"/>
+      <text x="500" y="115" text-anchor="middle" font-family="'Instrument Serif',serif" font-style="italic" font-size="22" fill="#d4a017">TDV</text>
+      <text x="500" y="140" text-anchor="middle" font-family="'Fira Code',monospace" font-size="11" fill="#c8d8e8">TIBCO Data Virtualization</text>
+      <text x="500" y="168" text-anchor="middle" font-family="'Newsreader',serif" font-style="italic" font-size="12" fill="#c8d8e8">Views consolidadas</text>
+      <text x="500" y="188" text-anchor="middle" font-family="'Newsreader',serif" font-style="italic" font-size="12" fill="#c8d8e8">Contratos implícitos</text>
+      <text x="500" y="220" text-anchor="middle" font-family="'Fira Code',monospace" font-size="10" fill="#6b7fa0" letter-spacing="1">ESTÁGIO INTERMEDIÁRIO</text>
+      <text x="500" y="242" text-anchor="middle" font-family="'Fira Code',monospace" font-size="10" fill="#6b7fa0" letter-spacing="1">VALIDAÇÃO SIDE-BY-SIDE</text>
+      <text x="500" y="264" text-anchor="middle" font-family="'Fira Code',monospace" font-size="10" fill="#6b7fa0" letter-spacing="1">PRESERVA SEMÂNTICA</text>
+
+      <!-- Arrow 2 -->
+      <path d="M630,180 L710,180" stroke="url(#flow-c4)" stroke-width="3" class="flow-r" fill="none" marker-end="url(#arr-c4)"/>
+      <text x="670" y="165" text-anchor="middle" font-family="'Fira Code',monospace" font-size="10" fill="#a78bfa" letter-spacing="1.5">ESTÁGIO 2</text>
+      <text x="670" y="205" text-anchor="middle" font-family="'Newsreader',serif" font-style="italic" font-size="11" fill="#c8d8e8">modernização</text>
+
+      <!-- STAGE 3: SAP Datasphere -->
+      <rect x="710" y="80" width="310" height="200" rx="16" fill="rgba(167,139,250,0.1)" stroke="#a78bfa" stroke-width="2" filter="url(#p4-glow)"/>
+      <text x="865" y="115" text-anchor="middle" font-family="'Instrument Serif',serif" font-style="italic" font-size="22" fill="#a78bfa">SAP Datasphere</text>
+      <text x="865" y="140" text-anchor="middle" font-family="'Fira Code',monospace" font-size="11" fill="#c8d8e8">+ SAP HANA</text>
+      <text x="865" y="168" text-anchor="middle" font-family="'Newsreader',serif" font-style="italic" font-size="12" fill="#c8d8e8">Entidades semânticas</text>
+      <text x="865" y="188" text-anchor="middle" font-family="'Newsreader',serif" font-style="italic" font-size="12" fill="#c8d8e8">Governança corporativa</text>
+      <text x="865" y="220" text-anchor="middle" font-family="'Fira Code',monospace" font-size="10" fill="#6b7fa0" letter-spacing="1">INFORMATION STEWARD</text>
+      <text x="865" y="242" text-anchor="middle" font-family="'Fira Code',monospace" font-size="10" fill="#6b7fa0" letter-spacing="1">QUALIDADE + CONSISTÊNCIA</text>
+      <text x="865" y="264" text-anchor="middle" font-family="'Fira Code',monospace" font-size="10" fill="#6b7fa0" letter-spacing="1">KNIME + AZURE SYNAPSE</text>
+
+      <!-- BOTTOM LABELS: downstream consumers -->
+      <line x1="30" y1="310" x2="1020" y2="310" stroke="var(--border)" stroke-width="1" stroke-dasharray="4 4"/>
+      <text x="525" y="335" text-anchor="middle" font-family="'Fira Code',monospace" font-size="11" fill="#60a5fa" letter-spacing="2" font-weight="700">CONSUMIDORES DOWNSTREAM &mdash; MIGRAÇÃO POR DOMÍNIO</text>
+      <text x="525" y="360" text-anchor="middle" font-family="'Newsreader',serif" font-style="italic" font-size="12" fill="#c8d8e8">Power BI &middot; Analytics &middot; Relatórios regulatórios &middot; nenhum consumidor percebeu diferença</text>
+
+    </svg>
+  </div>
+
+  <div class="reveal bottom-bar">
+    <p>
+      Migração <strong>incremental por domínio de negócio</strong> &mdash; não big bang. Cada entidade validada side-by-side por uma competência completa antes do corte. A complexidade estava nas <em>regras implícitas</em> acumuladas em décadas de operação.
+    </p>
+    <div class="bottom-bar__tags">
+      <span class="tag tag-purple">3 plataformas</span>
+      <span class="tag tag-orange">Incremental</span>
+      <span class="tag tag-gold">Contrato preservado</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================================== -->
+<!-- SLIDE 11 — RESULTADOS DOS CASES (timeline)                            -->
+<!-- ===================================================================== -->
+<section class="slide">
+  <div class="reveal">
+    <p class="slide__subtitle">RESULTADOS DOS CASES</p>
+  </div>
+  <h2 class="reveal slide__heading" style="margin-top:clamp(8px,1.2vh,14px);">
+    Quatro entregas, <span style="color:var(--accent);">quatro impactos mensuráveis</span>
+  </h2>
+
+  <div class="reveal timeline-grid" style="margin-top:clamp(20px,3vh,36px);">
+
+    <div class="tl-col">
+      <div class="tl-dot" style="border-color:var(--accent);"></div>
+      <div class="tl-year" style="color:var(--accent);">Case 01</div>
+      <div class="tl-title">Medallion &amp; Controller</div>
+      <div class="tl-desc">financial services</div>
+      <div class="tl-detail">
+        433 tabelas Bronze catalogadas no Unity Catalog. 17 Silver homologadas linha-a-linha vs. procedures T-SQL legadas. Ciclo Silver de 45 min &rarr; 18 min via paralelismo controlado por campo <code style="font-family:var(--font-mono); color:var(--accent);">seq</code>.
+      </div>
+      <span class="tl-stat" style="background:var(--accent-dim); color:var(--accent);">0 inconsistência BI</span>
+    </div>
+
+    <div class="tl-col">
+      <div class="tl-dot" style="border-color:var(--green);"></div>
+      <div class="tl-year" style="color:var(--green);">Case 02</div>
+      <div class="tl-title">Folha 40M+</div>
+      <div class="tl-desc">people analytics</div>
+      <div class="tl-detail">
+        8 tabelas fato homologadas cobrindo 12+ anos de histórico (2013&ndash;2026). 16 bloqueios técnicos diagnosticados e resolvidos com causa raiz documentada. Dynamic Partition Overwrite resolveu duplicatas legítimas.
+      </div>
+      <span class="tl-stat" style="background:var(--green-dim); color:var(--green);">~144 competências</span>
+    </div>
+
+    <div class="tl-col">
+      <div class="tl-dot" style="border-color:var(--gold);"></div>
+      <div class="tl-year" style="color:var(--gold);">Case 03</div>
+      <div class="tl-title">Homologação &amp; CLI</div>
+      <div class="tl-desc">setor público</div>
+      <div class="tl-detail">
+        4,1M+ PKs validados cross-env via OPENROWSET + AAD passthrough. 76 colunas auditadas, 21 com PASS absoluto. CLI própria <code style="font-family:var(--font-mono); color:var(--gold);">sc</code> reduziu diagnósticos de 15 min para 30 segundos.
+      </div>
+      <span class="tl-stat" style="background:var(--gold-dim); color:var(--gold);">0 byte copiado</span>
+    </div>
+
+    <div class="tl-col">
+      <div class="tl-dot" style="border-color:var(--purple);"></div>
+      <div class="tl-year" style="color:var(--purple);">Case 04</div>
+      <div class="tl-title">Datasphere Migration</div>
+      <div class="tl-desc">corporativo SAP</div>
+      <div class="tl-detail">
+        Migração incremental Oracle &rarr; TDV &rarr; SAP Datasphere. Nenhum consumidor downstream reportou quebra de comportamento. Sustentação da base Oracle de missão crítica em paralelo.
+      </div>
+      <span class="tl-stat" style="background:var(--purple-dim); color:var(--purple);">Contrato preservado</span>
+    </div>
+
+  </div>
+
+  <div class="reveal bottom-bar">
+    <p>
+      Cada resultado é <strong>verificado em evidência</strong>, não em promessa. Métricas de ciclo, contagem de tabelas, percentual de colunas em PASS &mdash; qualquer stakeholder pode auditar.
+    </p>
+    <div class="bottom-bar__tags">
+      <span class="tag tag-accent">Quant. medido</span>
+      <span class="tag tag-gold">Auditável</span>
+      <span class="tag tag-green">Reproduzível</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================================== -->
+<!-- SLIDE 12 — DIVIDER "Padrões Técnicos"                    -->
+<!-- ===================================================================== -->
+<section class="slide slide--divider">
+  <div class="slide__ghost">02</div>
+  <div class="divider-wrap">
+    <p class="reveal slide__subtitle" style="margin-bottom:clamp(14px,2vh,22px);">SEÇÃO 02</p>
+    <h2 class="reveal slide__display" style="font-size:clamp(56px,10vw,120px);">
+      <span class="shimmer-text">Padrões Técnicos</span>
+    </h2>
+    <p class="reveal slide__body" style="margin-top:clamp(16px,2.5vh,28px); max-width:60ch; margin-left:auto; margin-right:auto;">
+      Três padrões extraídos e documentados &mdash; aplicáveis além dos projetos de origem.
+    </p>
+    <div class="reveal" style="margin-top:clamp(20px,3vh,32px); display:flex; gap:0.6rem; justify-content:center; flex-wrap:wrap;">
+      <span class="tag tag-accent">Controller-driven</span>
+      <span class="tag tag-gold">Dynamic Partition Overwrite</span>
+      <span class="tag tag-green">Homologação Zero Amostragem</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================================== -->
+<!-- SLIDE 13 — PADRÃO 1: Controller-driven (comparison)            -->
+<!-- ===================================================================== -->
+<section class="slide">
+  <div class="reveal">
+    <p class="slide__subtitle">PADRÃO 01</p>
+  </div>
+  <h2 class="reveal slide__heading" style="margin-top:clamp(8px,1.2vh,14px);">
+    Controller-driven: <span style="color:var(--accent);">configuração como dado</span>
+  </h2>
+
+  <!-- Comparison -->
+  <div class="reveal" style="margin-top:clamp(16px,2.5vh,24px); flex:1; display:grid; grid-template-columns:1fr 64px 1fr; gap:0; align-items:stretch;">
+
+    <!-- LEFT: Without controller -->
+    <div style="background:rgba(248,81,73,0.03); border:1px solid rgba(248,81,73,0.18); border-radius:16px; padding:clamp(20px,3vh,32px); display:flex; flex-direction:column;">
+      <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:0.8rem;">
+        <span class="tag tag-red">Sem controller</span>
+        <span style="font-family:var(--font-mono); font-size:0.65rem; color:var(--text-dim); letter-spacing:0.12em;">ANTI-PADRÃO</span>
+      </div>
+      <h3 style="font-family:var(--font-display); font-style:italic; font-size:clamp(1.6rem,2.6vw,2.1rem); color:var(--red);">
+        N tabelas = <span style="color:var(--text);">N artefatos</span>
+      </h3>
+      <p style="font-family:var(--font-editorial); font-style:italic; font-size:clamp(0.95rem,1.3vw,1.1rem); color:var(--text-dim); margin-top:0.6rem; line-height:1.55;">
+        Cada nova tabela exige alteração de notebook, pipeline ou script. Mudança de configuração vira <strong style="color:var(--text);">commit de código</strong> &mdash; revisão, deploy, risco.
+      </p>
+      <div style="margin-top:clamp(14px,2vh,20px); display:flex; flex-direction:column; gap:0.5rem;">
+        <div style="display:flex; align-items:center; gap:0.5rem;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg><span style="font-family:var(--font-editorial); font-style:italic; font-size:0.92rem; color:var(--text-dim);">Onboarding lento de novas fontes</span></div>
+        <div style="display:flex; align-items:center; gap:0.5rem;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg><span style="font-family:var(--font-editorial); font-style:italic; font-size:0.92rem; color:var(--text-dim);">Divergência entre código e estado real</span></div>
+        <div style="display:flex; align-items:center; gap:0.5rem;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg><span style="font-family:var(--font-editorial); font-style:italic; font-size:0.92rem; color:var(--text-dim);">Dependência de autor original</span></div>
+      </div>
+      <div style="margin-top:auto; padding-top:clamp(14px,2vh,20px); border-top:1px solid var(--border); display:flex; align-items:baseline; gap:0.8rem;">
+        <span style="font-family:var(--font-display); font-style:italic; font-size:clamp(2rem,3.5vw,3rem); color:var(--red);">10 commits</span>
+        <span style="font-family:var(--font-editorial); font-style:italic; font-size:0.92rem; color:var(--text-dim);">para 10 novas tabelas</span>
+      </div>
+    </div>
+
+    <!-- CENTER divider -->
+    <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0.5rem;">
+      <div style="width:2px; flex:1; background:linear-gradient(180deg, transparent, rgba(212,160,23,0.3), transparent); max-height:30%;"></div>
+      <div style="width:clamp(44px,5vh,56px); height:clamp(44px,5vh,56px); border-radius:50%; background:var(--gold-dim); border:2px solid rgba(212,160,23,0.35); display:flex; align-items:center; justify-content:center;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </div>
+      <div style="width:2px; flex:1; background:linear-gradient(180deg, transparent, rgba(212,160,23,0.3), transparent); max-height:30%;"></div>
+    </div>
+
+    <!-- RIGHT: With controller -->
+    <div style="background:linear-gradient(135deg, var(--surface) 0%, rgba(0,180,255,0.04) 100%); border:1px solid rgba(0,180,255,0.25); border-radius:16px; padding:clamp(20px,3vh,32px); display:flex; flex-direction:column; box-shadow:0 0 30px rgba(0,180,255,0.06); animation:pulse-glow 5s ease-in-out infinite;">
+      <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:0.8rem;">
+        <span class="tag tag-accent">Com controller</span>
+        <span style="font-family:var(--font-mono); font-size:0.65rem; color:var(--text-dim); letter-spacing:0.12em;">PADRÃO APLICADO</span>
+      </div>
+      <h3 style="font-family:var(--font-display); font-style:italic; font-size:clamp(1.6rem,2.6vw,2.1rem); color:var(--accent);">
+        N tabelas = <span style="color:var(--text);">N linhas</span>
+      </h3>
+      <p style="font-family:var(--font-editorial); font-style:italic; font-size:clamp(0.95rem,1.3vw,1.1rem); color:var(--text-dim); margin-top:0.6rem; line-height:1.55;">
+        Tabelas Delta na camada <code style="font-family:var(--font-mono); color:var(--accent);">&lt;catalog&gt;.controller</code> parametrizam <strong style="color:var(--text);">toda a execução</strong>. Inserir uma linha é incorporar a tabela.
+      </p>
+      <div style="margin-top:clamp(14px,2vh,20px); display:flex; flex-direction:column; gap:0.5rem;">
+        <div style="display:flex; align-items:center; gap:0.5rem;"><span class="tag tag-accent">source_to_lake</span><span style="font-family:var(--font-editorial); font-style:italic; font-size:0.92rem; color:var(--text-dim);">extração SQL Server &rarr; ADLS</span></div>
+        <div style="display:flex; align-items:center; gap:0.5rem;"><span class="tag tag-accent">landing_to_bronze</span><span style="font-family:var(--font-editorial); font-style:italic; font-size:0.92rem; color:var(--text-dim);">conversão Delta</span></div>
+        <div style="display:flex; align-items:center; gap:0.5rem;"><span class="tag tag-accent">silver_notebooks</span><span style="font-family:var(--font-editorial); font-style:italic; font-size:0.92rem; color:var(--text-dim);">orquestração com <code style="font-family:var(--font-mono);">seq</code></span></div>
+      </div>
+      <div style="margin-top:auto; padding-top:clamp(14px,2vh,20px); border-top:1px solid var(--border); display:flex; align-items:baseline; gap:0.8rem;">
+        <span style="font-family:var(--font-display); font-style:italic; font-size:clamp(2rem,3.5vw,3rem); color:var(--accent);">0 commits</span>
+        <span style="font-family:var(--font-editorial); font-style:italic; font-size:0.92rem; color:var(--text-dim);">&middot; <strong style="color:var(--text); font-weight:500;">433 tabelas</strong> governadas</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="reveal bottom-bar">
+    <p>
+      Governança da pipeline <strong>embutida na própria pipeline</strong>. Auditoria de mudanças vira histórico de uma tabela Delta. Onboarding de novas fontes vira <em>insert statement</em>, não sprint de desenvolvimento.
+    </p>
+    <div class="bottom-bar__tags">
+      <span class="tag tag-accent">Metadata-driven</span>
+      <span class="tag tag-gold">Auditável</span>
+      <span class="tag tag-green">Escalável</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================================== -->
+<!-- SLIDE 14 — PADRÃO 2: Dynamic Partition Overwrite               -->
+<!-- ===================================================================== -->
+<section class="slide">
+  <div class="reveal">
+    <p class="slide__subtitle">PADRÃO 02</p>
+  </div>
+  <h2 class="reveal slide__heading" style="margin-top:clamp(8px,1.2vh,14px);">
+    Dynamic Partition Overwrite: <span style="color:var(--gold);">quando MERGE não serve</span>
+  </h2>
+
+  <div class="reveal" style="margin-top:clamp(14px,2vh,22px); flex:1; display:grid; grid-template-columns:1fr 1.05fr; gap:clamp(16px,2vw,24px); align-items:stretch;">
+
+    <!-- LEFT: Problem context -->
+    <div style="background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:clamp(18px,2.5vh,26px); display:flex; flex-direction:column;">
+      <p class="slide__subtitle" style="color:var(--red);">O PROBLEMA</p>
+      <h3 style="font-family:var(--font-display); font-style:italic; font-size:clamp(1.3rem,2vw,1.7rem); margin-top:0.4rem;">
+        Duplicatas <span style="color:var(--red);">legítimas</span> quebram MERGE
+      </h3>
+      <p style="font-family:var(--font-editorial); font-style:italic; font-size:clamp(0.92rem,1.2vw,1.05rem); color:var(--text-dim); margin-top:0.8rem; line-height:1.55;">
+        Arquivo <code style="font-family:var(--font-mono); color:var(--accent);">ContratadosRC.txt</code> contém linhas <strong style="color:var(--text);">100% idênticas por design</strong>: o mesmo funcionário pode aparecer até 21 vezes na mesma competência por múltiplos vínculos.
+      </p>
+      <div class="code-block" style="margin-top:clamp(12px,1.8vh,18px); font-size:0.72rem;">
+<span class="dim">-- MERGE falha silenciosamente:</span>
+<span class="kw">MERGE</span> <span class="fn">INTO</span> fato_contratados <span class="kw">AS</span> t
+<span class="kw">USING</span> bronze_contratados <span class="kw">AS</span> s
+ <span class="kw">ON</span> t.pk = s.pk
+<span class="kw">WHEN MATCHED</span> <span class="kw">THEN UPDATE</span> <span class="kw">SET</span> *
+
+<span class="dim">-- Erro:</span>
+<span class="str">"Cannot perform a MERGE operation
+ when multiple source rows match
+ the same target row"</span>
+      </div>
+    </div>
+
+    <!-- RIGHT: Solution -->
+    <div style="background:linear-gradient(135deg, var(--surface) 0%, rgba(212,160,23,0.04) 100%); border:1px solid rgba(212,160,23,0.25); border-radius:14px; padding:clamp(18px,2.5vh,26px); display:flex; flex-direction:column;">
+      <p class="slide__subtitle" style="color:var(--gold);">A SOLUÇÃO</p>
+      <h3 style="font-family:var(--font-display); font-style:italic; font-size:clamp(1.3rem,2vw,1.7rem); margin-top:0.4rem;">
+        Reescrever a <span style="color:var(--gold);">partição inteira</span>
+      </h3>
+      <p style="font-family:var(--font-editorial); font-style:italic; font-size:clamp(0.92rem,1.2vw,1.05rem); color:var(--text-dim); margin-top:0.8rem; line-height:1.55;">
+        Dynamic Partition Overwrite preserva a semântica: <strong style="color:var(--text);">a partição de competência é idêntica &agrave; fonte</strong>. Duplicatas mantidas, outras partições intactas.
+      </p>
+      <div class="code-block" style="margin-top:clamp(12px,1.8vh,18px); font-size:0.72rem;">
+<span class="dim"># Configuração Spark:</span>
+spark.conf.<span class="fn">set</span>(
+  <span class="str">"spark.sql.sources.</span>
+<span class="str">   partitionOverwriteMode"</span>,
+  <span class="str">"dynamic"</span>
+)
+
+<span class="dim"># Escrita:</span>
+df.write.<span class="fn">format</span>(<span class="str">"delta"</span>) \
+ .<span class="fn">mode</span>(<span class="str">"overwrite"</span>) \
+ .<span class="fn">option</span>(<span class="str">"partitionOverwriteMode"</span>,
+         <span class="str">"dynamic"</span>) \
+ .<span class="fn">partitionBy</span>(<span class="str">"partition_date"</span>) \
+ .<span class="fn">saveAsTable</span>(<span class="str">"refined.fato"</span>)
+      </div>
+    </div>
+
+  </div>
+
+  <!-- COMPARISON MINI TABLE -->
+  <div class="reveal" style="margin-top:clamp(12px,2vh,18px); display:grid; grid-template-columns:repeat(3, 1fr); gap:clamp(10px,1.5vw,16px);">
+
+    <div style="background:var(--surface); border:1px solid rgba(107,127,160,0.25); border-radius:12px; padding:clamp(12px,1.8vh,18px);">
+      <p style="font-family:var(--font-mono); font-size:0.65rem; color:var(--text-dim); letter-spacing:0.15em; text-transform:uppercase;">OVERWRITE total</p>
+      <p style="font-family:var(--font-display); font-style:italic; font-size:clamp(0.95rem,1.3vw,1.1rem); color:var(--text); margin-top:0.4rem;">Simples mas <span style="color:var(--red);">perigoso</span></p>
+      <p style="font-family:var(--font-editorial); font-style:italic; font-size:clamp(0.78rem,0.95vw,0.88rem); color:var(--text-dim); margin-top:0.4rem; line-height:1.5;">Janela de inconsistência + perda de histórico não presente na fonte atual.</p>
+    </div>
+
+    <div style="background:var(--surface); border:1px solid rgba(0,180,255,0.25); border-radius:12px; padding:clamp(12px,1.8vh,18px);">
+      <p style="font-family:var(--font-mono); font-size:0.65rem; color:var(--accent); letter-spacing:0.15em; text-transform:uppercase;">MERGE ACID</p>
+      <p style="font-family:var(--font-display); font-style:italic; font-size:clamp(0.95rem,1.3vw,1.1rem); color:var(--text); margin-top:0.4rem;">Ideal com <span style="color:var(--accent);">chaves únicas</span></p>
+      <p style="font-family:var(--font-editorial); font-style:italic; font-size:clamp(0.78rem,0.95vw,0.88rem); color:var(--text-dim); margin-top:0.4rem; line-height:1.5;">Atomicidade linha-a-linha, zero janela. Exige chaves estáveis não-duplicadas.</p>
+    </div>
+
+    <div style="background:linear-gradient(135deg, var(--surface) 0%, rgba(212,160,23,0.05) 100%); border:1px solid rgba(212,160,23,0.3); border-radius:12px; padding:clamp(12px,1.8vh,18px); box-shadow:0 0 20px rgba(212,160,23,0.04);">
+      <p style="font-family:var(--font-mono); font-size:0.65rem; color:var(--gold); letter-spacing:0.15em; text-transform:uppercase;">DPO (dynamic)</p>
+      <p style="font-family:var(--font-display); font-style:italic; font-size:clamp(0.95rem,1.3vw,1.1rem); color:var(--text); margin-top:0.4rem;">Ideal com <span style="color:var(--gold);">duplicatas legítimas</span></p>
+      <p style="font-family:var(--font-editorial); font-style:italic; font-size:clamp(0.78rem,0.95vw,0.88rem); color:var(--text-dim); margin-top:0.4rem; line-height:1.5;">Semântica por partição. Preserva histórico fora da janela reescrita.</p>
+    </div>
+
+  </div>
+
+  <div class="reveal bottom-bar">
+    <p>
+      A escolha de estratégia de escrita não é técnica pura &mdash; é <strong>semântica de negócio</strong>. Entender se a duplicata é erro ou design economiza semanas de debugging.
+    </p>
+    <div class="bottom-bar__tags">
+      <span class="tag tag-gold">DPO</span>
+      <span class="tag tag-accent">MERGE ACID</span>
+      <span class="tag tag-green">Contexto &gt; dogma</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================================== -->
+<!-- SLIDE 15 — PADRÃO 3: Homologação Zero Amostragem -->
+<!-- ===================================================================== -->
+<section class="slide">
+  <div class="reveal">
+    <p class="slide__subtitle">PADRÃO 03</p>
+  </div>
+  <h2 class="reveal slide__heading" style="margin-top:clamp(8px,1.2vh,14px);">
+    Homologação <span style="color:var(--green);">zero amostragem</span>
+  </h2>
+
+  <!-- 3-PHASE FLOW -->
+  <div class="reveal" style="margin-top:clamp(16px,2.5vh,26px); flex:1; display:flex; gap:0; align-items:stretch;">
+
+    <div style="flex:1; background:var(--surface); border:1px solid rgba(0,180,255,0.25); border-radius:14px; padding:clamp(18px,2.8vh,28px) clamp(16px,2vw,24px); margin-right:0.4rem; display:flex; flex-direction:column;">
+      <div style="display:flex; align-items:center; gap:0.8rem; margin-bottom:0.6rem;">
+        <div style="width:44px; height:44px; border-radius:12px; background:var(--accent-dim); border:1.5px solid rgba(0,180,255,0.35); display:flex; align-items:center; justify-content:center;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg>
+        </div>
+        <div>
+          <p style="font-family:var(--font-mono); font-size:0.68rem; color:var(--accent); letter-spacing:0.15em;">FASE 01</p>
+          <h4 style="font-family:var(--font-display); font-style:italic; font-size:clamp(1.2rem,1.7vw,1.45rem); color:var(--accent);">Universo</h4>
+        </div>
+      </div>
+      <p style="font-family:var(--font-editorial); font-style:italic; font-size:clamp(0.92rem,1.2vw,1.05rem); color:var(--text-dim); line-height:1.55; margin-top:0.4rem;">
+        <strong style="color:var(--text);">FULL OUTER JOIN</strong> sobre PKs entre o lake e a base espelho. Quantifica PKs comuns, só-no-lake, só-no-espelho.
+      </p>
+      <div style="margin-top:auto; padding-top:clamp(12px,1.8vh,16px); border-top:1px solid var(--border);">
+        <p style="font-family:var(--font-mono); font-size:0.7rem; color:var(--text-dim); margin-bottom:0.3rem;">EVIDÊNCIA</p>
+        <span class="tag tag-accent">4,1M+ PKs comuns</span>
+      </div>
+    </div>
+
+    <!-- Arrow -->
+    <div style="display:flex; align-items:center; padding:0 0.3rem;">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </div>
+
+    <div style="flex:1; background:var(--surface); border:1px solid rgba(212,160,23,0.3); border-radius:14px; padding:clamp(18px,2.8vh,28px) clamp(16px,2vw,24px); margin:0 0.4rem; display:flex; flex-direction:column;">
+      <div style="display:flex; align-items:center; gap:0.8rem; margin-bottom:0.6rem;">
+        <div style="width:44px; height:44px; border-radius:12px; background:var(--gold-dim); border:1.5px solid rgba(212,160,23,0.35); display:flex; align-items:center; justify-content:center;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
+        </div>
+        <div>
+          <p style="font-family:var(--font-mono); font-size:0.68rem; color:var(--gold); letter-spacing:0.15em;">FASE 02</p>
+          <h4 style="font-family:var(--font-display); font-style:italic; font-size:clamp(1.2rem,1.7vw,1.45rem); color:var(--gold);">Diff por Coluna</h4>
+        </div>
+      </div>
+      <p style="font-family:var(--font-editorial); font-style:italic; font-size:clamp(0.92rem,1.2vw,1.05rem); color:var(--text-dim); line-height:1.55; margin-top:0.4rem;">
+        Para cada coluna: <strong style="color:var(--text);">null-vs-valor</strong>, <strong style="color:var(--text);">valor-vs-null</strong>, <strong style="color:var(--text);">valor-vs-valor</strong>. Classificação, não amostragem.
+      </p>
+      <div style="margin-top:auto; padding-top:clamp(12px,1.8vh,16px); border-top:1px solid var(--border);">
+        <p style="font-family:var(--font-mono); font-size:0.7rem; color:var(--text-dim); margin-bottom:0.3rem;">EVIDÊNCIA</p>
+        <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
+          <span class="tag tag-gold">76 colunas</span>
+          <span class="tag tag-green">21 PASS absoluto</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Arrow -->
+    <div style="display:flex; align-items:center; padding:0 0.3rem;">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </div>
+
+    <div style="flex:1; background:linear-gradient(135deg, var(--surface) 0%, rgba(63,185,80,0.04) 100%); border:1.5px solid rgba(63,185,80,0.3); border-radius:14px; padding:clamp(18px,2.8vh,28px) clamp(16px,2vw,24px); margin-left:0.4rem; display:flex; flex-direction:column; box-shadow:0 0 30px rgba(63,185,80,0.04);">
+      <div style="display:flex; align-items:center; gap:0.8rem; margin-bottom:0.6rem;">
+        <div style="width:44px; height:44px; border-radius:12px; background:var(--green-dim); border:1.5px solid rgba(63,185,80,0.35); display:flex; align-items:center; justify-content:center;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+        </div>
+        <div>
+          <p style="font-family:var(--font-mono); font-size:0.68rem; color:var(--green); letter-spacing:0.15em;">FASE 03</p>
+          <h4 style="font-family:var(--font-display); font-style:italic; font-size:clamp(1.2rem,1.7vw,1.45rem); color:var(--green);">Causa Raiz</h4>
+        </div>
+      </div>
+      <p style="font-family:var(--font-editorial); font-style:italic; font-size:clamp(0.92rem,1.2vw,1.05rem); color:var(--text-dim); line-height:1.55; margin-top:0.4rem;">
+        Para cada coluna FAIL: <strong style="color:var(--text);">distribuição dos pares</strong> (valor legado &rarr; valor novo). Toda divergência classificada: corrigir, aceitar melhoria, investigar.
+      </p>
+      <div style="margin-top:auto; padding-top:clamp(12px,1.8vh,16px); border-top:1px solid var(--border);">
+        <p style="font-family:var(--font-mono); font-size:0.7rem; color:var(--text-dim); margin-bottom:0.3rem;">EVIDÊNCIA</p>
+        <span class="tag tag-green">55 colunas documentadas</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="reveal bottom-bar">
+    <p>
+      &ldquo;<strong>Validamos 10% e era equivalente</strong>&rdquo; não é o mesmo que &ldquo;<strong>validamos 100% e é equivalente</strong>&rdquo;. Para stakeholders que assinam go-live, a diferença é significativa &mdash; e auditável.
+    </p>
+    <div class="bottom-bar__tags">
+      <span class="tag tag-green">100% universo</span>
+      <span class="tag tag-gold">Auditável</span>
+      <span class="tag tag-accent">OPENROWSET</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================================== -->
+<!-- SLIDE 16 — RESULTADOS CONSOLIDADOS (5 big stats)                      -->
+<!-- ===================================================================== -->
+<section class="slide">
+  <div class="reveal">
+    <p class="slide__subtitle">RESULTADOS CONSOLIDADOS</p>
+  </div>
+  <h2 class="reveal slide__heading" style="margin-top:clamp(8px,1.2vh,14px);">
+    Números <span style="color:var(--accent);">verificados em evidência</span>
+  </h2>
+
+  <div class="reveal" style="margin-top:clamp(20px,3vh,36px); display:grid; grid-template-columns:repeat(5, 1fr); gap:clamp(10px,1.5vw,18px); flex:1; align-content:center;">
+
+    <div class="stat-card" style="display:flex; flex-direction:column; justify-content:center; text-align:center;">
+      <div class="big-stat" style="color:var(--green);">40M+</div>
+      <div class="stat-lbl" style="margin-top:0.8rem;">LINHAS FATO</div>
+      <p style="font-family:var(--font-editorial); font-style:italic; font-size:0.8rem; color:var(--text-dim); margin-top:0.5rem; line-height:1.4;">processadas e homologadas</p>
+    </div>
+
+    <div class="stat-card" style="display:flex; flex-direction:column; justify-content:center; text-align:center;">
+      <div class="big-stat" style="color:var(--accent);">433</div>
+      <div class="stat-lbl" style="margin-top:0.8rem;">TABELAS DELTA</div>
+      <p style="font-family:var(--font-editorial); font-style:italic; font-size:0.8rem; color:var(--text-dim); margin-top:0.5rem; line-height:1.4;">Bronze no Unity Catalog</p>
+    </div>
+
+    <div class="stat-card gold" style="display:flex; flex-direction:column; justify-content:center; text-align:center;">
+      <div class="big-stat" style="color:var(--gold);">4,1M</div>
+      <div class="stat-lbl" style="margin-top:0.8rem;">PKs VALIDADAS</div>
+      <p style="font-family:var(--font-editorial); font-style:italic; font-size:0.8rem; color:var(--text-dim); margin-top:0.5rem; line-height:1.4;">cross-env, zero amostragem</p>
+    </div>
+
+    <div class="stat-card purple" style="display:flex; flex-direction:column; justify-content:center; text-align:center;">
+      <div class="big-stat" style="color:var(--purple);">16</div>
+      <div class="stat-lbl" style="margin-top:0.8rem;">BLOQUEIOS</div>
+      <p style="font-family:var(--font-editorial); font-style:italic; font-size:0.8rem; color:var(--text-dim); margin-top:0.5rem; line-height:1.4;">documentados em produção</p>
+    </div>
+
+    <div class="stat-card orange" style="display:flex; flex-direction:column; justify-content:center; text-align:center;">
+      <div class="big-stat" style="color:var(--orange);">10+</div>
+      <div class="stat-lbl" style="margin-top:0.8rem;">ANOS DE ATUAÇÃO</div>
+      <p style="font-family:var(--font-editorial); font-style:italic; font-size:0.8rem; color:var(--text-dim); margin-top:0.5rem; line-height:1.4;">engenharia de dados sênior</p>
+    </div>
+
+  </div>
+
+  <div class="reveal bottom-bar">
+    <p>
+      Cada número corresponde a um <strong>artefato documentável</strong>: nota técnica, case study, tabela Delta, relatório de homologação. Evidência, não narrativa.
+    </p>
+    <div class="bottom-bar__tags">
+      <span class="tag tag-green">Verificável</span>
+      <span class="tag tag-gold">Documentável</span>
+      <span class="tag tag-accent">Reproduzível</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================================== -->
+<!-- SLIDE 17 — DIVIDER "Filosofia de Trabalho"                            -->
+<!-- ===================================================================== -->
+<section class="slide slide--divider">
+  <div class="slide__ghost">03</div>
+  <div class="divider-wrap">
+    <p class="reveal slide__subtitle" style="margin-bottom:clamp(14px,2vh,22px);">SEÇÃO 03</p>
+    <h2 class="reveal slide__display" style="font-size:clamp(56px,10vw,120px);">
+      <span class="shimmer-text">Filosofia de Trabalho</span>
+    </h2>
+    <p class="reveal slide__body" style="margin-top:clamp(16px,2.5vh,28px); max-width:60ch; margin-left:auto; margin-right:auto;">
+      Os princípios que atravessam todos os projetos &mdash; tecnologia muda, disciplina persiste.
+    </p>
+    <div class="reveal" style="margin-top:clamp(20px,3vh,32px); display:flex; gap:0.6rem; justify-content:center; flex-wrap:wrap;">
+      <span class="tag tag-gold">Documentação</span>
+      <span class="tag tag-accent">Homologação</span>
+      <span class="tag tag-green">Automação</span>
+      <span class="tag tag-purple">Padrões</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================================== -->
+<!-- SLIDE 18 — FILOSOFIA (4 princípios)                             -->
+<!-- ===================================================================== -->
+<section class="slide">
+  <div class="reveal">
+    <p class="slide__subtitle">QUATRO PRINCÍPIOS</p>
+  </div>
+  <h2 class="reveal slide__heading" style="margin-top:clamp(8px,1.2vh,14px);">
+    O que eu <span style="color:var(--accent);">traria para sua equipe</span>
+  </h2>
+
+  <div class="reveal tier-row cols-2x2" style="margin-top:clamp(18px,3vh,28px);">
+
+    <!-- 1. DOC IS PRODUCT -->
+    <div class="tier-card" style="border:1px solid rgba(212,160,23,0.22);"
+      onmouseenter="this.style.borderColor='rgba(212,160,23,0.4)';this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 28px rgba(212,160,23,0.1)'"
+      onmouseleave="this.style.borderColor='rgba(212,160,23,0.22)';this.style.transform='none';this.style.boxShadow='none'">
+      <div style="display:flex; align-items:center; gap:0.8rem; margin-bottom:0.6rem;">
+        <div style="width:40px; height:40px; border-radius:10px; background:var(--gold-dim); border:1px solid rgba(212,160,23,0.3); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </div>
+        <h4 style="font-family:var(--font-display); font-style:italic; font-size:clamp(1.1rem,1.6vw,1.4rem); color:var(--gold);">Documentação é produto</h4>
+      </div>
+      <p>
+        Notas técnicas, case studies e decisões arquiteturais são entregas de primeira classe &mdash; não subproduto. A arquitetura viva na cabeça de uma pessoa morre quando ela sai.
+      </p>
+      <div style="margin-top:auto; padding-top:clamp(10px,1.5vh,14px); border-top:1px solid var(--border);">
+        <p style="font-family:var(--font-mono); font-size:0.65rem; color:var(--text-dim); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:0.3rem;">Na prática</p>
+        <p style="font-family:var(--font-editorial); font-style:italic; font-size:0.82rem; color:var(--text-dim); line-height:1.45;">3 notas técnicas + 4 case studies documentáveis ao final de cada projeto.</p>
+      </div>
+    </div>
+
+    <!-- 2. HOMOLOGAÇÃO ANTES DO GO-LIVE -->
+    <div class="tier-card" style="border:1px solid rgba(0,180,255,0.22);"
+      onmouseenter="this.style.borderColor='rgba(0,180,255,0.4)';this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 28px rgba(0,180,255,0.1)'"
+      onmouseleave="this.style.borderColor='rgba(0,180,255,0.22)';this.style.transform='none';this.style.boxShadow='none'">
+      <div style="display:flex; align-items:center; gap:0.8rem; margin-bottom:0.6rem;">
+        <div style="width:40px; height:40px; border-radius:10px; background:var(--accent-dim); border:1px solid rgba(0,180,255,0.3); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M9 12l2 2 4-4"/><path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9c2.49 0 4.74 1.01 6.37 2.64"/></svg>
+        </div>
+        <h4 style="font-family:var(--font-display); font-style:italic; font-size:clamp(1.1rem,1.6vw,1.4rem); color:var(--accent);">Homologação antes do go-live</h4>
+      </div>
+      <p>
+        Toda migração ou refatoração de dados precisa de paridade verificável &mdash; <strong style="color:var(--text);">não estimativa</strong>. Amostragem cria lacuna de confiança que nunca fecha.
+      </p>
+      <div style="margin-top:auto; padding-top:clamp(10px,1.5vh,14px); border-top:1px solid var(--border);">
+        <p style="font-family:var(--font-mono); font-size:0.65rem; color:var(--text-dim); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:0.3rem;">Na prática</p>
+        <p style="font-family:var(--font-editorial); font-style:italic; font-size:0.82rem; color:var(--text-dim); line-height:1.45;">4,1M PKs validadas em um projeto &mdash; 0 bytes copiados entre ambientes.</p>
+      </div>
+    </div>
+
+    <!-- 3. AUTOMAÇÃO COMO MULTIPLICADOR -->
+    <div class="tier-card" style="border:1px solid rgba(63,185,80,0.22);"
+      onmouseenter="this.style.borderColor='rgba(63,185,80,0.4)';this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 28px rgba(63,185,80,0.1)'"
+      onmouseleave="this.style.borderColor='rgba(63,185,80,0.22)';this.style.transform='none';this.style.boxShadow='none'">
+      <div style="display:flex; align-items:center; gap:0.8rem; margin-bottom:0.6rem;">
+        <div style="width:40px; height:40px; border-radius:10px; background:var(--green-dim); border:1px solid rgba(63,185,80,0.3); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        </div>
+        <h4 style="font-family:var(--font-display); font-style:italic; font-size:clamp(1.1rem,1.6vw,1.4rem); color:var(--green);">Automação como multiplicador</h4>
+      </div>
+      <p>
+        CLIs, templates e scripts de deploy são investimentos com <strong style="color:var(--text);">retorno composto</strong>. Cada diagnóstico manual salvo é hora recuperada para problemas reais.
+      </p>
+      <div style="margin-top:auto; padding-top:clamp(10px,1.5vh,14px); border-top:1px solid var(--border);">
+        <p style="font-family:var(--font-mono); font-size:0.65rem; color:var(--text-dim); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:0.3rem;">Na prática</p>
+        <p style="font-family:var(--font-editorial); font-style:italic; font-size:0.82rem; color:var(--text-dim); line-height:1.45;">CLI <code style="font-family:var(--font-mono); color:var(--green);">sc</code> reduziu diagnósticos de 15 min para 30 segundos.</p>
+      </div>
+    </div>
+
+    <!-- 4. PADRÕES REDUZEM CARGA COGNITIVA -->
+    <div class="tier-card" style="border:1px solid rgba(167,139,250,0.22);"
+      onmouseenter="this.style.borderColor='rgba(167,139,250,0.4)';this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 28px rgba(167,139,250,0.1)'"
+      onmouseleave="this.style.borderColor='rgba(167,139,250,0.22)';this.style.transform='none';this.style.boxShadow='none'">
+      <div style="display:flex; align-items:center; gap:0.8rem; margin-bottom:0.6rem;">
+        <div style="width:40px; height:40px; border-radius:10px; background:var(--purple-dim); border:1px solid rgba(167,139,250,0.3); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        </div>
+        <h4 style="font-family:var(--font-display); font-style:italic; font-size:clamp(1.1rem,1.6vw,1.4rem); color:var(--purple);">Padrões reduzem carga cognitiva</h4>
+      </div>
+      <p>
+        Templates de notebook, estrutura de camadas e convenções de auditoria liberam a mente para <strong style="color:var(--text);">o problema real</strong> &mdash; não para reinventar scaffold.
+      </p>
+      <div style="margin-top:auto; padding-top:clamp(10px,1.5vh,14px); border-top:1px solid var(--border);">
+        <p style="font-family:var(--font-mono); font-size:0.65rem; color:var(--text-dim); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:0.3rem;">Na prática</p>
+        <p style="font-family:var(--font-editorial); font-style:italic; font-size:0.82rem; color:var(--text-dim); line-height:1.45;">Onboarding de novos notebooks: 2-3 horas &rarr; 20-30 minutos com template.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="reveal bottom-bar">
+    <p>
+      Tecnologia muda a cada 3 anos &mdash; <strong>disciplina persiste</strong>. Esses quatro princípios atravessam Oracle legado, Databricks moderno e qualquer plataforma futura.
+    </p>
+    <div class="bottom-bar__tags">
+      <span class="tag tag-gold">Sustentável</span>
+      <span class="tag tag-accent">Transferível</span>
+      <span class="tag tag-green">Repetitível</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================================== -->
+<!-- SLIDE 19 — FECHAMENTO + CONTATO                                       -->
+<!-- ===================================================================== -->
+<section class="slide slide--quote">
+
+  <div class="reveal"><div class="slide__quote-mark" style="color:var(--gold);">&ldquo;</div></div>
+
+  <div class="reveal">
+    <blockquote style="max-width:28ch;">
+      Engenharia de dados é <strong>engenharia de software</strong> aplicada a dados.
+    </blockquote>
+  </div>
+
+  <div class="reveal contact-row" style="max-width:1000px; margin-left:auto; margin-right:auto; margin-top:clamp(32px,5vh,56px);">
+
+    <a href="https://linkedin.com/in/wilson-lucas-719963b4" target="_blank" rel="noopener" class="contact-card" style="text-decoration:none;">
+      <div class="contact-card__icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+      </div>
+      <p class="contact-card__label">LINKEDIN</p>
+      <p class="contact-card__value">linkedin.com/in/wilson-lucas-719963b4</p>
+      <p class="contact-card__note">Perfil profissional completo</p>
+    </a>
+
+    <a href="https://github.com/WilsonLucas" target="_blank" rel="noopener" class="contact-card" style="text-decoration:none; background:linear-gradient(135deg, var(--surface) 0%, rgba(212,160,23,0.04) 100%); border-color:rgba(212,160,23,0.25);">
+      <div class="contact-card__icon" style="background:rgba(212,160,23,0.08); border-color:rgba(212,160,23,0.3);">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+      </div>
+      <p class="contact-card__label">GITHUB</p>
+      <p class="contact-card__value" style="color:var(--gold);">github.com/WilsonLucas</p>
+      <p class="contact-card__note">Repos majoritariamente privados (NDA)</p>
+    </a>
+
+    <a href="mailto:wilsonlucas201@gmail.com" class="contact-card" style="text-decoration:none; background:linear-gradient(135deg, var(--surface) 0%, rgba(63,185,80,0.04) 100%); border-color:rgba(63,185,80,0.25);">
+      <div class="contact-card__icon" style="background:rgba(63,185,80,0.08); border-color:rgba(63,185,80,0.3);">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      </div>
+      <p class="contact-card__label">E-MAIL</p>
+      <p class="contact-card__value" style="color:var(--green);">wilsonlucas201@gmail.com</p>
+      <p class="contact-card__note">Resposta em até 24h</p>
+    </a>
+
+  </div>
+
+  <div class="reveal" style="margin-top:clamp(24px,4vh,40px);">
+    <span class="tag tag-gold" style="border-radius:100px; letter-spacing:0.1em;">
+      Aberto a conversas &middot; 2026
+    </span>
+  </div>
+
+  <div class="reveal" style="margin-top:clamp(20px,3vh,32px);">
+    <p style="font-family:var(--font-mono); font-size:0.68rem; color:var(--text-dim); letter-spacing:0.15em;">
+      WILSON LUCAS &middot; ENGENHEIRO DE DADOS SÊNIOR &middot; PORTFÓLIO 2026
+    </p>
+  </div>
+
+</section>
+
+</div><!-- /deck -->
+
+<script>
+class SlideEngine {
+  constructor() {
+    this.deck = document.getElementById('deck');
+    this.slides = [...document.querySelectorAll('.slide')];
+    this.dots = document.getElementById('dots');
+    this.progress = document.getElementById('progress');
+    this.counter = document.getElementById('counter');
+    this.hints = document.getElementById('hints');
+    this.total = this.slides.length;
+    this.current = 0;
+
+    this.slides.forEach((_, i) => {
+      const d = document.createElement('button');
+      d.className = 'deck-dot';
+      d.setAttribute('aria-label', 'Ir para slide ' + (i + 1));
+      d.addEventListener('click', () => this.goTo(i));
+      this.dots.appendChild(d);
+    });
+
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          this.current = this.slides.indexOf(e.target);
+          this.updateChrome();
+        }
+      });
+    }, { root: this.deck, threshold: 0.5 });
+    this.slides.forEach(s => obs.observe(s));
+
+    document.addEventListener('keydown', e => {
+      if (['ArrowDown','ArrowRight','Space','PageDown'].includes(e.code)) { e.preventDefault(); this.next(); }
+      if (['ArrowUp','ArrowLeft','PageUp'].includes(e.code)) { e.preventDefault(); this.prev(); }
+      if (e.code === 'Home') { e.preventDefault(); this.goTo(0); }
+      if (e.code === 'End') { e.preventDefault(); this.goTo(this.total - 1); }
+    });
+
+    let touchY = 0;
+    this.deck.addEventListener('touchstart', e => { touchY = e.touches[0].clientY; }, { passive: true });
+    this.deck.addEventListener('touchend', e => {
+      const dy = touchY - e.changedTouches[0].clientY;
+      if (Math.abs(dy) > 50) dy > 0 ? this.next() : this.prev();
+    }, { passive: true });
+
+    setTimeout(() => this.hints.classList.add('faded'), 4000);
+    this.updateChrome();
+    if (this.slides[0]) this.slides[0].classList.add('visible');
+  }
+
+  goTo(i) { this.slides[i]?.scrollIntoView({ behavior: 'smooth' }); }
+  next() { this.goTo(Math.min(this.current + 1, this.total - 1)); }
+  prev() { this.goTo(Math.max(this.current - 1, 0)); }
+
+  updateChrome() {
+    const pct = ((this.current + 1) / this.total) * 100;
+    this.progress.style.width = pct + '%';
+    this.counter.textContent = (this.current + 1) + ' / ' + this.total;
+    [...this.dots.children].forEach((d, i) => d.classList.toggle('active', i === this.current));
+  }
+}
+new SlideEngine();
+</script>
+</body>
+</html>
