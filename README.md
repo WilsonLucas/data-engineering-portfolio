@@ -1,114 +1,194 @@
-# Wilson Lucas — Engenheiro de Dados Sênior | Portfolio
+<div align="center">
 
-> Arquiteturas de dados robustas, pipelines homologados em produção, automação que escala.
+# Wilson Lucas — Engenheiro de Dados Sênior
 
----
+### Arquiteturas de dados robustas · Pipelines homologados em produção · Automação que escala
 
-## Sobre
+[![Portfolio](https://img.shields.io/badge/🌐_Portfolio_ao_vivo-wilsonlucas.github.io-0B1F3A?style=for-the-badge&labelColor=D4A017)](https://wilsonlucas.github.io/data-engineering-portfolio/)
+[![Slides](https://img.shields.io/badge/🎬_Apresentação-19_slides-00B4FF?style=for-the-badge&labelColor=0B1F3A)](https://wilsonlucas.github.io/data-engineering-portfolio/PRESENTATION/portfolio-slides.html)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-wilson--lucas-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/wilson-lucas-719963b4)
 
-Engenheiro de Dados Sênior com 10+ anos de experiência construindo e sustentando plataformas de dados em ambientes on-premises e em nuvem. Atuo em consultoria itinerante, com foco em projetos de alta complexidade técnica nos setores financeiro, de saúde, público e regulado.
+[![Azure](https://img.shields.io/badge/Azure-Databricks-0078D4?style=flat-square&logo=microsoftazure&logoColor=white)](https://azure.microsoft.com)
+[![Delta Lake](https://img.shields.io/badge/Delta_Lake-Unity_Catalog-00ADD4?style=flat-square)](https://delta.io)
+[![PySpark](https://img.shields.io/badge/PySpark-Spark_SQL-E25A1C?style=flat-square&logo=apachespark&logoColor=white)](https://spark.apache.org)
+[![SAP](https://img.shields.io/badge/SAP-Datasphere-0FAAFF?style=flat-square&logo=sap&logoColor=white)](https://www.sap.com)
+[![10+ anos](https://img.shields.io/badge/Experiência-10%2B_anos-5AD977?style=flat-square)](#trajetória-profissional)
 
-Minha especialidade é a interseção entre arquitetura, engenharia e governança: desenhar pipelines na arquitetura Medallion (Bronze, Silver, Gold) sobre Azure Databricks, Delta Lake e Unity Catalog; conduzir migrações críticas de Oracle e SQL Server para plataformas analíticas modernas; e garantir a qualidade dos dados por meio de homologações byte-a-byte contra bases legadas.
-
-Entregas recentes incluem processamento e homologação de mais de 40 milhões de linhas em tabelas fato de folha de pagamento, catálogo de 433+ tabelas no Unity Catalog em ambiente do setor segurador, auditoria de 76 colunas contra base espelho on-premises com metodologia de zero amostragem, e desenvolvimento de CLI própria em Python para inspeção de ambientes Synapse e ADLS.
-
----
-
-## Nota sobre Confidencialidade
-
-> Os clientes não são citados nominalmente neste portfolio devido a NDAs e acordos de confidencialidade vigentes. Os case studies documentam arquitetura, decisões técnicas e padrões aplicados, sem expor código proprietário, dados sensíveis ou informações identificáveis de clientes. Os empregadores (Compass.UOL, Dataside) são mencionados como contexto quando relevante.
+</div>
 
 ---
 
-## Stack Principal
+## 👀 Primeira visita? Comece por aqui
 
-**Cloud e Plataformas de Dados**
-- Azure Databricks · Azure Synapse Analytics · Azure Data Factory
-- ADLS Gen2 · Azure Key Vault · Unity Catalog · Delta Lake
-- SAP Datasphere · SAP HANA · TDV (TIBCO Data Virtualization)
-- Oracle Cloud Infrastructure (OCI)
+> ### 🎯 [**Abrir Portfolio Completo →**](https://wilsonlucas.github.io/data-engineering-portfolio/)
+>
+> Landing page visual com stack, case studies, padrões técnicos e contato.
+> Recomendado para uma primeira leitura narrativa.
 
-**Linguagens e Processamento**
-- PySpark · Spark SQL · Python · T-SQL · PL/SQL · Bash
-
-**Arquiteturas e Padrões**
-- Medallion Architecture (Raw/Landing → Bronze → Silver → Gold)
-- Controller-driven Architecture · MERGE idempotente ACID
-- Schema Evolution · Dynamic Partition Overwrite
-- Modelagem Dimensional (star e snowflake) · SCD Tipo 1 e 2
-
-**ETL/ELT e Integração**
-- SSIS · Informatica PowerCenter · Pentaho Data Integration (PDI)
-- SAS Data Integration 9.4 · SAS Viya · Knime · SAP Information Steward
-
-**Bancos de Dados**
-- Oracle · SQL Server · PostgreSQL · MySQL · Delta Lake (Parquet)
-
-**DevOps, CLI e Automação**
-- Databricks CLI v0.297+ · Azure CLI · Git · Desenvolvimento de CLIs em Python
-
-**Metodologia e Governança**
-- Homologação byte-a-byte (zero amostragem) · Auditoria linha-a-linha
-- Data Quality · Data Governance · Scrum
+Alternativas rápidas:
+- 🎬 **[Apresentação em slides (19 telas)](https://wilsonlucas.github.io/data-engineering-portfolio/PRESENTATION/portfolio-slides.html)** — para uma leitura de ~10 min
+- 📄 **Este README** — para navegar pelos arquivos do repositório diretamente
 
 ---
 
-## Case Studies
+## 🧭 O que você encontra aqui
 
-| # | Projeto | Setor | Stack Central | Complexidade |
-|---|---------|-------|---------------|-------------|
-| 01 | [Controller-driven Medallion Architecture](./case-studies/01-controller-driven-medallion.md) | Segurador | ADF · Databricks · Unity Catalog · Delta Lake · PySpark | Alta |
-| 02 | [People Analytics — Folha de Pagamento 40M+ linhas](./case-studies/02-folha-pagamento-40M-linhas.md) | Saúde (RH) | Synapse · Databricks · Delta Lake · PySpark | Muito Alta |
-| 03 | [Homologação Byte-a-Byte Cross-Env com OPENROWSET](./case-studies/03-homologacao-byte-a-byte.md) | Público | Synapse Serverless SQL · Delta Lake · Python · pyarrow | Alta |
-| 04 | [Migração de Camada Semântica Corporativa](./case-studies/04-migracao-camada-semantica.md) | Corporativo | TDV · SAP Datasphere · SAP HANA · Oracle · Synapse | Alta |
-
----
-
-## Padrões e Metodologias
-
-Notas técnicas aprofundadas sobre padrões reutilizáveis extraídos dos projetos reais.
-
-| Nota Técnica | Descrição |
-|--------------|-----------|
-| [Controller-driven Architecture](./technical-notes/controller-driven-architecture.md) | Como parametrizar 100% de uma pipeline via tabelas Delta de controle |
-| [Dynamic Partition Overwrite](./technical-notes/dynamic-partition-overwrite.md) | Padrão para lidar com duplicatas legítimas que quebram MERGE tradicional |
-| [Metodologia de Homologação](./technical-notes/homologacao-metodologia.md) | Zero amostragem, universo idêntico, diff por coluna, causa raiz documentada |
+| Seção | Conteúdo |
+|---|---|
+| [**Landing page**](https://wilsonlucas.github.io/data-engineering-portfolio/) | Portfolio visual completo |
+| [**Case Studies**](./case-studies/) | 4 projetos reais documentados (anonimizados por NDA) |
+| [**Padrões Técnicos**](./technical-notes/) | 3 padrões reutilizáveis extraídos dos projetos |
+| [**Slides**](./PRESENTATION/) | Apresentação em 19 slides single-file HTML |
+| [**Bio expandida**](./SOBRE.md) | Narrativa de trajetória e filosofia de trabalho |
 
 ---
 
-## Trajetória Profissional (resumida)
+## 🔒 Confidencialidade
+
+> Os clientes não são citados nominalmente devido a acordos de confidencialidade vigentes. Os case studies documentam **arquitetura, decisões técnicas e padrões aplicados** — sem expor código proprietário, dados sensíveis ou informações identificáveis. Descritores de setor (seguradora nacional, operadora de saúde, setor público, corporativo) substituem nomes reais em todo o material.
+
+---
+
+## 📂 Case Studies
+
+| # | Projeto | Setor | Stack Central |
+|---|---------|-------|---------------|
+| 01 | [Controller-driven Medallion Architecture](./case-studies/01-controller-driven-medallion.md) | Seguradora nacional | Azure Data Factory · Databricks · Unity Catalog · Delta Lake |
+| 02 | [Folha de Pagamento — 40M+ Linhas](./case-studies/02-folha-pagamento-40M-linhas.md) | Operadora de saúde | Synapse · Databricks · Delta Lake · PySpark |
+| 03 | [Homologação Byte-a-Byte com CLI Própria](./case-studies/03-homologacao-byte-a-byte.md) | Setor público | Synapse Serverless SQL · OPENROWSET · Python · pyarrow |
+| 04 | [Migração de Camada Semântica Corporativa](./case-studies/04-migracao-camada-semantica.md) | Corporativo | TDV · SAP Datasphere · SAP HANA · Oracle |
+
+### Padrões Técnicos
+
+| Padrão | Quando usar |
+|---|---|
+| [Controller-driven Architecture](./technical-notes/controller-driven-architecture.md) | Parametrizar 100% de uma pipeline via tabelas Delta de controle |
+| [Dynamic Partition Overwrite](./technical-notes/dynamic-partition-overwrite.md) | Lidar com duplicatas legítimas que quebram MERGE tradicional |
+| [Metodologia de Homologação](./technical-notes/homologacao-metodologia.md) | Validar migrações com zero amostragem + causa raiz documentada |
+
+---
+
+## 🛠️ Stack Principal
+
+<table>
+<tr>
+<td valign="top" width="33%">
+
+**☁️ Cloud & Data Lakehouse**
+- Azure Databricks
+- Azure Synapse Analytics
+- Azure Data Factory
+- ADLS Gen2 · Azure Key Vault
+- Unity Catalog · Delta Lake
+- Oracle Cloud Infrastructure
+
+**💻 Linguagens**
+- PySpark · Spark SQL
+- Python · T-SQL · PL/SQL
+- SQL ANSI · Bash
+
+</td>
+<td valign="top" width="33%">
+
+**🏗️ Arquiteturas & Padrões**
+- Medallion Architecture
+- Controller-driven Architecture
+- MERGE idempotente ACID
+- Schema Evolution
+- Dynamic Partition Overwrite
+- Modelagem Dimensional
+- SCD Tipo 1 e 2 · CDC
+
+**🧭 Semântica & BI**
+- SAP Datasphere · SAP HANA
+- TDV (TIBCO Data Virtualization)
+- SAP Information Steward
+- Power BI
+
+</td>
+<td valign="top" width="33%">
+
+**🔧 ETL/ELT Legado**
+- SSIS · Informatica PowerCenter
+- Pentaho Data Integration (PDI)
+- SAS DI 9.4 · SAS Viya · Knime
+
+**🗄️ Bancos**
+- Oracle · SQL Server
+- PostgreSQL · MySQL
+
+**🤖 DevOps & Automação**
+- Databricks CLI v0.297+
+- Azure CLI · Git
+- CLIs internas em Python
+- Elastic Stack (ELK)
+
+</td>
+</tr>
+</table>
+
+---
+
+## 📊 Em números
+
+<div align="center">
+
+| 40M+ | 433 | 4,1M | 16 | 10+ |
+|:---:|:---:|:---:|:---:|:---:|
+| **linhas processadas** | **tabelas catalogadas** | **PKs validadas** | **bloqueios resolvidos** | **anos de experiência** |
+| Folha de pagamento · 12 anos de histórico | Unity Catalog · Bronze → Silver | Zero amostragem · 76 colunas | BL01–BL16 documentados | 5 empresas · 4 setores |
+
+</div>
+
+---
+
+## 🗓️ Trajetória Profissional
 
 | Período | Empresa | Papel |
-|---------|---------|-------|
-| Dez/2024 – Atual | Dataside (Consultoria) | Engenheiro de Dados Sênior — multi-cliente |
-| Jul/2023 – Atual | Compass.UOL | Engenheiro de Dados Sênior |
-| Jun/2021 – Jun/2023 | VERT | Engenheiro de Dados Sênior |
-| Fev/2019 – Mai/2021 | Global Web | DBA Pleno / Consultor DBA |
-| Mai/2017 – Jan/2019 | Stefanini | Analista de Dados |
+|---|---|---|
+| Dez/2024 – Atual | **Dataside** (Consultoria) | Engenheiro de Dados Sênior — multi-cliente |
+| Jul/2023 – Atual | **Compass.UOL** | Engenheiro de Dados Sênior |
+| Jun/2021 – Jun/2023 | **VERT** | Engenheiro de Dados Sênior |
+| Fev/2019 – Fev/2023 | **Global Web** | DBA Pleno → Consultor DBA |
+| Mai/2017 – Jan/2019 | **Stefanini** | Analista de Dados |
 
----
-
-## Formação
-
+**Formação:**
 - Especialização em Banco de Dados e Business Intelligence — SENAC (2020)
 - Bacharelado em Sistemas de Informação — UNIP (2016)
 
 ---
 
-## Contato
+## 📬 Contato
 
-- LinkedIn: [linkedin.com/in/wilson-lucas-719963b4](https://linkedin.com/in/wilson-lucas-719963b4)
-- GitHub: [github.com/WilsonLucas](https://github.com/WilsonLucas)
-- E-mail: wilsonlucas201@gmail.com
+<div align="center">
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/wilson-lucas-719963b4)
+[![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/WilsonLucas)
+[![E-mail](https://img.shields.io/badge/E--mail-EA4335?style=for-the-badge&logo=gmail&logoColor=white)](mailto:wilsonlucas201@gmail.com)
+
+**Brasília, Distrito Federal · Brasil** — aberto a conversas em 2026
+
+</div>
 
 ---
 
-## Bio Expandida
+## 🧰 Como este repositório foi construído
 
-Para narrativa detalhada sobre trajetória, filosofia de trabalho e áreas de domínio, ver [SOBRE.md](./SOBRE.md).
+Este portfolio é um site estático gerado a partir de markdown. Para regenerar os HTMLs após editar um `.md`:
+
+```bash
+python build_site.py
+git add . && git commit -m "docs: update case studies" && git push
+```
+
+O GitHub Pages faz redeploy automático em ~1 minuto. O design system (navy/cyan/gold) está em [`assets/style.css`](./assets/style.css) e é compartilhado entre landing page, case studies e technical notes.
 
 ---
 
-## Direitos e Licença
+<div align="center">
 
-O conteúdo conceitual deste portfolio — arquiteturas, metodologias, padrões técnicos e decisões de design — é de autoria própria e pode ser referenciado livremente com atribuição. Este material não representa, reproduz nem expõe código proprietário de nenhum cliente.
+**Licenciado sob [MIT](./LICENSE)** · Conteúdo conceitual e anonimizado · Sem exposição de dados de clientes
+
+Feito com ❤️ e `PySpark` em Brasília
+
+</div>
