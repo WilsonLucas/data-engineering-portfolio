@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Case 04 · Migração de Camada Semântica — Portfolio de Engenharia de Dados de Wilson Lucas.">
+<title>Case 04 · Migração de Camada Semântica | Wilson Lucas · Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Newsreader:ital,wght@0,400;0,500;1,400;1,500&family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="navbar-inner">
+        <div class="navbar-brand"><a href="../index.html" style="color: inherit;">Wilson Lucas · <em>Portfolio</em></a></div>
+        <div class="navbar-links">
+            <a href="../index.html#sobre">Sobre</a>
+            <a href="../index.html#stack">Stack</a>
+            <a href="../index.html#cases">Case Studies</a>
+            <a href="../index.html#padroes">Padrões</a>
+            <a href="../index.html#contato">Contato</a>
+        </div>
+    </div>
+</nav>
+
+<header class="article-header">
+    <div class="container">
+        <a href="../index.html#cases" class="back-link">Voltar ao portfolio</a>
+        <div class="section-label">// Case Study 04 · Corporativo</div>
+    </div>
+</header>
+
+<article class="container">
+    <div class="article-content">
+<h1>Case Study 04 — Migração de Camada Semântica Corporativa</h1>
+<p><strong>Setor:</strong> Corporativo (grande empresa, ecossistema SAP + Oracle)
+<strong>Empregador:</strong> Compass.UOL
+<strong>Papel:</strong> Engenheiro de Dados Sênior — ponto focal técnico</p>
+<hr />
+<h2>Setor e Perfil do Projeto</h2>
+<p>Projeto de modernização de arquitetura de acesso a dados em uma organização corporativa de grande porte, com múltiplas áreas consumidoras de dados (analytics, BI, relatórios regulatórios) e histórico de décadas de regras de negócio consolidadas em fontes heterogêneas.</p>
+<p>A organização tinha duas frentes de trabalho simultâneas: (1) consolidação de fontes legadas dispersas em uma camada de virtualização (Oracle → TDV), e (2) modernização da camada semântica corporativa, migrando do TDV para SAP Datasphere como nova plataforma de governança e acesso a dados.</p>
+<p>O desafio não era apenas técnico — era de continuidade de contrato. Dezenas de áreas consumidoras dependiam de entidades e métricas que tinham sido construídas e refinadas ao longo de anos. Qualquer ruptura nesse contrato, mesmo técnica, traduzia-se em retrabalho para squads de analytics e BI que usavam esses dados como insumo de suas entregas.</p>
+<hr />
+<h2>Problema</h2>
+<p><strong>Arquitetural:</strong> Como migrar uma camada semântica corporativa que acumula anos de regras de negócio sem interromper o contrato de dados com os consumidores downstream?</p>
+<p><strong>Técnico (frente 1):</strong> Como consolidar múltiplas fontes Oracle legadas heterogêneas — com schemas inconsistentes, nomenclaturas divergentes e regras de joining acumuladas ao longo de anos — em uma camada unificada via TDV?</p>
+<p><strong>Técnico (frente 2):</strong> Como replicar no SAP Datasphere o comportamento semântico exato das entidades TDV, preservando a experiência dos consumidores de BI e analytics que já conhecem e confiam nos dados que recebem?</p>
+<p><strong>Operacional:</strong> Como manter a estabilidade da base Oracle de missão crítica — que serve múltiplas áreas e é o coração do ambiente produtivo — enquanto a migração acontece em paralelo?</p>
+<hr />
+<h2>Stack Aplicada</h2>
+<table>
+<thead>
+<tr>
+<th>Componente</th>
+<th>Papel no Projeto</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Oracle (on-premises)</td>
+<td>Fonte principal de dados transacionais / operacionais</td>
+</tr>
+<tr>
+<td>TDV (TIBCO Data Virtualization)</td>
+<td>Camada de virtualização e consolidação de fontes</td>
+</tr>
+<tr>
+<td>SAP Datasphere</td>
+<td>Nova plataforma semântica corporativa (destino da migração)</td>
+</tr>
+<tr>
+<td>SAP HANA</td>
+<td>Banco de dados analítico subjacente ao SAP Datasphere</td>
+</tr>
+<tr>
+<td>SAP Information Steward</td>
+<td>Qualidade de dados e monitoramento de consistência</td>
+</tr>
+<tr>
+<td>Azure Synapse Analytics</td>
+<td>Processamento complementar de dados analíticos</td>
+</tr>
+<tr>
+<td>Azure Databricks</td>
+<td>Transformações em escala para alimentação de camadas analíticas</td>
+</tr>
+<tr>
+<td>Knime</td>
+<td>Automação de fluxos de qualidade e integração de dados</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>Arquitetura</h2>
+<pre class="codehilite"><code>Fontes legadas                 Camada de Virtualização        Camada Semântica Nova
+──────────────                 ──────────────────────         ─────────────────────
+Oracle DB 1                    TDV                            SAP Datasphere
+  [esquema_A]  ──────────────► [view_consolidada_X]  ──────► [entidade_semântica_X]
+  [esquema_B]  ──────────────► [view_consolidada_Y]  ──────► [entidade_semântica_Y]
+Oracle DB 2                    [view_consolidada_Z]  ──────► [entidade_semântica_Z]
+  [esquema_C]  ──────────────►
+SAP HANA                                                             │
+  [tabela_D]   ──────────────►                                       ▼
+                                                           Consumidores downstream
+                                                           ─────────────────────
+                                                           Power BI / BI tools
+                                                           Squads de analytics
+                                                           Relatórios regulatórios
+
+                    ┌──────────────────────────────────────┐
+                    │  SAP Information Steward             │
+                    │  (monitoramento de qualidade         │
+                    │   ao longo do pipeline)              │
+                    └──────────────────────────────────────┘
+
+                    ┌──────────────────────────────────────┐
+                    │  Azure Synapse + Databricks          │
+                    │  (processamento para alimentação     │
+                    │   de camadas analíticas específicas) │
+                    └──────────────────────────────────────┘
+</code></pre>
+
+<p><strong>TDV como camada intermediária:</strong> a decisão de manter o TDV como estágio intermediário antes do SAP Datasphere não foi arquitetural apenas — foi pragmática. O TDV já estava em produção e as views construídas nele representavam contratos implícitos de dados que os consumidores conheciam. Migrar direto de Oracle para SAP Datasphere teria exigido reescrever toda a semântica de uma vez. A abordagem em dois estágios permitiu validar a consolidação Oracle → TDV antes de avançar para TDV → Datasphere.</p>
+<hr />
+<h2>Decisões Técnicas-Chave</h2>
+<h3>1. Abordagem incremental vs. big bang</h3>
+<p><strong>Alternativa descartada:</strong> migrar todas as entidades de uma vez (big bang), com um corte de data único.</p>
+<p><strong>Decisão adotada:</strong> migração incremental por domínio de negócio, com validação e homologação de cada domínio antes de avançar para o próximo. Consumidores do domínio migrado fazem o corte para o SAP Datasphere enquanto outros ainda consomem do TDV.</p>
+<p><strong>Justificativa:</strong> Em um ambiente com dezenas de consumidores, um big bang cria um ponto único de falha massiva. A abordagem incremental limita o raio de impacto de qualquer problema para um domínio por vez.</p>
+<hr />
+<h3>2. Preservação do contrato de dados como restrição primária</h3>
+<p><strong>Princípio aplicado:</strong> a migração é bem-sucedida apenas quando o consumidor downstream não percebe diferença no comportamento dos dados — mesmas granularidades, mesmas métricas calculadas da mesma forma, mesmos filtros implícitos.</p>
+<p><strong>Implicação técnica:</strong> antes de migrar qualquer entidade TDV para SAP Datasphere, a entidade equivalente no Datasphere era validada side-by-side com a original TDV por pelo menos uma competência completa de dados. Apenas após validação com PASS o consumidor era instruído a migrar seu endpoint.</p>
+<hr />
+<h3>3. Sustentação da base Oracle como fundação do projeto</h3>
+<p><strong>Contexto:</strong> Assumir a sustentação da principal base Oracle do ambiente como ponto focal da equipe significou ser o responsável por estabilidade, disponibilidade e rastreabilidade de dados críticos durante todo o período da migração.</p>
+<p><strong>Por que é tecnicamente relevante:</strong> manter uma base Oracle legada estável enquanto você conecta novas camadas sobre ela — TDV, Synapse, Databricks — exige entender profundamente os contratos implícitos que a base mantém: views que encapsulam regras de negócio não documentadas, procedures que executam lógicas acumuladas ao longo de anos, índices e configurações de performance que não têm documentação formal.</p>
+<p><strong>Abordagem:</strong> mapeamento defensivo de todas as dependências antes de qualquer mudança. Nenhuma alteração no ambiente Oracle sem análise de impacto documentada.</p>
+<hr />
+<h3>4. Monitoramento de qualidade com SAP Information Steward</h3>
+<p><strong>Desafio:</strong> com fontes heterogêneas sendo consolidadas no TDV e depois migradas para o Datasphere, como garantir que a qualidade dos dados se mantém ao longo de todo o pipeline?</p>
+<p><strong>Solução:</strong> regras de qualidade implementadas no SAP Information Steward cobrindo completude (campos obrigatórios não nulos), consistência (valores dentro de domínios esperados) e integridade referencial (FKs respeitadas entre entidades relacionadas). Alertas automáticos acionados quando qualquer regra é violada.</p>
+<hr />
+<h3>5. Knime para automação de fluxos de integração</h3>
+<p><strong>Contexto:</strong> alguns fluxos de integração de dados não se encaixavam na arquitetura principal (TDV → Datasphere) por terem requisitos específicos de transformação ou por serem feeds pontuais de sistemas externos.</p>
+<p><strong>Solução:</strong> Knime como ferramenta de automação visual para esses fluxos — conectando Oracle, ADLS e SAP HANA com lógica de transformação encapsulada em workflows auditáveis.</p>
+<hr />
+<h2>Dimensão do Ambiente</h2>
+<table>
+<thead>
+<tr>
+<th>Aspecto</th>
+<th>Escala</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fontes heterogêneas consolidadas</td>
+<td>Oracle (múltiplos schemas) + SAP HANA + outras</td>
+</tr>
+<tr>
+<td>Entidades na camada TDV</td>
+<td>Dezenas (com regras de negócio acumuladas)</td>
+</tr>
+<tr>
+<td>Áreas consumidoras</td>
+<td>Múltiplas (analytics, BI, relatórios regulatórios)</td>
+</tr>
+<tr>
+<td>Tempo de operação do ambiente legado</td>
+<td>Décadas</td>
+</tr>
+<tr>
+<td>Profundidade técnica da sustentação</td>
+<td>Missão crítica (SLA de disponibilidade)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>Padrões Aplicados</h2>
+<ul>
+<li>Migração incremental por domínio com validação side-by-side</li>
+<li>Mapeamento defensivo de dependências antes de alterações</li>
+<li>Monitoramento contínuo de qualidade com regras automatizadas</li>
+</ul>
+<hr />
+<h2>Lições Aprendidas</h2>
+<p><strong>Em migrações de camada semântica, a complexidade está nas regras implícitas.</strong> Toda view do TDV que &ldquo;apenas filtra por status = ativo&rdquo; esconde a pergunta: o que acontece com registros inativos? Os consumidores os veem? Eles precisam ser excluídos? Essas perguntas não têm resposta na documentação — têm resposta nos comportamentos implícitos que o usuário de BI construiu ao longo de anos. Descobrir essas regras antes de migrar é a maior parte do trabalho.</p>
+<p><strong>Sustentação e modernização não são opostos — são complementares.</strong> Manter a base Oracle estável não era um obstáculo à modernização — era o que tornava a modernização segura. Uma plataforma que falha durante a migração não tem crédito para migrar mais. A confiança construída pela sustentação de qualidade é o capital que financia as mudanças arquiteturais.</p>
+<p><strong>SAP Datasphere tem uma curva de adoção.</strong> A plataforma combina conceitos de virtualização (views sobre fontes externas), persistência (tabelas replicadas) e modelagem semântica (espaços analíticos) de uma forma que não é intuitiva para quem vem de TDV ou de um data warehouse tradicional. O onboarding de consumidores exigiu treinamento e documentação específicos para cada padrão de uso.</p>
+<p><strong>Ecossistemas heterogêneos exigem neutralidade técnica.</strong> Trabalhar com Oracle, SAP, Azure e ferramentas de qualidade ao mesmo tempo — sem preferência ideológica por nenhum — é uma competência em si. O melhor design de integração respeita os pontos fortes de cada componente ao invés de forçar tudo em uma única pilha.</p>
+    </div>
+
+    <nav class="article-nav"><a href="03-homologacao-byte-a-byte.html">← Case 03 · Homologação Byte-a-Byte</a><span></span></nav>
+</article>
+
+<footer>
+    <div class="container">
+        <p><strong>Wilson Lucas</strong> · Engenheiro de Dados Sênior</p>
+        <p><em>Material conceitual e anonimizado · Nenhum dado de cliente exposto</em></p>
+    </div>
+</footer>
+
+</body>
+</html>

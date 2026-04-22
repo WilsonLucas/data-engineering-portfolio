@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Portfolio de Engenharia de Dados de Wilson Lucas — Azure Databricks, Delta Lake, PySpark, Unity Catalog. Arquiteturas, case studies e padrões técnicos.">
+<meta property="og:title" content="Wilson Lucas — Engenheiro de Dados Sênior | Portfolio">
+<meta property="og:description" content="Arquiteturas de dados robustas, pipelines homologados em produção, automação que escala.">
+<meta property="og:type" content="website">
+<title>Wilson Lucas — Engenheiro de Dados Sênior | Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Newsreader:ital,wght@0,400;0,500;1,400;1,500&family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<!-- ============ NAVBAR ============ -->
+<nav class="navbar">
+    <div class="navbar-inner">
+        <div class="navbar-brand">Wilson Lucas · <em>Portfolio</em></div>
+        <div class="navbar-links">
+            <a href="#sobre">Sobre</a>
+            <a href="#stack">Stack</a>
+            <a href="#cases">Case Studies</a>
+            <a href="#padroes">Padrões</a>
+            <a href="#contato">Contato</a>
+        </div>
+    </div>
+</nav>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+    <div class="container hero-inner">
+        <div class="hero-badge">Portfólio · 2026</div>
+        <h1 class="hero-title">Wilson Lucas</h1>
+        <p class="hero-subtitle">Engenheiro de Dados Sênior</p>
+        <div class="hero-tags">
+            <span class="tag">Azure Databricks</span>
+            <span class="tag gold">Delta Lake</span>
+            <span class="tag">Unity Catalog</span>
+            <span class="tag purple">PySpark</span>
+            <span class="tag green">10+ anos</span>
+        </div>
+        <div class="hero-sectors">Financial Services · Healthcare · Setor Público · Corporativo</div>
+    </div>
+</section>
+
+<!-- ============ SOBRE ============ -->
+<section id="sobre">
+    <div class="container">
+        <div class="section-label">// 01 · Sobre</div>
+        <h2 class="section-title">Arquiteturas de dados <em>robustas</em>, pipelines homologados em produção, automação que escala.</h2>
+        <p class="section-subtitle">Mais de dez anos construindo e sustentando plataformas de dados em ambientes on-premises e em nuvem — do DBA tradicional ao data lakehouse moderno. Atuação atual em consultoria itinerante em projetos de alta complexidade técnica.</p>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; margin-top: 40px;">
+            <div style="padding: 28px; background: var(--navy-surface); border: 1px solid var(--border); border-radius: 10px;">
+                <div style="font-family: var(--font-display); font-size: 3rem; color: var(--gold); line-height: 1; font-style: italic;">40M+</div>
+                <div style="font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-muted); margin-top: 8px;">Linhas Processadas</div>
+                <p style="margin-top: 12px; color: var(--text-dim); font-size: 0.88rem;">Tabelas fato de folha de pagamento · 12 anos de histórico</p>
+            </div>
+            <div style="padding: 28px; background: var(--navy-surface); border: 1px solid var(--border); border-radius: 10px;">
+                <div style="font-family: var(--font-display); font-size: 3rem; color: var(--cyan); line-height: 1; font-style: italic;">433</div>
+                <div style="font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-muted); margin-top: 8px;">Tabelas Catalogadas</div>
+                <p style="margin-top: 12px; color: var(--text-dim); font-size: 0.88rem;">Unity Catalog · Bronze → Silver · rastreabilidade completa</p>
+            </div>
+            <div style="padding: 28px; background: var(--navy-surface); border: 1px solid var(--border); border-radius: 10px;">
+                <div style="font-family: var(--font-display); font-size: 3rem; color: #5ad977; line-height: 1; font-style: italic;">4,1M</div>
+                <div style="font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-muted); margin-top: 8px;">PKs Validadas</div>
+                <p style="margin-top: 12px; color: var(--text-dim); font-size: 0.88rem;">Homologação zero-amostragem · 76 colunas auditadas</p>
+            </div>
+            <div style="padding: 28px; background: var(--navy-surface); border: 1px solid var(--border); border-radius: 10px;">
+                <div style="font-family: var(--font-display); font-size: 3rem; color: #a67cff; line-height: 1; font-style: italic;">10+</div>
+                <div style="font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-muted); margin-top: 8px;">Anos de Experiência</div>
+                <p style="margin-top: 12px; color: var(--text-dim); font-size: 0.88rem;">5 empresas · 4 setores · DBA → data lakehouse moderno</p>
+            </div>
+        </div>
+
+        <div style="margin-top: 40px;">
+            <a href="SOBRE.html" class="case-link" style="color: var(--gold);">Ler bio completa</a>
+        </div>
+    </div>
+</section>
+
+<!-- ============ NDA NOTICE ============ -->
+<section style="padding: 48px 0; background: var(--navy-dark);">
+    <div class="container">
+        <div style="display: flex; gap: 24px; align-items: flex-start; padding: 32px; background: rgba(212, 160, 23, 0.04); border: 1px solid var(--gold); border-radius: 12px;">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.6" style="flex-shrink: 0; margin-top: 2px;">
+                <rect x="4" y="11" width="16" height="10" rx="2"/>
+                <path d="M8 11V7a4 4 0 0 1 8 0v4"/>
+            </svg>
+            <div>
+                <div style="font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 8px;">Nota de Confidencialidade</div>
+                <p style="margin: 0; color: var(--text-dim); font-family: var(--font-editorial); font-style: italic; font-size: 1rem; line-height: 1.7;">Os clientes não são citados nominalmente devido a acordos de confidencialidade. Os case studies documentam arquitetura, decisões técnicas e padrões aplicados, sem expor código proprietário ou dados sensíveis. Os descritores de setor (seguradora nacional, operadora de saúde, setor público, corporativo de grande porte) substituem nomes reais em todo o material.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============ STACK ============ -->
+<section id="stack">
+    <div class="container">
+        <div class="section-label">// 02 · Stack Técnica</div>
+        <h2 class="section-title">Ferramentas e plataformas com <em>contexto de uso real</em></h2>
+        <p class="section-subtitle">Stack construída ao longo de dez anos em projetos de produção — cada ferramenta escolhida por mérito técnico e documentada nos case studies.</p>
+
+        <div class="stack-grid">
+            <div class="stack-cat">
+                <div class="stack-cat-label">01 · Cloud Lakehouse</div>
+                <h3 class="stack-cat-title">Azure · Databricks · Delta</h3>
+                <div class="stack-cat-items">Azure Databricks · Azure Synapse Analytics · Azure Data Factory · ADLS Gen2 · Azure Key Vault · Unity Catalog · Delta Lake · Oracle Cloud Infrastructure</div>
+            </div>
+            <div class="stack-cat">
+                <div class="stack-cat-label">02 · Processamento</div>
+                <h3 class="stack-cat-title">PySpark · Python · SQL</h3>
+                <div class="stack-cat-items">PySpark · Spark SQL · Python · T-SQL · PL/SQL · SQL ANSI · Bash · Databricks CLI v0.297+ · Azure CLI</div>
+            </div>
+            <div class="stack-cat">
+                <div class="stack-cat-label">03 · Semântica · BI</div>
+                <h3 class="stack-cat-title">SAP · TDV · Power BI</h3>
+                <div class="stack-cat-items">SAP Datasphere · SAP HANA · TDV (TIBCO Data Virtualization) · SAP Information Steward · Power BI · Modelagem dimensional</div>
+            </div>
+            <div class="stack-cat">
+                <div class="stack-cat-label">04 · Arquiteturas</div>
+                <h3 class="stack-cat-title">Medallion · CDC · MERGE</h3>
+                <div class="stack-cat-items">Medallion Architecture (Bronze/Silver/Gold) · Data Lake · Data Warehouse · SCD 1 e 2 · CDC · MERGE idempotente ACID · Dynamic Partition Overwrite</div>
+            </div>
+            <div class="stack-cat">
+                <div class="stack-cat-label">05 · ETL Legado</div>
+                <h3 class="stack-cat-title">SSIS · PowerCenter · SAS</h3>
+                <div class="stack-cat-items">SSIS · Informatica PowerCenter · Pentaho Data Integration (PDI / Kettle) · SAS Data Integration 9.4 · SAS Viya · Knime</div>
+            </div>
+            <div class="stack-cat">
+                <div class="stack-cat-label">06 · Bancos · Observabilidade</div>
+                <h3 class="stack-cat-title">Oracle · PostgreSQL · ELK</h3>
+                <div class="stack-cat-items">Oracle · SQL Server · PostgreSQL · MySQL · Parquet · Elastic Stack (Elasticsearch, Logstash, Kibana)</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============ CASE STUDIES ============ -->
+<section id="cases">
+    <div class="container">
+        <div class="section-label">// 03 · Case Studies</div>
+        <h2 class="section-title">Quatro projetos, quatro setores, <em>um método</em></h2>
+        <p class="section-subtitle">Cada case documenta um problema real, a arquitetura aplicada, decisões técnicas com trade-offs avaliados e resultado quantificado. Clientes anonimizados sob NDA.</p>
+
+        <div class="case-grid">
+            <a href="case-studies/01-controller-driven-medallion.html" class="case-card">
+                <div class="case-number">Case 01</div>
+                <div class="case-sector">Financial Services · Seguradora Nacional</div>
+                <h3 class="case-title">Controller-driven Medallion Architecture</h3>
+                <p class="case-desc">Arquitetura Medallion end-to-end com Unity Catalog e Delta Lake, parametrizada por 4 tabelas controller que eliminam a necessidade de alterar código para adicionar novas tabelas à pipeline.</p>
+                <div class="case-metrics">
+                    <span class="case-metric">433 tabelas Bronze</span>
+                    <span class="case-metric">17 Silver homologadas</span>
+                    <span class="case-metric">MERGE ACID</span>
+                    <span class="case-metric">Ciclo 45 → 18 min</span>
+                </div>
+                <span class="case-link">Ler case completo</span>
+            </a>
+
+            <a href="case-studies/02-folha-pagamento-40M-linhas.html" class="case-card green">
+                <div class="case-number">Case 02</div>
+                <div class="case-sector">Healthcare · People Analytics / RH</div>
+                <h3 class="case-title">Folha de Pagamento · 40M+ Linhas</h3>
+                <p class="case-desc">Camada analítica de RH cobrindo 12+ anos de histórico (2013–2026). Oito tabelas fato homologadas sobre dados com peculiaridades brasileiras (encoding ISO-8859-1, decimal BR, duplicatas legítimas).</p>
+                <div class="case-metrics">
+                    <span class="case-metric">8 fatos entregues</span>
+                    <span class="case-metric">16 BLs resolvidos</span>
+                    <span class="case-metric">Dynamic Partition Overwrite</span>
+                    <span class="case-metric">Histórico 2013–2026</span>
+                </div>
+                <span class="case-link">Ler case completo</span>
+            </a>
+
+            <a href="case-studies/03-homologacao-byte-a-byte.html" class="case-card gold">
+                <div class="case-number">Case 03</div>
+                <div class="case-sector">Setor Público · MPE</div>
+                <h3 class="case-title">Homologação Byte-a-Byte com CLI Própria</h3>
+                <p class="case-desc">Migração de procedures T-SQL legadas para PySpark com metodologia de homologação zero-amostragem. OPENROWSET cross-env + CLI própria em Python para inspeção de schemas e pipelines.</p>
+                <div class="case-metrics">
+                    <span class="case-metric">4,1M PKs validadas</span>
+                    <span class="case-metric">76 colunas auditadas</span>
+                    <span class="case-metric">SynapseCheck CLI</span>
+                    <span class="case-metric">0 bytes movidos</span>
+                </div>
+                <span class="case-link">Ler case completo</span>
+            </a>
+
+            <a href="case-studies/04-migracao-camada-semantica.html" class="case-card purple">
+                <div class="case-number">Case 04</div>
+                <div class="case-sector">Corporativo · Grande Porte</div>
+                <h3 class="case-title">Migração de Camada Semântica Corporativa</h3>
+                <p class="case-desc">Modernização em dois estágios: Oracle → TDV (consolidação) → SAP Datasphere (camada semântica). Missão crítica com sustentação contínua e migração incremental por domínio.</p>
+                <div class="case-metrics">
+                    <span class="case-metric">SAP Datasphere</span>
+                    <span class="case-metric">TDV</span>
+                    <span class="case-metric">Migração incremental</span>
+                    <span class="case-metric">Missão crítica</span>
+                </div>
+                <span class="case-link">Ler case completo</span>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ============ PADRÕES TÉCNICOS ============ -->
+<section id="padroes">
+    <div class="container">
+        <div class="section-label">// 04 · Padrões Técnicos</div>
+        <h2 class="section-title">Padrões reutilizáveis, <em>documentados</em></h2>
+        <p class="section-subtitle">Três padrões extraídos dos case studies, com decisão técnica, trade-off e quando usar (ou não) cada um.</p>
+
+        <div class="tech-grid">
+            <a href="technical-notes/controller-driven-architecture.html" class="tech-card">
+                <h3>Controller-driven Architecture</h3>
+                <p>Parametrização completa de pipeline via tabelas Delta — adicionar uma tabela vira um INSERT, não um commit.</p>
+                <span class="case-link">Ler padrão</span>
+            </a>
+            <a href="technical-notes/dynamic-partition-overwrite.html" class="tech-card">
+                <h3>Dynamic Partition Overwrite</h3>
+                <p>Como lidar com duplicatas legítimas que quebram o MERGE convencional. Atomicidade por partição como contrato.</p>
+                <span class="case-link">Ler padrão</span>
+            </a>
+            <a href="technical-notes/homologacao-metodologia.html" class="tech-card">
+                <h3>Homologação Zero Amostragem</h3>
+                <p>Metodologia em 3 fases (universo, diff por coluna, causa raiz) para validar migrações com 100% de cobertura.</p>
+                <span class="case-link">Ler padrão</span>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ============ CTA SLIDES ============ -->
+<section>
+    <div class="container">
+        <div class="cta-slides">
+            <div class="cta-slides-title">Prefere uma apresentação visual?</div>
+            <p class="cta-slides-desc">Todo o conteúdo deste portfolio em um deck de 19 slides navegáveis — ideal para uma sessão de entrevista técnica ou uma leitura rápida.</p>
+            <a href="PRESENTATION/portfolio-slides.html" class="cta-button">Abrir apresentação</a>
+        </div>
+    </div>
+</section>
+
+<!-- ============ CONTATO ============ -->
+<section id="contato">
+    <div class="container">
+        <div class="section-label">// 05 · Contato</div>
+        <h2 class="section-title">Aberto a <em>conversas</em></h2>
+        <p class="section-subtitle">Disponível para projetos onde a complexidade técnica é real e documentação e homologação rigorosa são valorizadas.</p>
+
+        <div class="contact-grid">
+            <a href="https://linkedin.com/in/wilson-lucas-719963b4" target="_blank" rel="noopener" class="contact-card">
+                <div class="contact-icon">
+                    <svg viewBox="0 0 24 24"><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/><path d="M22 9h-4v12h4V9z M14 9h-4v12h4v-6c0-2 1-3 2-3s2 1 2 3"/></svg>
+                </div>
+                <div>
+                    <div class="contact-label">LinkedIn</div>
+                    <div class="contact-value">wilson-lucas-719963b4</div>
+                </div>
+            </a>
+            <a href="https://github.com/WilsonLucas" target="_blank" rel="noopener" class="contact-card gold">
+                <div class="contact-icon">
+                    <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                </div>
+                <div>
+                    <div class="contact-label">GitHub</div>
+                    <div class="contact-value">WilsonLucas</div>
+                </div>
+            </a>
+            <a href="mailto:wilsonlucas201@gmail.com" class="contact-card green">
+                <div class="contact-icon">
+                    <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                </div>
+                <div>
+                    <div class="contact-label">E-mail</div>
+                    <div class="contact-value">wilsonlucas201@gmail.com</div>
+                </div>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+    <div class="container">
+        <p><strong>Wilson Lucas da Cruz Pinto</strong> · Engenheiro de Dados Sênior · Brasília, DF</p>
+        <p><em>Portfolio publicado em 2026 · Atualizado conforme os projetos evoluem</em></p>
+        <p style="margin-top: 16px; font-size: 0.75rem;">Conteúdo sob licença MIT · Material conceitual e anonimizado · Nenhum dado de cliente exposto</p>
+    </div>
+</footer>
+
+</body>
+</html>

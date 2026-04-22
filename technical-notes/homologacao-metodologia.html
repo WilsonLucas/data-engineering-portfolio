@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Padrão · Homologação Zero-Amostragem — Portfolio de Engenharia de Dados de Wilson Lucas.">
+<title>Padrão · Homologação Zero-Amostragem | Wilson Lucas · Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Newsreader:ital,wght@0,400;0,500;1,400;1,500&family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="navbar-inner">
+        <div class="navbar-brand"><a href="../index.html" style="color: inherit;">Wilson Lucas · <em>Portfolio</em></a></div>
+        <div class="navbar-links">
+            <a href="../index.html#sobre">Sobre</a>
+            <a href="../index.html#stack">Stack</a>
+            <a href="../index.html#cases">Case Studies</a>
+            <a href="../index.html#padroes">Padrões</a>
+            <a href="../index.html#contato">Contato</a>
+        </div>
+    </div>
+</nav>
+
+<header class="article-header">
+    <div class="container">
+        <a href="../index.html#padroes" class="back-link">Voltar ao portfolio</a>
+        <div class="section-label">// Padrão Técnico 03</div>
+    </div>
+</header>
+
+<article class="container">
+    <div class="article-content">
+<h1>Metodologia de Homologação — Zero Amostragem, Universo Idêntico, Causa Raiz</h1>
+<p><strong>Categoria:</strong> Metodologia de Qualidade de Dados
+<strong>Stack:</strong> PySpark · Spark SQL · Azure Synapse Serverless SQL · Delta Lake</p>
+<hr />
+<h2>O Problema que Motiva</h2>
+<p>Toda migração de pipeline — de procedures T-SQL legadas para PySpark, de Oracle para Databricks, de qualquer sistema A para qualquer sistema B — enfrenta a mesma pergunta fundamental: <strong>o novo sistema produz os mesmos dados que o legado?</strong></p>
+<p>A resposta usual é validar por amostragem: pega-se N% dos registros, compara-se à mão, declara-se equivalência. O problema com amostragem é que ela só prova que as N% linhas validadas estão corretas. As (100-N)% restantes permanecem sem garantia.</p>
+<p>Em projetos onde os dados de saída são consumidos por diretoria, alimentam decisões de negócio relevantes ou têm requisitos regulatórios, amostragem não é suficiente. A pergunta &ldquo;você testou todos os registros?&rdquo; precisa ter resposta afirmativa.</p>
+<p>Esta metodologia responde a essa pergunta com estrutura, reproducibilidade e documentação de causa raiz para cada divergência encontrada.</p>
+<hr />
+<h2>Premissas da Metodologia</h2>
+<ol>
+<li><strong>Zero amostragem:</strong> toda chave primária do universo é validada, não uma amostra</li>
+<li><strong>Universo idêntico:</strong> o conjunto de PKs comparado deve ser o mesmo nos dois sistemas antes de comparar valores</li>
+<li><strong>Diff por coluna:</strong> a divergência é classificada por coluna e por tipo — não apenas &ldquo;linhas diferentes&rdquo;</li>
+<li><strong>Causa raiz documentada:</strong> cada divergência tem uma explicação, não apenas uma contagem</li>
+</ol>
+<hr />
+<h2>Arquitetura da Validação (3 Blocos)</h2>
+<pre class="codehilite"><code>BLOCO 1 — Universo
+┌───────────────────────────────────────────────────────────┐
+│ FULL OUTER JOIN entre PKs do novo sistema e PKs do legado │
+│                                                           │
+│ Resultado:                                                │
+│   pk_comuns          → ambos os sistemas têm esta PK     │
+│   pk_apenas_novo     → novo sistema tem, legado não tem   │
+│   pk_apenas_legado   → legado tem, novo sistema não tem   │
+└───────────────────────────────────────────────────────────┘
+            │
+            ▼ (usar apenas pk_comuns para os próximos blocos)
+
+BLOCO 2 — Diff por Coluna
+┌───────────────────────────────────────────────────────────┐
+│ Para cada coluna, contar divergências classificadas:      │
+│                                                           │
+│   null_vs_valor   → novo=NULL, legado=valor               │
+│   valor_vs_null   → novo=valor, legado=NULL               │
+│   valor_vs_valor  → ambos têm valor, mas diferem         │
+│                                                           │
+│ Resultado por coluna:                                     │
+│   status = PASS (0 divergências) ou FAIL (n divergências) │
+└───────────────────────────────────────────────────────────┘
+            │
+            ▼ (apenas para colunas com FAIL)
+
+BLOCO 3 — Causa Raiz
+┌───────────────────────────────────────────────────────────┐
+│ Para cada coluna com FAIL, distribuição dos pares de      │
+│ valores divergentes:                                      │
+│   valor_novo | valor_legado | contagem                    │
+│   &quot;SP&quot;       | &quot;SÃO PAULO&quot;  | 1.200                      │
+│   NULL       | &quot;SP&quot;         | 340                        │
+│                                                           │
+│ Resultado: causa raiz identificada e categorizada         │
+└───────────────────────────────────────────────────────────┘
+</code></pre>
+
+<hr />
+<h2>Implementação — Bloco 1: Universo</h2>
+<pre class="codehilite"><code class="language-python">from pyspark.sql import functions as F
+
+# Leitura das duas fontes
+df_novo = spark.read.format(&quot;delta&quot;).load(&quot;&lt;path_novo_sistema&gt;&quot;)
+df_legado = spark.read.format(&quot;delta&quot;).load(&quot;&lt;path_legado&gt;&quot;)
+# ou: df_legado = spark.read.jdbc(...) para bases relacionais
+
+# FULL OUTER JOIN nas PKs
+df_universo = df_novo.select(&quot;pk&quot;).alias(&quot;novo&quot;) \
+    .join(
+        df_legado.select(&quot;pk&quot;).alias(&quot;legado&quot;),
+        on=&quot;pk&quot;,
+        how=&quot;full_outer&quot;
+    )
+
+# Classificação
+pk_comuns = df_universo.filter(
+    F.col(&quot;novo.pk&quot;).isNotNull() &amp; F.col(&quot;legado.pk&quot;).isNotNull()
+)
+pk_apenas_novo = df_universo.filter(F.col(&quot;legado.pk&quot;).isNull())
+pk_apenas_legado = df_universo.filter(F.col(&quot;novo.pk&quot;).isNull())
+
+# Report
+print(f&quot;PKs comuns:          {pk_comuns.count():&gt;10,}&quot;)
+print(f&quot;PKs apenas no novo:  {pk_apenas_novo.count():&gt;10,}&quot;)
+print(f&quot;PKs apenas no legado:{pk_apenas_legado.count():&gt;10,}&quot;)
+</code></pre>
+
+<p><strong>Interpretação:</strong>
+- <code>pk_apenas_novo &gt; 0</code>: o novo sistema processa registros que o legado não conhecia — pode ser bug ou dado novo legítimo
+- <code>pk_apenas_legado &gt; 0</code>: o novo sistema está perdendo registros — quase sempre é bug a investigar
+- Ambos zerados: universo idêntico, pode avançar para o Bloco 2</p>
+<hr />
+<h2>Implementação — Bloco 2: Diff por Coluna</h2>
+<pre class="codehilite"><code class="language-python"># Definir colunas a validar (excluir PKs e metadados de auditoria)
+colunas = [c for c in df_novo.columns
+           if c not in (&quot;pk&quot;, &quot;insert_date&quot;, &quot;update_date&quot;, &quot;partition_date&quot;)]
+
+# Join interno nas PKs comuns
+df_join = pk_comuns_df \
+    .join(df_novo.alias(&quot;N&quot;), on=&quot;pk&quot;) \
+    .join(df_legado.alias(&quot;L&quot;), on=&quot;pk&quot;)
+
+resultados = []
+
+for col in colunas:
+    # Total de linhas no universo comum
+    total = df_join.count()
+
+    # Contar cada tipo de divergência
+    null_vs_valor = df_join.filter(
+        F.col(f&quot;N.{col}&quot;).isNull() &amp; F.col(f&quot;L.{col}&quot;).isNotNull()
+    ).count()
+
+    valor_vs_null = df_join.filter(
+        F.col(f&quot;N.{col}&quot;).isNotNull() &amp; F.col(f&quot;L.{col}&quot;).isNull()
+    ).count()
+
+    valor_vs_valor = df_join.filter(
+        F.col(f&quot;N.{col}&quot;).isNotNull() &amp;
+        F.col(f&quot;L.{col}&quot;).isNotNull() &amp;
+        (F.col(f&quot;N.{col}&quot;).cast(&quot;string&quot;) != F.col(f&quot;L.{col}&quot;).cast(&quot;string&quot;))
+    ).count()
+
+    total_div = null_vs_valor + valor_vs_null + valor_vs_valor
+
+    resultados.append({
+        &quot;coluna&quot;:        col,
+        &quot;total_linhas&quot;:  total,
+        &quot;divergencias&quot;:  total_div,
+        &quot;pct_divergencia&quot;: round(total_div / total * 100, 2) if total &gt; 0 else 0,
+        &quot;null_vs_valor&quot;: null_vs_valor,
+        &quot;valor_vs_null&quot;: valor_vs_null,
+        &quot;valor_vs_valor&quot;: valor_vs_valor,
+        &quot;status&quot;:        &quot;PASS&quot; if total_div == 0 else &quot;FAIL&quot;
+    })
+
+# Exibir resultado
+df_resultado = spark.createDataFrame(resultados)
+df_resultado.orderBy(&quot;status&quot;, F.desc(&quot;divergencias&quot;)).show(50, truncate=False)
+</code></pre>
+
+<hr />
+<h2>Implementação — Bloco 3: Causa Raiz</h2>
+<pre class="codehilite"><code class="language-python">def analisa_causa_raiz(df_join, coluna: str, top_n: int = 20):
+    &quot;&quot;&quot;
+    Para uma coluna com FAIL, retorna a distribuição dos pares divergentes.
+    Permite identificar o padrão da divergência (ex: formato, encoding, regra).
+    &quot;&quot;&quot;
+    return df_join.filter(
+        F.col(f&quot;N.{coluna}&quot;).cast(&quot;string&quot;) != F.col(f&quot;L.{coluna}&quot;).cast(&quot;string&quot;)
+    ).groupBy(
+        F.col(f&quot;N.{coluna}&quot;).alias(&quot;valor_novo&quot;),
+        F.col(f&quot;L.{coluna}&quot;).alias(&quot;valor_legado&quot;)
+    ).agg(
+        F.count(&quot;*&quot;).alias(&quot;ocorrencias&quot;)
+    ).orderBy(
+        F.desc(&quot;ocorrencias&quot;)
+    ).limit(top_n)
+
+# Executar para cada coluna com FAIL
+colunas_fail = [r[&quot;coluna&quot;] for r in resultados if r[&quot;status&quot;] == &quot;FAIL&quot;]
+
+for col in colunas_fail:
+    print(f&quot;\n=== Causa raiz: {col} ===&quot;)
+    analisa_causa_raiz(df_join, col).show(truncate=False)
+</code></pre>
+
+<p><strong>Exemplo de output e interpretação:</strong></p>
+<pre class="codehilite"><code>=== Causa raiz: cd_municipio ===
++------------+-------------+-----------+
+|valor_novo  |valor_legado |ocorrencias|
++------------+-------------+-----------+
+|3550308     |3550308      |1200       | ← mesmo valor, mas tipo diferente?
+|NULL        |3550308      |340        | ← novo sistema não está populando
+|3550308     |35503080     |89         | ← legado tem zero extra no final
++------------+-------------+-----------+
+
+Causa raiz identificada:
+- Linha 1: possível divergência de tipo (INT vs. STRING), CAST resolve
+- Linha 2: coluna não mapeada no novo sistema — bug de transformação
+- Linha 3: legado tem erro de dado (código incorreto) — o novo sistema está correto
+</code></pre>
+
+<hr />
+<h2>Validação Cross-Environment com OPENROWSET</h2>
+<p>Em projetos onde o ambiente de dev tem acesso read-only ao storage de prod, o OPENROWSET do Synapse Serverless SQL permite validar sem mover dados:</p>
+<pre class="codehilite"><code class="language-sql">-- Query executada no endpoint -ondemand do Synapse
+-- Permite que DEV leia PROD diretamente via token AAD
+
+SELECT pk, coluna_a, coluna_b
+FROM OPENROWSET(
+    BULK 'https://&lt;storage-prod&gt;.dfs.core.windows.net/&lt;container&gt;/&lt;path&gt;/',
+    FORMAT = 'DELTA'
+) WITH (
+    pk       VARCHAR(50),
+    coluna_a DECIMAL(18,2),
+    coluna_b VARCHAR(200)
+) AS prod_data
+</code></pre>
+
+<p>Em PySpark, usar o connector JDBC para ler via Serverless SQL:</p>
+<pre class="codehilite"><code class="language-python">df_legado = spark.read \
+    .format(&quot;com.microsoft.azure.synapse.spark&quot;) \
+    .option(&quot;url&quot;, &quot;jdbc:sqlserver://&lt;workspace&gt;-ondemand.sql.azuresynapse.net;...&quot;) \
+    .option(&quot;query&quot;, &quot;SELECT pk, coluna_a FROM &lt;view_sobre_prod&gt;&quot;) \
+    .load()
+</code></pre>
+
+<hr />
+<h2>Template de Relatório de Homologação</h2>
+<p>Ao final da validação, o relatório deve conter:</p>
+<pre class="codehilite"><code>RELATÓRIO DE HOMOLOGAÇÃO — &lt;Nome da Tabela&gt;
+Data: YYYY-MM-DD
+Validado por: [nome]
+Ambiente novo: &lt;endpoint/path&gt;
+Ambiente legado: &lt;endpoint/path&gt;
+
+BLOCO 1 — UNIVERSO
+  PKs comuns:           X,XXX,XXX
+  PKs apenas no novo:   0
+  PKs apenas no legado: 0
+  Status: PASS
+
+BLOCO 2 — DIFF POR COLUNA (resumo)
+  Total de colunas validadas: XX
+  Colunas com PASS absoluto: XX
+  Colunas com FAIL:           XX
+
+  Detalhes por coluna:
+  coluna_a   PASS    (0 divergências)
+  coluna_b   PASS    (0 divergências)
+  coluna_c   FAIL    (1.200 divergências — 0,3% do universo)
+  ...
+
+BLOCO 3 — CAUSA RAIZ (para colunas com FAIL)
+  coluna_c:
+    Causa raiz: código de município sem padding de zeros à esquerda no legado.
+    Decisão: novo sistema está correto (código IBGE com 7 dígitos).
+    Ação: nenhuma — divergência aceita.
+
+RESULTADO FINAL: APROVADO PARA GO-LIVE
+Pendências documentadas: 1 divergência aceita em coluna_c (ver acima)
+</code></pre>
+
+<hr />
+<h2>Quando NÃO Usar Esta Metodologia</h2>
+<p>Esta metodologia pressupõe que <strong>existe uma base espelho ou legado como referência</strong>. Não se aplica quando:</p>
+<ol>
+<li>Não existe sistema legado para comparar — o dado é gerado pela primeira vez</li>
+<li>O legado é o sistema de origem (fonte transacional) e não uma transformação equivalente</li>
+<li>A validação de negócio é mais relevante que a paridade técnica — nesses casos, regras de negócio customizadas são mais adequadas que diff linha-a-linha</li>
+</ol>
+<hr />
+<h2>Referências</h2>
+<ul>
+<li><a href="https://docs.delta.io/latest/delta-batch.html">Delta Lake — Reading Delta Tables</a></li>
+<li><a href="https://learn.microsoft.com/en-us/azure/synapse-analytics/sql/query-delta-lake-format">Azure Synapse — OPENROWSET with Delta Lake</a></li>
+<li><a href="https://spark.apache.org/docs/latest/api/python/reference/pyspark.sql/api/pyspark.sql.DataFrame.join.html">PySpark — Full Outer Join</a></li>
+</ul>
+<hr />
+<p><em>Metodologia aplicada no <a href="../case-studies/03-homologacao-byte-a-byte.html">Case Study 03 — Homologação Byte-a-Byte Cross-Env</a> e no <a href="../case-studies/01-controller-driven-medallion.html">Case Study 01 — Controller-driven Medallion Architecture</a></em></p>
+    </div>
+
+    <nav class="article-nav"><a href="dynamic-partition-overwrite.html">← Dynamic Partition Overwrite</a><span></span></nav>
+</article>
+
+<footer>
+    <div class="container">
+        <p><strong>Wilson Lucas</strong> · Engenheiro de Dados Sênior</p>
+        <p><em>Material conceitual e anonimizado · Nenhum dado de cliente exposto</em></p>
+    </div>
+</footer>
+
+</body>
+</html>

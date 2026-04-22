@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Padrão · Controller-driven Architecture — Portfolio de Engenharia de Dados de Wilson Lucas.">
+<title>Padrão · Controller-driven Architecture | Wilson Lucas · Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Newsreader:ital,wght@0,400;0,500;1,400;1,500&family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="navbar-inner">
+        <div class="navbar-brand"><a href="../index.html" style="color: inherit;">Wilson Lucas · <em>Portfolio</em></a></div>
+        <div class="navbar-links">
+            <a href="../index.html#sobre">Sobre</a>
+            <a href="../index.html#stack">Stack</a>
+            <a href="../index.html#cases">Case Studies</a>
+            <a href="../index.html#padroes">Padrões</a>
+            <a href="../index.html#contato">Contato</a>
+        </div>
+    </div>
+</nav>
+
+<header class="article-header">
+    <div class="container">
+        <a href="../index.html#padroes" class="back-link">Voltar ao portfolio</a>
+        <div class="section-label">// Padrão Técnico 01</div>
+    </div>
+</header>
+
+<article class="container">
+    <div class="article-content">
+<h1>Controller-driven Architecture — Parametrização de Pipeline via Tabelas Delta</h1>
+<p><strong>Categoria:</strong> Padrão Arquitetural
+<strong>Stack:</strong> Azure Databricks · Delta Lake · Azure Data Factory · PySpark · Unity Catalog</p>
+<hr />
+<h2>O Problema que Motiva</h2>
+<p>Pipelines de dados crescem de formas que ninguém planeja no início. O que começa com 10 tabelas cresce para 50, depois 200, depois 400. Cada nova tabela, em uma arquitetura convencional, significa:</p>
+<ul>
+<li>Um novo job parametrizado no orquestrador (ADF, Airflow, etc.)</li>
+<li>Um novo notebook ou script com lógica ligeiramente diferente do anterior</li>
+<li>Um novo lugar para manter configuração de schema, fonte, destino e estratégia de escrita</li>
+</ul>
+<p>O resultado é uma explosão de configuração hard-coded — notebooks quase idênticos que diferem em três linhas, pipelines ADF com dezenas de atividades Copy quase iguais, e nenhum lugar único que responda &ldquo;quais tabelas fazem parte desta pipeline?&rdquo;</p>
+<p>A <strong>controller-driven architecture</strong> inverte essa lógica: a configuração vive em tabelas de dados (Delta), não em código. O código processa o que a tabela diz. Adicionar uma nova tabela à pipeline é uma operação de dados (INSERT), não uma operação de código (commit).</p>
+<hr />
+<h2>Princípio Central</h2>
+<pre class="codehilite"><code>Arquitetura convencional:
+  código define QUAIS tabelas processar
+  código define COMO processar cada tabela
+  → N tabelas = N configurações de código
+
+Arquitetura controller-driven:
+  tabela Delta define QUAIS tabelas processar e COM QUAIS PARÂMETROS
+  código define COMO processar (genérico, parametrizado)
+  → N tabelas = N linhas na tabela controller
+</code></pre>
+
+<hr />
+<h2>Estrutura das Tabelas Controller</h2>
+<p>A implementação típica usa 3-4 tabelas Delta em um schema dedicado (<code>&lt;catalog&gt;.controller</code>):</p>
+<h3>1. Tabela de Extração da Fonte (<code>source_to_lake</code>)</h3>
+<p>Define quais tabelas da fonte devem ser extraídas, com qual query e para qual destino.</p>
+<pre class="codehilite"><code class="language-sql">-- DDL simplificado
+CREATE TABLE controller.source_to_lake (
+    id_tabela       INTEGER,
+    schema_fonte    STRING,       -- schema no SQL Server de origem
+    tabela_fonte    STRING,       -- nome da tabela de origem
+    query_override  STRING,       -- query customizada (NULL = SELECT * sem filtro)
+    path_destino    STRING,       -- path no ADLS de destino (landing zone)
+    batch_flag      INTEGER,      -- agrupa tabelas em lotes para paralelismo ADF
+    ativo           BOOLEAN,      -- flag para habilitar/desabilitar extração
+    dt_atualizacao  TIMESTAMP
+);
+</code></pre>
+
+<p><strong>Exemplo de dados:</strong></p>
+<pre class="codehilite"><code>id | schema_fonte | tabela_fonte  | batch_flag | ativo
+1  | dbo          | tb_apolice    | 1          | true
+2  | dbo          | tb_sinistro   | 1          | true
+3  | dbo          | tb_segurado   | 2          | true
+4  | dbo          | tb_historico  | 2          | false  ← desabilitada sem alterar código
+</code></pre>
+
+<p>O ADF lê esta tabela via <code>Lookup</code> e distribui a extração por <code>batch_flag</code>:
+- <code>batch_flag = 1</code>: primeiro lote (paralelo entre si)
+- <code>batch_flag = 2</code>: segundo lote (executa após o primeiro)</p>
+<hr />
+<h3>2. Tabela de Ingestão Landing → Bronze (<code>landing_to_bronze</code>)</h3>
+<p>Define o mapeamento entre arquivos na zona landing e tabelas Bronze de destino.</p>
+<pre class="codehilite"><code class="language-sql">CREATE TABLE controller.landing_to_bronze (
+    id_tabela           INTEGER,
+    path_landing        STRING,       -- path do arquivo na landing zone
+    catalog_destino     STRING,       -- catalog Unity Catalog de destino
+    schema_destino      STRING,       -- schema de destino
+    tabela_destino      STRING,       -- nome da tabela Delta de destino
+    schema_override     STRING,       -- schema explícito (NULL = inferência automática)
+    estrategia_escrita  STRING,       -- &quot;merge&quot; ou &quot;overwrite&quot; ou &quot;append&quot;
+    partition_col       STRING,       -- coluna de partição (NULL = sem partição)
+    ativo               BOOLEAN
+);
+</code></pre>
+
+<hr />
+<h3>3. Tabela de Orquestração Silver (<code>silver_notebooks</code>)</h3>
+<p>Declara quais notebooks Silver executar e em que ordem/paralelismo.</p>
+<pre class="codehilite"><code class="language-sql">CREATE TABLE controller.silver_notebooks (
+    id_notebook         INTEGER,
+    path_notebook       STRING,       -- path do notebook no workspace Databricks
+    seq                 INTEGER,      -- nível de execução (mesmo seq = paralelo)
+    timeout_minutos     INTEGER,      -- timeout máximo de execução
+    ativo               BOOLEAN,
+    dt_atualizacao      TIMESTAMP
+);
+</code></pre>
+
+<p><strong>O campo <code>seq</code> é o coração da orquestração:</strong></p>
+<pre class="codehilite"><code>seq=1: [notebook_clientes] [notebook_apolices] [notebook_produtos]  ← paralelo
+seq=2: [notebook_sinistros] [notebook_cobertura]                    ← paralelo, após seq=1
+seq=3: [notebook_fato_pricipal]                                     ← após seq=2
+</code></pre>
+
+<p>Adicionar dependência entre notebooks é uma questão de ajustar o <code>seq</code> — sem alterar o orquestrador.</p>
+<hr />
+<h3>4. Backup da Controller (<code>bckup_source</code>)</h3>
+<p>Snapshot versionado das outras tabelas controller, para auditoria e rollback.</p>
+<pre class="codehilite"><code class="language-sql">CREATE TABLE controller.bckup_source (
+    tabela_origem   STRING,
+    snapshot_json   STRING,       -- conteúdo serializado da tabela em JSON
+    dt_snapshot     TIMESTAMP,
+    motivo          STRING        -- &quot;pré-deploy&quot;, &quot;pré-reprocessamento&quot;, etc.
+);
+</code></pre>
+
+<hr />
+<h2>Como o Orquestrador Consume as Controller Tables</h2>
+<h3>No Azure Data Factory — Fase de Extração</h3>
+<pre class="codehilite"><code class="language-json">// Atividade Lookup — lê a tabela controller
+{
+  &quot;name&quot;: &quot;LookupSourceTables&quot;,
+  &quot;type&quot;: &quot;Lookup&quot;,
+  &quot;typeProperties&quot;: {
+    &quot;source&quot;: {
+      &quot;type&quot;: &quot;AzureSqlSource&quot;,
+      &quot;sqlReaderQuery&quot;: &quot;SELECT * FROM controller.source_to_lake WHERE ativo = 1 AND batch_flag = @{pipeline().parameters.batch_num} ORDER BY id_tabela&quot;
+    }
+  }
+}
+
+// Atividade ForEach — itera sobre o resultado do Lookup
+{
+  &quot;name&quot;: &quot;ForEachTable&quot;,
+  &quot;type&quot;: &quot;ForEach&quot;,
+  &quot;typeProperties&quot;: {
+    &quot;isSequential&quot;: false,          // paralelo dentro do lote
+    &quot;batchCount&quot;: 10,               // máximo 10 em paralelo
+    &quot;items&quot;: &quot;@activity('LookupSourceTables').output.value&quot;,
+    &quot;activities&quot;: [
+      {
+        &quot;name&quot;: &quot;CopyToLanding&quot;,
+        &quot;type&quot;: &quot;Copy&quot;,
+        &quot;typeProperties&quot;: {
+          &quot;source&quot;: {
+            &quot;sqlReaderQuery&quot;: &quot;@{if(equals(item().query_override, null), concat('SELECT * FROM ', item().schema_fonte, '.', item().tabela_fonte), item().query_override)}&quot;
+          },
+          &quot;sink&quot;: {
+            &quot;storeSettings&quot;: {
+              &quot;folderPath&quot;: &quot;@item().path_destino&quot;
+            }
+          }
+        }
+      }
+    ]
+  }
+}
+</code></pre>
+
+<h3>No Databricks — Fase de Orquestração Silver</h3>
+<pre class="codehilite"><code class="language-python"># Notebook orquestrador — lê silver_notebooks e executa por seq
+from pyspark.sql import functions as F
+
+df_notebooks = spark.read.format(&quot;delta&quot;) \
+    .load(f&quot;{catalog}.controller.silver_notebooks&quot;) \
+    .filter(&quot;ativo = true&quot;) \
+    .orderBy(&quot;seq&quot;, &quot;id_notebook&quot;)
+
+# Agrupa por seq para controlar paralelismo
+niveis = df_notebooks.select(&quot;seq&quot;).distinct().orderBy(&quot;seq&quot;).collect()
+
+for nivel in niveis:
+    seq_atual = nivel.seq
+    notebooks_nivel = df_notebooks.filter(f&quot;seq = {seq_atual}&quot;).collect()
+
+    # Executar notebooks do mesmo nível em paralelo via threads
+    from concurrent.futures import ThreadPoolExecutor
+
+    def executa_notebook(row):
+        dbutils.notebook.run(
+            path=row.path_notebook,
+            timeout_seconds=row.timeout_minutos * 60,
+            arguments={&quot;partition_date&quot;: partition_date}
+        )
+
+    with ThreadPoolExecutor(max_workers=len(notebooks_nivel)) as executor:
+        futures = [executor.submit(executa_notebook, nb) for nb in notebooks_nivel]
+        for f in futures:
+            f.result()  # levanta exceção se algum notebook falhar
+
+    print(f&quot;Nível seq={seq_atual} concluído ({len(notebooks_nivel)} notebooks)&quot;)
+</code></pre>
+
+<hr />
+<h2>Operações Comuns via Controller Tables</h2>
+<h3>Adicionar uma nova tabela à pipeline</h3>
+<pre class="codehilite"><code class="language-sql">-- Adicionar extração do SQL Server
+INSERT INTO controller.source_to_lake
+(id_tabela, schema_fonte, tabela_fonte, path_destino, batch_flag, ativo)
+VALUES (400, 'dbo', 'tb_nova_tabela', 'landing/tb_nova_tabela/', 2, true);
+
+-- Adicionar mapeamento landing → Bronze
+INSERT INTO controller.landing_to_bronze
+(id_tabela, path_landing, catalog_destino, schema_destino, tabela_destino, estrategia_escrita, ativo)
+VALUES (400, 'landing/tb_nova_tabela/', 'catalog_prod', 'bronze', 'tb_nova_tabela', 'merge', true);
+</code></pre>
+
+<p>Resultado: na próxima execução da pipeline, a nova tabela é extraída, convertida para Delta Bronze e processada automaticamente. Zero mudança de código.</p>
+<h3>Desabilitar temporariamente uma tabela</h3>
+<pre class="codehilite"><code class="language-sql">UPDATE controller.source_to_lake
+SET ativo = false
+WHERE tabela_fonte = 'tb_problematica';
+</code></pre>
+
+<h3>Ajustar paralelismo do orquestrador Silver</h3>
+<pre class="codehilite"><code class="language-sql">-- Mover notebook para executar antes (seq menor)
+UPDATE controller.silver_notebooks
+SET seq = 1
+WHERE path_notebook LIKE '%tb_clientes%';
+</code></pre>
+
+<hr />
+<h2>Quando Usar Controller-driven Architecture</h2>
+<p>Use este padrão quando:</p>
+<ol>
+<li>A pipeline gerencia <strong>muitas tabelas homogêneas</strong> — a mesma lógica se aplica a dezenas ou centenas de entidades com parâmetros distintos</li>
+<li>A equipe que <strong>configura</strong> a pipeline é diferente da equipe que <strong>desenvolve</strong> — analistas de dados podem adicionar tabelas sem precisar de um desenvolvedor</li>
+<li><strong>Auditoria de configuração</strong> é importante — o histórico de quais tabelas estavam ativas em qual versão é rastreável via <code>bckup_source</code> e via o próprio Delta Lake (Time Travel)</li>
+<li>O ambiente precisa de <strong>múltiplos ambientes</strong> (dev/prod) com configurações distintas — basta ter schemas <code>controller</code> distintos por catalog</li>
+</ol>
+<hr />
+<h2>Quando NÃO Usar</h2>
+<p><strong>Não use</strong> quando:</p>
+<ol>
+<li>A pipeline tem <strong>poucas tabelas estáticas</strong> (&lt; 10) com lógicas muito distintas entre si — o overhead de manter a controller table não compensa</li>
+<li>Cada tabela tem uma <strong>lógica de transformação radicalmente diferente</strong> — a controller parametriza configuração, não lógica. Se o código para cada tabela é diferente, a parametrização não resolve</li>
+<li>A equipe não tem <strong>disciplina de dados</strong> — uma controller table desatualizada é pior que configuração hard-coded, porque cria falsa sensação de controle enquanto os dados ficam defasados</li>
+</ol>
+<hr />
+<h2>Comparação com Alternativas</h2>
+<table>
+<thead>
+<tr>
+<th>Abordagem</th>
+<th>Escalabilidade</th>
+<th>Auditabilidade</th>
+<th>Curva de Adoção</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Hard-coded por tabela</td>
+<td>Baixa (1 artefato por tabela)</td>
+<td>Baixa (no git)</td>
+<td>Zero</td>
+</tr>
+<tr>
+<td>Parâmetros no orquestrador</td>
+<td>Média (limitado pela UI)</td>
+<td>Média (via histórico do orquestrador)</td>
+<td>Baixa</td>
+</tr>
+<tr>
+<td>Controller tables (Delta)</td>
+<td>Alta (INSERT = nova tabela)</td>
+<td>Alta (Delta Time Travel)</td>
+<td>Média</td>
+</tr>
+<tr>
+<td>Config files (YAML/JSON)</td>
+<td>Média (escala com arquivos)</td>
+<td>Média (no git)</td>
+<td>Baixa-Média</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>Referências</h2>
+<ul>
+<li><a href="https://docs.delta.io/latest/delta-utility.html">Delta Lake — Time Travel</a></li>
+<li><a href="https://learn.microsoft.com/en-us/azure/data-factory/control-flow-for-each-activity">Azure Data Factory — ForEach Activity</a></li>
+<li><a href="https://docs.databricks.com/en/dev-tools/databricks-utils.html#dbutils-notebook">Databricks — dbutils.notebook.run</a></li>
+</ul>
+<hr />
+<p><em>Padrão aplicado no <a href="../case-studies/01-controller-driven-medallion.html">Case Study 01 — Controller-driven Medallion Architecture</a></em></p>
+    </div>
+
+    <nav class="article-nav"><span></span><a href="dynamic-partition-overwrite.html">Dynamic Partition Overwrite →</a></nav>
+</article>
+
+<footer>
+    <div class="container">
+        <p><strong>Wilson Lucas</strong> · Engenheiro de Dados Sênior</p>
+        <p><em>Material conceitual e anonimizado · Nenhum dado de cliente exposto</em></p>
+    </div>
+</footer>
+
+</body>
+</html>

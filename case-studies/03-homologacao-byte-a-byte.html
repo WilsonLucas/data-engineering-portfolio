@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Case 03 · Homologação Byte-a-Byte — Portfolio de Engenharia de Dados de Wilson Lucas.">
+<title>Case 03 · Homologação Byte-a-Byte | Wilson Lucas · Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Newsreader:ital,wght@0,400;0,500;1,400;1,500&family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="navbar-inner">
+        <div class="navbar-brand"><a href="../index.html" style="color: inherit;">Wilson Lucas · <em>Portfolio</em></a></div>
+        <div class="navbar-links">
+            <a href="../index.html#sobre">Sobre</a>
+            <a href="../index.html#stack">Stack</a>
+            <a href="../index.html#cases">Case Studies</a>
+            <a href="../index.html#padroes">Padrões</a>
+            <a href="../index.html#contato">Contato</a>
+        </div>
+    </div>
+</nav>
+
+<header class="article-header">
+    <div class="container">
+        <a href="../index.html#cases" class="back-link">Voltar ao portfolio</a>
+        <div class="section-label">// Case Study 03 · Setor Público</div>
+    </div>
+</header>
+
+<article class="container">
+    <div class="article-content">
+<h1>Case Study 03 — Homologação Byte-a-Byte Cross-Env com OPENROWSET</h1>
+<p><strong>Setor:</strong> Público (apoio a micro e pequenas empresas)
+<strong>Empregador:</strong> Dataside (consultoria)
+<strong>Papel:</strong> Engenheiro de Dados Sênior — responsabilidade técnica integral</p>
+<hr />
+<h2>Setor e Perfil do Projeto</h2>
+<p>Migração de lógica analítica legada — procedures T-SQL on-premises desenvolvidas ao longo de anos — para PySpark em Azure Synapse Analytics. O projeto atendia uma agência pública cujos dados de saída são consumidos diretamente por diretoria e stakeholders estaduais: dashboards e relatórios com impacto em decisões de alocação de recursos para micro e pequenas empresas.</p>
+<p>Pela criticidade do consumo downstream, a organização exigiu paridade verificável e documentada entre a nova implementação PySpark e as procedures legadas — não uma estimativa de equivalência, mas evidência auditável de que cada linha, cada valor, cada chave primária do novo sistema corresponde ao legado.</p>
+<hr />
+<h2>Problema</h2>
+<p><strong>Técnico:</strong> Como homologar a migração de procedures T-SQL para PySpark quando o ambiente de desenvolvimento tem acesso read-only à produção e os dados de dev estão estruturalmente incompletos (subconjunto da base)?</p>
+<p><strong>Metodológico:</strong> Como estruturar uma validação que seja auditável, reproducível e que vá além da amostragem — especialmente quando a diretoria precisa assinar o go-live baseada nos resultados?</p>
+<p><strong>Ferramental:</strong> Como inspecionar schemas Delta, listar paths ADLS e verificar status de pipelines sem depender do Synapse Studio para cada operação do dia a dia?</p>
+<hr />
+<h2>Stack Aplicada</h2>
+<table>
+<thead>
+<tr>
+<th>Componente</th>
+<th>Tecnologia</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Processamento principal</td>
+<td>Azure Synapse Analytics (Spark Pool)</td>
+</tr>
+<tr>
+<td>Homologação cross-env</td>
+<td>Synapse Serverless SQL (OPENROWSET + AAD passthrough)</td>
+</tr>
+<tr>
+<td>Formato de armazenamento</td>
+<td>Delta Lake</td>
+</tr>
+<tr>
+<td>Storage</td>
+<td>Azure Data Lake Storage Gen2</td>
+</tr>
+<tr>
+<td>Linguagem de transformação</td>
+<td>PySpark + Spark SQL</td>
+</tr>
+<tr>
+<td>Parsing de metadados</td>
+<td>Python + pyarrow</td>
+</tr>
+<tr>
+<td>Ferramenta CLI própria</td>
+<td>Python (SynapseCheck / <code>sc</code>)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>Arquitetura do Ambiente</h2>
+<pre class="codehilite"><code>Ambiente PROD (read-only)          Ambiente DEV
+──────────────────────────         ──────────────────────────
+SQL Server on-prem                 Synapse Spark Pool
+  [procedures T-SQL legadas]         [notebooks PySpark (novo)]
+          │                                    │
+          ▼                                    ▼
+  Base espelho ADLS (prod)          ADLS DEV
+  (Delta/Parquet)                   (Delta)
+
+                    ┌─────────────────────────────┐
+                    │  Synapse Serverless SQL      │
+                    │  (synapseXXX-ondemand)       │
+                    │                              │
+                    │  OPENROWSET com AAD          │
+                    │  passthrough permite que     │
+                    │  DEV leia PROD diretamente   │
+                    └─────────────────────────────┘
+                               ▲
+                               │
+                    Metodologia de homologação
+                    (3 blocos de validação)
+</code></pre>
+
+<hr />
+<h2>A Solução do Acesso Cross-Environment</h2>
+<p>O bloqueio fundamental era: o ambiente de desenvolvimento não tinha dados suficientes para uma validação completa. A cópia de dados de prod para dev era inviável (volume e compliance). A solução foi usar o Synapse Serverless SQL com <code>OPENROWSET</code> e passthrough AAD para que o ambiente de dev lesse diretamente os dados de produção, sem movimentação de dados.</p>
+<pre class="codehilite"><code class="language-sql">-- Query executada em DEV, lendo PROD via Serverless SQL
+SELECT
+    pk_coluna,
+    coluna_a,
+    coluna_b,
+    coluna_c
+FROM OPENROWSET(
+    BULK 'https://&lt;storage-prod&gt;.dfs.core.windows.net/&lt;container&gt;/&lt;path&gt;/',
+    FORMAT = 'DELTA'
+) WITH (
+    pk_coluna    VARCHAR(50),
+    coluna_a     DECIMAL(18,2),
+    coluna_b     VARCHAR(200),
+    coluna_c     DATE
+) AS prod_data
+</code></pre>
+
+<p><strong>Por que funciona:</strong> O Synapse Serverless SQL (<code>-ondemand</code> endpoint) usa o token AAD do usuário autenticado para acessar o storage — sem mover dados, sem criar cópias intermediárias, com controle de acesso pelo RBAC do Azure.</p>
+<hr />
+<h2>Metodologia de Homologação (Zero Amostragem)</h2>
+<p>A metodologia foi desenvolvida em três blocos independentes que juntos provam equivalência completa.</p>
+<h3>Bloco 1 — Universo (Cobertura de Chaves Primárias)</h3>
+<p>Objetivo: garantir que o novo sistema processa exatamente o mesmo universo de registros que o legado — nem mais, nem menos.</p>
+<pre class="codehilite"><code class="language-python"># Leitura da tabela nova (DEV/lake)
+df_lake = spark.read.format(&quot;delta&quot;).load(&quot;&lt;path_dev&gt;&quot;)
+
+# Leitura da base espelho (PROD via Serverless SQL)
+df_espelho = spark.read \
+    .format(&quot;com.microsoft.azure.synapse.spark&quot;) \
+    .option(&quot;url&quot;, &quot;jdbc:sqlserver://&lt;serverless&gt;-ondemand.sql.azuresynapse.net&quot;) \
+    .option(&quot;query&quot;, &quot;SELECT pk FROM &lt;tabela_espelho&gt;&quot;) \
+    .load()
+
+# FULL OUTER JOIN para encontrar divergências de universo
+df_universo = df_lake.select(&quot;pk&quot;).alias(&quot;lake&quot;) \
+    .join(df_espelho.select(&quot;pk&quot;).alias(&quot;espelho&quot;), on=&quot;pk&quot;, how=&quot;full_outer&quot;)
+
+pk_comuns         = df_universo.filter(&quot;lake.pk IS NOT NULL AND espelho.pk IS NOT NULL&quot;)
+pk_apenas_lake    = df_universo.filter(&quot;espelho.pk IS NULL&quot;)
+pk_apenas_espelho = df_universo.filter(&quot;lake.pk IS NULL&quot;)
+
+print(f&quot;PKs comuns: {pk_comuns.count()}&quot;)
+print(f&quot;PKs apenas no lake (novo): {pk_apenas_lake.count()}&quot;)
+print(f&quot;PKs apenas no espelho (legado): {pk_apenas_espelho.count()}&quot;)
+</code></pre>
+
+<p><strong>Resultado neste projeto:</strong> 4,1M+ PKs comuns, 0 divergências de universo após correção dos filtros de data.</p>
+<hr />
+<h3>Bloco 2 — Diff por Coluna (Validação de Valores)</h3>
+<p>Objetivo: para cada coluna, quantificar e classificar as divergências entre o lago e o espelho, usando apenas as PKs comuns.</p>
+<pre class="codehilite"><code class="language-python">colunas_para_validar = [c for c in df_lake.columns if c != &quot;pk&quot;]
+
+resultados = []
+
+for coluna in colunas_para_validar:
+    df_diff = pk_comuns.join(df_lake.select(&quot;pk&quot;, coluna).alias(&quot;L&quot;), on=&quot;pk&quot;) \
+                       .join(df_espelho.select(&quot;pk&quot;, coluna).alias(&quot;E&quot;), on=&quot;pk&quot;)
+
+    total = df_diff.count()
+
+    # Classificação dos tipos de divergência
+    null_vs_valor = df_diff.filter(
+        F.col(f&quot;L.{coluna}&quot;).isNull() &amp; F.col(f&quot;E.{coluna}&quot;).isNotNull()
+    ).count()
+
+    valor_vs_null = df_diff.filter(
+        F.col(f&quot;L.{coluna}&quot;).isNotNull() &amp; F.col(f&quot;E.{coluna}&quot;).isNull()
+    ).count()
+
+    valor_vs_valor = df_diff.filter(
+        F.col(f&quot;L.{coluna}&quot;).isNotNull() &amp;
+        F.col(f&quot;E.{coluna}&quot;).isNotNull() &amp;
+        (F.col(f&quot;L.{coluna}&quot;) != F.col(f&quot;E.{coluna}&quot;))
+    ).count()
+
+    divergencias = null_vs_valor + valor_vs_null + valor_vs_valor
+
+    resultados.append({
+        &quot;coluna&quot;: coluna,
+        &quot;total&quot;: total,
+        &quot;divergencias&quot;: divergencias,
+        &quot;null_vs_valor&quot;: null_vs_valor,
+        &quot;valor_vs_null&quot;: valor_vs_null,
+        &quot;valor_vs_valor&quot;: valor_vs_valor,
+        &quot;status&quot;: &quot;PASS&quot; if divergencias == 0 else &quot;FAIL&quot;
+    })
+</code></pre>
+
+<p><strong>Resultado neste projeto:</strong> 76 colunas auditadas, 21 com PASS absoluto (zero divergências), demais com causa raiz documentada.</p>
+<hr />
+<h3>Bloco 3 — Distribuição de Pares (Causa Raiz)</h3>
+<p>Objetivo: para colunas com <code>FAIL</code>, entender o padrão das divergências. Não apenas &ldquo;quantas linhas divergem&rdquo;, mas &ldquo;qual é o mapeamento de valor legado para valor novo&rdquo;.</p>
+<pre class="codehilite"><code class="language-python"># Para cada coluna com divergência, gerar a distribuição dos pares
+def analisa_pares(df_diff, coluna, top_n=20):
+    return df_diff.filter(
+        F.col(f&quot;L.{coluna}&quot;) != F.col(f&quot;E.{coluna}&quot;)
+    ).groupBy(
+        F.col(f&quot;L.{coluna}&quot;).alias(&quot;valor_lake&quot;),
+        F.col(f&quot;E.{coluna}&quot;).alias(&quot;valor_espelho&quot;)
+    ).count() \
+     .orderBy(F.desc(&quot;count&quot;)) \
+     .limit(top_n)
+</code></pre>
+
+<p><strong>Exemplo de insight gerado:</strong> a coluna <code>cd_municipio</code> divergia em 12.000 linhas porque o legado usava código IBGE sem zeros à esquerda, enquanto o novo sistema preservava o formato original da fonte. Causa raiz documentada → decisão de negócio: qual formato é o correto para o downstream.</p>
+<hr />
+<h2>CLI Própria — SynapseCheck (<code>sc</code>)</h2>
+<p>Para reduzir a dependência do Synapse Studio em tarefas de diagnóstico do dia a dia, desenvolvi uma CLI Python read-only com os seguintes comandos:</p>
+<pre class="codehilite"><code>sc config                    # Valida setup (credenciais, conectividade)
+sc storage &quot;&lt;path&gt;&quot;          # Lista paths ADLS (similar a ls)
+sc tables                    # Lista tabelas conhecidas no registry
+sc inspect &lt;tabela&gt;          # Schema Delta (lê _delta_log sem Spark)
+sc notebooks                 # Lista notebooks do workspace Synapse
+sc status -d 7               # Status de pipeline runs dos últimos 7 dias
+</code></pre>
+
+<p><strong>Inovação técnica interna:</strong> o comando <code>sc inspect</code> lê o schema Delta diretamente dos arquivos <code>_delta_log</code> via parsing do transaction log — sem precisar de uma sessão Spark ativa, em segundos ao invés de minutos de startup de cluster.</p>
+<pre class="codehilite"><code class="language-python">import json
+from pathlib import Path
+
+def infer_schema_from_delta_log(delta_log_path: str) -&gt; dict:
+    &quot;&quot;&quot;
+    Lê o schema de uma tabela Delta diretamente do _delta_log,
+    sem iniciar uma sessão Spark.
+    &quot;&quot;&quot;
+    log_files = sorted(Path(delta_log_path).glob(&quot;*.json&quot;))
+
+    for log_file in reversed(log_files):
+        with open(log_file) as f:
+            for line in f:
+                entry = json.loads(line)
+                if &quot;metaData&quot; in entry:
+                    schema_str = entry[&quot;metaData&quot;][&quot;schemaString&quot;]
+                    return json.loads(schema_str)
+
+    raise ValueError(&quot;Schema não encontrado no delta_log&quot;)
+</code></pre>
+
+<p><strong>Leitura de Parquet sem cluster:</strong> para inspeção de arquivos Parquet de 2GB+, implementei download parcial (últimos 2MB, onde o footer do Parquet está) + reconstrução via <code>pyarrow</code>, permitindo obter schema e estatísticas de coluna sem subir cluster.</p>
+<pre class="codehilite"><code class="language-python">import pyarrow.parquet as pq
+import io
+
+def read_parquet_footer(storage_client, blob_path: str) -&gt; pq.ParquetFile:
+    &quot;&quot;&quot;
+    Lê footer de Parquet &gt;= 2GB sem baixar o arquivo inteiro.
+    Resolve o erro &quot;Message type not found&quot; causado por INT96 timestamps.
+    &quot;&quot;&quot;
+    # Tamanho do arquivo
+    blob = storage_client.get_blob_client(container=..., blob=blob_path)
+    size = blob.get_blob_properties().size
+
+    # Baixar apenas os últimos 2MB (footer + magic bytes)
+    offset = max(0, size - 2 * 1024 * 1024)
+    footer_bytes = blob.download_blob(offset=offset, length=2 * 1024 * 1024).readall()
+
+    # Reconstruir via pyarrow
+    buffer = io.BytesIO(footer_bytes)
+    return pq.ParquetFile(buffer)
+</code></pre>
+
+<hr />
+<h2>Decisões Técnicas-Chave</h2>
+<h3>1. OPENROWSET vs. cópia de dados para homologação</h3>
+<p><strong>Alternativa descartada:</strong> copiar os dados de prod para dev para validação local.</p>
+<p><strong>Motivo:</strong> Volume (dezenas de GB), compliance (dados de negócio transitando entre ambientes), e tempo de setup. O OPENROWSET com passthrough AAD entregou o mesmo resultado sem mover um byte.</p>
+<h3>2. Zero amostragem — validação do universo completo</h3>
+<p><strong>Alternativa descartada:</strong> validar uma amostra de 10% ou 1M de registros.</p>
+<p><strong>Motivo:</strong> Em projetos de migração com consumo por diretoria, amostragem cria uma lacuna de confiança que nunca fecha. &ldquo;Validamos 10% e era equivalente&rdquo; não é o mesmo que &ldquo;validamos 100% e é equivalente&rdquo;. Para o stakeholder que vai assinar o go-live, a diferença é significativa.</p>
+<h3>3. CLI read-only vs. permissões elevadas</h3>
+<p><strong>Decisão:</strong> A CLI <code>sc</code> foi desenvolvida como estritamente read-only — nenhum comando modifica dados ou configurações.</p>
+<p><strong>Motivo:</strong> Em ambiente de prod com acesso AAD passthrough, ter uma ferramenta que acidentalmente modifica dados seria um risco operacional. Read-only elimina essa classe de acidente.</p>
+<hr />
+<h2>Resultados Quantificados</h2>
+<table>
+<thead>
+<tr>
+<th>Métrica</th>
+<th>Valor</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PKs comuns validados</td>
+<td>4,1M+</td>
+</tr>
+<tr>
+<td>Colunas auditadas</td>
+<td>76</td>
+</tr>
+<tr>
+<td>Colunas com PASS absoluto (zero divergências)</td>
+<td>21</td>
+</tr>
+<tr>
+<td>Colunas com divergência e causa raiz documentada</td>
+<td>55</td>
+</tr>
+<tr>
+<td>Ambientes cruzados na validação</td>
+<td>2 (dev lendo prod via OPENROWSET)</td>
+</tr>
+<tr>
+<td>Movimentação de dados para homologação</td>
+<td>0 bytes</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>Padrões Aplicados</h2>
+<ul>
+<li><a href="../technical-notes/homologacao-metodologia.html">Metodologia de Homologação</a> — detalhamento completo dos 3 blocos de validação</li>
+</ul>
+<hr />
+<h2>Lições Aprendidas</h2>
+<p><strong>OPENROWSET como proxy de acesso é subutilizado.</strong> A maioria dos engenheiros usa Serverless SQL apenas para queries ad hoc sobre arquivos ADLS. Usá-lo como ponte controlada entre ambientes — dev lendo prod sem cópia — é um padrão elegante que vale documentar e replicar.</p>
+<p><strong>&ldquo;Causa raiz documentada&rdquo; é diferente de &ldquo;erro corrigido&rdquo;.</strong> Algumas das 55 colunas com divergência tinham divergências corretas — o novo sistema calculava diferente, e a diferença era intencional (melhoria de regra de negócio). Documentar a causa raiz permitiu classificar cada divergência em &ldquo;corrigir&rdquo;, &ldquo;aceitar como melhoria&rdquo; ou &ldquo;investigar mais&rdquo;. Sem essa classificação, toda divergência parece falha.</p>
+<p><strong>INT96 timestamps são uma armadilha clássica do Parquet.</strong> O erro <code>"Message type not found"</code> ao ler Parquet via pyarrow é quase sempre causado por colunas de timestamp gravadas no formato INT96 (legado do Impala). A solução é usar <code>read_options=pyarrow.parquet.ParquetDatasetReaderOptions(coerce_int96_timestamp_unit="ms")</code>. Documentado nos comentários da CLI.</p>
+<p><strong>CLI própria multiplica produtividade em ambientes complexos.</strong> O retorno sobre o investimento de 2-3 dias para construir a <code>sc</code> foi enorme — cada diagnóstico que antes levava 15 minutos de navegação no Synapse Studio passou a levar 30 segundos no terminal.</p>
+    </div>
+
+    <nav class="article-nav"><a href="02-folha-pagamento-40M-linhas.html">← Case 02 · Folha de Pagamento</a><a href="04-migracao-camada-semantica.html">Case 04 · Migração Camada Semântica →</a></nav>
+</article>
+
+<footer>
+    <div class="container">
+        <p><strong>Wilson Lucas</strong> · Engenheiro de Dados Sênior</p>
+        <p><em>Material conceitual e anonimizado · Nenhum dado de cliente exposto</em></p>
+    </div>
+</footer>
+
+</body>
+</html>

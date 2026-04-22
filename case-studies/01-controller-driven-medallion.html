@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Case 01 · Controller-driven Medallion Architecture — Portfolio de Engenharia de Dados de Wilson Lucas.">
+<title>Case 01 · Controller-driven Medallion Architecture | Wilson Lucas · Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Newsreader:ital,wght@0,400;0,500;1,400;1,500&family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="navbar-inner">
+        <div class="navbar-brand"><a href="../index.html" style="color: inherit;">Wilson Lucas · <em>Portfolio</em></a></div>
+        <div class="navbar-links">
+            <a href="../index.html#sobre">Sobre</a>
+            <a href="../index.html#stack">Stack</a>
+            <a href="../index.html#cases">Case Studies</a>
+            <a href="../index.html#padroes">Padrões</a>
+            <a href="../index.html#contato">Contato</a>
+        </div>
+    </div>
+</nav>
+
+<header class="article-header">
+    <div class="container">
+        <a href="../index.html#cases" class="back-link">Voltar ao portfolio</a>
+        <div class="section-label">// Case Study 01 · Financial Services</div>
+    </div>
+</header>
+
+<article class="container">
+    <div class="article-content">
+<h1>Case Study 01 — Controller-driven Medallion Architecture</h1>
+<p><strong>Setor:</strong> Segurador (financial services)
+<strong>Empregador:</strong> Dataside (consultoria)
+<strong>Papel:</strong> Engenheiro de Dados Sênior — responsabilidade técnica integral</p>
+<hr />
+<h2>Setor e Perfil do Projeto</h2>
+<p>Projeto end-to-end de modernização de plataforma analítica em uma seguradora nacional de médio-grande porte. A organização mantinha seus sistemas transacionais em SQL Server on-premises e extraía dados para análise por meio de pipelines ad hoc criados ao longo de anos — sem padrão arquitetural, sem catalogação centralizada, sem rastreabilidade de linhagem.</p>
+<p>A migração para uma arquitetura Medallion moderna no Azure exigia não apenas mover dados, mas resolver o problema estrutural de como gerenciar, monitorar e evoluir centenas de tabelas ao longo do tempo sem depender de intervenção manual para cada mudança de schema ou nova fonte incorporada.</p>
+<hr />
+<h2>Problema</h2>
+<p><strong>Técnico:</strong> Como migrar 433 tabelas de SQL Server on-premises para Azure Databricks com Unity Catalog, mantendo rastreabilidade, idempotência e janelas curtas de ingestão (cargas a cada 30 minutos), sem criar janela de inconsistência para consumidores de BI downstream?</p>
+<p><strong>Operacional:</strong> Como garantir que a plataforma possa ser mantida e evoluída por um time que não tem o contexto de cada decisão de implementação — i.e., como embutir a governança da pipeline na própria pipeline?</p>
+<p><strong>Escala do desafio:</strong>
+- 433 tabelas Bronze com schemas heterogêneos
+- 35 tabelas Silver com regras de negócio acumuladas
+- SQL Server on-premises como fonte — sem acesso direto por ferramentas cloud-native
+- Exigência de equivalência semântica verificável entre a camada Silver nova e as procedures T-SQL legadas</p>
+<hr />
+<h2>Stack Aplicada</h2>
+<table>
+<thead>
+<tr>
+<th>Componente</th>
+<th>Tecnologia</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Orquestração</td>
+<td>Azure Data Factory</td>
+</tr>
+<tr>
+<td>Fonte</td>
+<td>SQL Server on-premises</td>
+</tr>
+<tr>
+<td>Gestão de segredos</td>
+<td>Azure Key Vault</td>
+</tr>
+<tr>
+<td>Storage (landing e lake)</td>
+<td>Azure Data Lake Storage Gen2</td>
+</tr>
+<tr>
+<td>Processamento</td>
+<td>Azure Databricks (Unity Catalog)</td>
+</tr>
+<tr>
+<td>Formato de armazenamento</td>
+<td>Delta Lake</td>
+</tr>
+<tr>
+<td>Linguagem de transformação</td>
+<td>PySpark + Spark SQL</td>
+</tr>
+<tr>
+<td>Automação e deploy</td>
+<td>Databricks CLI v0.297+ + Git Bash</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>Arquitetura</h2>
+<pre class="codehilite"><code>SQL Server              ADLS Gen2                 Azure Databricks
+on-premises             ─────────                 ────────────────
+                        landing/                  &lt;catalog&gt;.bronze
+  [tabela_A]  ─────►  [tabela_A.csv]  ─────►    [tabela_A]  (Delta)
+  [tabela_B]  ─────►  [tabela_B.csv]  ─────►    [tabela_B]  (Delta)
+  [...]       ─────►  [...]           ─────►    [...]       (Delta)
+  433 tabelas          (zona bruta,               433 tabelas
+                        sem transformação)         433 tabelas
+                                                  ──────────────
+                                                  &lt;catalog&gt;.silver
+                                                  [tabela_X] (Delta)
+                                                  [tabela_Y] (Delta)
+                                                  [...]
+                                                  35 tabelas
+                                        ▲
+                                        │
+                              &lt;catalog&gt;.controller
+                              ┌─────────────────────────┐
+                              │ source_to_lake     (399) │
+                              │ landing_to_bronze  (360) │
+                              │ silver_notebooks    (24) │
+                              │ bckup_source              │
+                              └─────────────────────────┘
+</code></pre>
+
+<p><strong>Camada Landing:</strong> recebe os arquivos extraídos do SQL Server via ADF, no formato original, sem transformação. Funciona como zona de aterrissagem imutável — a fonte de verdade do que chegou.</p>
+<p><strong>Camada Bronze:</strong> conversão dos arquivos landing para formato Delta Lake. Schema idêntico à fonte, sem regras de negócio aplicadas. Cada tabela tem metadados de auditoria (<code>insert_date</code>, <code>update_date</code>) adicionados automaticamente.</p>
+<p><strong>Camada Silver:</strong> transformações de negócio, joins, agregações e enriquecimentos. Cada tabela Silver tem um notebook dedicado, homologado linha-a-linha contra a procedure T-SQL equivalente.</p>
+<p><strong>Controller Layer:</strong> o coração da arquitetura. Quatro tabelas Delta em <code>&lt;catalog&gt;.controller</code> que parametrizam toda a execução sem alterar código de notebooks.</p>
+<hr />
+<h2>A Controller Layer — Decisão Central</h2>
+<p>A inovação arquitetural central do projeto é a separação completa entre <em>lógica de execução</em> (notebooks) e <em>configuração de execução</em> (tabelas Delta de controle).</p>
+<p><strong><code>source_to_lake</code> (399 registros):</strong> Define quais tabelas do SQL Server devem ser extraídas, com qual query, para qual path no ADLS, e com qual flag de lote (<code>batch_flag</code>). O ADF lê essa tabela e distribui os jobs de extração em paralelo por lote — sem precisar de parâmetros hard-coded no pipeline.</p>
+<p><strong><code>landing_to_bronze</code> (360 registros):</strong> Define o mapeamento entre arquivos landing e tabelas Bronze de destino, incluindo schema esperado, estratégia de escrita e eventuais transformações de tipo necessárias na conversão.</p>
+<p><strong><code>silver_notebooks</code> (24 registros):</strong> Lista os notebooks Silver a serem executados pelo orquestrador, com um campo <code>seq</code> que define o nível de paralelismo intra-nível. Notebooks com o mesmo valor de <code>seq</code> podem rodar em paralelo; notebooks com <code>seq</code> distintos rodam sequencialmente entre si, respeitando dependências.</p>
+<p><strong><code>bckup_source</code>:</strong> Snapshot versionado do estado das outras três tabelas controller, permitindo rollback e auditoria de mudanças de configuração ao longo do tempo.</p>
+<pre class="codehilite"><code>Execução da pipeline (simplificada):
+
+ADF Pipeline
+├── Fase 1: Ler source_to_lake → distribuir extração SQL Server por batch_flag
+│   ├── Lote 1: tabelas A, B, C ... (paralelo)
+│   └── Lote 2: tabelas D, E, F ... (paralelo, após lote 1)
+│
+├── Fase 2: Ler landing_to_bronze → converter arquivos → Delta Bronze
+│   └── Todos em paralelo (sem dependências entre si)
+│
+└── Fase 3: Ler silver_notebooks → executar notebooks por seq
+    ├── seq=1: notebooks X, Y (paralelo)
+    ├── seq=2: notebooks W, Z (paralelo, após seq=1)
+    └── seq=3: notebook final (após seq=2)
+</code></pre>
+
+<hr />
+<h2>Decisões Técnicas-Chave</h2>
+<h3>1. Overwrite → MERGE atômico ACID</h3>
+<p><strong>Problema:</strong> A carga inicial usava <code>overwrite</code> para gravar as tabelas Silver. Isso criava uma janela de inconsistência de 5 a 15 minutos durante cada carga — qualquer query de BI executada nesse intervalo retornava dados parciais ou inconsistentes.</p>
+<p><strong>Decisão:</strong> Migrar para MERGE atômico ACID com a cláusula <code>WHEN NOT MATCHED BY SOURCE DELETE</code>.</p>
+<pre class="codehilite"><code class="language-sql">MERGE INTO silver.tabela_destino AS target
+USING (SELECT * FROM bronze.tabela_origem WHERE particao = :data) AS source
+ON target.chave_negocio = source.chave_negocio
+WHEN MATCHED THEN UPDATE SET *
+WHEN NOT MATCHED BY TARGET THEN INSERT *
+WHEN NOT MATCHED BY SOURCE THEN DELETE
+</code></pre>
+
+<p><strong>Trade-off avaliado:</strong> O MERGE é mais lento que o overwrite e exige chaves de negócio estáveis. No contexto deste projeto, as tabelas Silver têm chaves bem definidas (herança das procedures T-SQL) e a eliminação da janela de inconsistência foi considerada inegociável pelo negócio.</p>
+<p><strong>Resultado:</strong> Zero reclamações de dados inconsistentes em BI após a migração para MERGE.</p>
+<hr />
+<h3>2. Schema Evolution com auditoria de campo</h3>
+<p><strong>Problema:</strong> A migração de procedures T-SQL para PySpark revelou que a coluna de data de referência tinha nome diferente entre os dois ambientes (<code>dt_base</code> no legado vs. convenção nova).</p>
+<p><strong>Decisão:</strong> Formalizar o padrão de campos de auditoria — <code>insert_date</code> e <code>update_date</code> — e documentar a evolução de schema como parte do processo de homologação.</p>
+<pre class="codehilite"><code class="language-python"># Configuração padrão em todos os notebooks Silver
+spark.conf.set(&quot;spark.databricks.delta.schema.autoMerge.enabled&quot;, &quot;true&quot;)
+
+# Campos de auditoria adicionados automaticamente
+df = df.withColumn(&quot;insert_date&quot;, to_utc_timestamp(current_timestamp(), &quot;GMT-3&quot;)) \
+       .withColumn(&quot;update_date&quot;, to_utc_timestamp(current_timestamp(), &quot;GMT-3&quot;))
+</code></pre>
+
+<p><strong>Trade-off avaliado:</strong> O <code>autoMerge.enabled</code> pode mascarar mudanças de schema não intencionais. Mitigamos com alertas de monitoramento e com o processo de homologação que valida o schema antes de promover de dev para prod.</p>
+<hr />
+<h3>3. Paralelismo controlado via campo <code>seq</code></h3>
+<p><strong>Problema:</strong> A execução sequencial de todos os 24 notebooks Silver era lenta (45+ minutos por ciclo) e subutilizava o cluster.</p>
+<p><strong>Decisão:</strong> Introduzir o campo <code>seq</code> na tabela <code>silver_notebooks</code> para declarar explicitamente o nível de paralelismo de cada notebook.</p>
+<p><strong>Trade-off avaliado:</strong> Paralelismo irrestrito poderia causar contenção de recursos no cluster e condições de corrida em tabelas com dependências. O campo <code>seq</code> dá controle fino: notebooks no mesmo nível rodam em paralelo, níveis distintos são barreiras de sincronização.</p>
+<p><strong>Resultado:</strong> Redução do ciclo Silver de 45+ minutos para aproximadamente 18 minutos com o mesmo tamanho de cluster.</p>
+<hr />
+<h3>4. Automação via Databricks CLI v0.297+</h3>
+<p><strong>Problema:</strong> Deploy manual de notebooks entre ambientes (dev → prod) era lento, sujeito a erros e não rastreável.</p>
+<p><strong>Decisão:</strong> Automatizar deploy e validação via Databricks CLI com scripts Git Bash.</p>
+<pre class="codehilite"><code class="language-bash"># Configuração necessária no Git Bash (Windows) para evitar conversão de paths
+export MSYS_NO_PATHCONV=1
+
+# Sintaxe nova CLI v0.297+ (jobs submit, não databricks runs submit)
+databricks jobs submit --json '{
+  &quot;run_name&quot;: &quot;deploy_silver_notebook&quot;,
+  &quot;existing_cluster_id&quot;: &quot;&lt;cluster_id&gt;&quot;,
+  &quot;notebook_task&quot;: {
+    &quot;notebook_path&quot;: &quot;/Shared/silver/tabela_x&quot;
+  }
+}'
+
+# Verificar output do run
+databricks jobs get-run-output --run-id &lt;run_id&gt;
+</code></pre>
+
+<p><strong>Trade-off avaliado:</strong> A CLI v0.297+ quebrou a sintaxe da versão anterior em vários pontos. A decisão foi documentar a versão mínima requerida e manter um script de setup de ambiente que valida a versão antes de executar.</p>
+<hr />
+<h3>5. Template padronizado de notebook Silver</h3>
+<p><strong>Problema:</strong> Notebooks criados ad hoc por diferentes pessoas tinham estruturas incompatíveis, dificultando revisão, debug e onboarding.</p>
+<p><strong>Decisão:</strong> Criar um template obrigatório para todos os notebooks Silver com estrutura fixa.</p>
+<pre class="codehilite"><code># Estrutura obrigatória de notebook Silver:
+#
+# [Bloco 1] Header Markdown: nome da tabela, responsável, data, versão
+# [Bloco 2] %run ../ingest_functions_uc  ← funções compartilhadas via %run
+# [Bloco 3] Variáveis de configuração (catalog, schema, tabela, partition_date)
+# [Bloco 4] Leitura da Bronze + transformações PySpark
+# [Bloco 5] Chamada a carga_automatica() com parâmetros da tabela
+</code></pre>
+
+<p><strong>Resultado:</strong> Onboarding de novos notebooks reduziu de 2-3 horas para 20-30 minutos usando o template como base.</p>
+<hr />
+<h2>Resultados Quantificados</h2>
+<table>
+<thead>
+<tr>
+<th>Métrica</th>
+<th>Valor</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tabelas Bronze catalogadas (Unity Catalog)</td>
+<td>433</td>
+</tr>
+<tr>
+<td>Tabelas Silver entregues</td>
+<td>35</td>
+</tr>
+<tr>
+<td>Tabelas Silver homologadas linha-a-linha vs. T-SQL legado</td>
+<td>17</td>
+</tr>
+<tr>
+<td>Tempo de ciclo Silver (antes / depois do paralelismo)</td>
+<td>~45 min → ~18 min</td>
+</tr>
+<tr>
+<td>Janela de inconsistência para BI (antes / depois do MERGE)</td>
+<td>5-15 min → 0</td>
+</tr>
+<tr>
+<td>Notebooks Silver padronizados com template</td>
+<td>100%</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>Padrões Aplicados</h2>
+<ul>
+<li><a href="../technical-notes/controller-driven-architecture.html">Controller-driven Architecture</a> — a base da parametrização da pipeline</li>
+<li><a href="../technical-notes/homologacao-metodologia.html">Metodologia de Homologação</a> — como as 17 tabelas Silver foram validadas</li>
+</ul>
+<hr />
+<h2>Lições Aprendidas</h2>
+<p><strong>A controller layer só funciona se for a fonte de verdade.</strong> Em alguns momentos, houve tentação de &ldquo;resolver rápido&rdquo; editando diretamente o notebook em vez de atualizar a tabela controller. Cada exceção a essa regra criou inconsistência entre o estado real da pipeline e o que a controller declarava. A disciplina de sempre passar pela controller é o que mantém a arquitetura sustentável.</p>
+<p><strong>Homologação linha-a-linha é lenta na primeira vez e barata para sempre.</strong> As 17 tabelas Silver foram homologadas em ~6 semanas. Parece muito — mas em produção, zero retrabalho corretivo. Cada divergência documentada no processo de homologação revelou uma assunção de negócio não documentada na procedure T-SQL, que teria sido silenciosamente propagada para a camada Silver se não houvesse o processo de validação.</p>
+<p><strong>A versão da CLI importa.</strong> A quebra de API entre versões do Databricks CLI (v0.2xx → v0.297+) causou falhas silenciosas em scripts que funcionavam na versão anterior. Fixar a versão no script de setup e documentar a versão mínima é obrigatório em projetos com automação via CLI.</p>
+    </div>
+
+    <nav class="article-nav"><span></span><a href="02-folha-pagamento-40M-linhas.html">Case 02 · Folha de Pagamento →</a></nav>
+</article>
+
+<footer>
+    <div class="container">
+        <p><strong>Wilson Lucas</strong> · Engenheiro de Dados Sênior</p>
+        <p><em>Material conceitual e anonimizado · Nenhum dado de cliente exposto</em></p>
+    </div>
+</footer>
+
+</body>
+</html>
