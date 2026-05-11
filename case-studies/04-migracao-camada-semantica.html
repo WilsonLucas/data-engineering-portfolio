@@ -95,33 +95,33 @@
 </table>
 <hr />
 <h2>Arquitetura</h2>
-<pre class="codehilite"><code>Fontes legadas                 Camada de Virtualização        Camada Semântica Nova
-──────────────                 ──────────────────────         ─────────────────────
-Oracle DB 1                    TDV                            SAP Datasphere
-  [esquema_A]  ──────────────► [view_consolidada_X]  ──────► [entidade_semântica_X]
-  [esquema_B]  ──────────────► [view_consolidada_Y]  ──────► [entidade_semântica_Y]
-Oracle DB 2                    [view_consolidada_Z]  ──────► [entidade_semântica_Z]
-  [esquema_C]  ──────────────►
-SAP HANA                                                             │
-  [tabela_D]   ──────────────►                                       ▼
-                                                           Consumidores downstream
-                                                           ─────────────────────
-                                                           Power BI / BI tools
-                                                           Squads de analytics
-                                                           Relatórios regulatórios
+<div class="codehilite"><pre><span></span><code><span class="n">Fontes</span><span class="w"> </span><span class="n">legadas</span><span class="w">                 </span><span class="n">Camada</span><span class="w"> </span><span class="n">de</span><span class="w"> </span><span class="n">Virtualização</span><span class="w">        </span><span class="n">Camada</span><span class="w"> </span><span class="n">Semântica</span><span class="w"> </span><span class="n">Nova</span>
+<span class="err">──────────────</span><span class="w">                 </span><span class="err">──────────────────────</span><span class="w">         </span><span class="err">─────────────────────</span>
+<span class="n">Oracle</span><span class="w"> </span><span class="n">DB</span><span class="w"> </span><span class="mi">1</span><span class="w">                    </span><span class="n">TDV</span><span class="w">                            </span><span class="n">SAP</span><span class="w"> </span><span class="n">Datasphere</span>
+<span class="w">  </span><span class="o">[</span><span class="n">esquema_A</span><span class="o">]</span><span class="w">  </span><span class="err">──────────────►</span><span class="w"> </span><span class="o">[</span><span class="n">view_consolidada_X</span><span class="o">]</span><span class="w">  </span><span class="err">──────►</span><span class="w"> </span><span class="o">[</span><span class="n">entidade_semântica_X</span><span class="o">]</span>
+<span class="w">  </span><span class="o">[</span><span class="n">esquema_B</span><span class="o">]</span><span class="w">  </span><span class="err">──────────────►</span><span class="w"> </span><span class="o">[</span><span class="n">view_consolidada_Y</span><span class="o">]</span><span class="w">  </span><span class="err">──────►</span><span class="w"> </span><span class="o">[</span><span class="n">entidade_semântica_Y</span><span class="o">]</span>
+<span class="n">Oracle</span><span class="w"> </span><span class="n">DB</span><span class="w"> </span><span class="mi">2</span><span class="w">                    </span><span class="o">[</span><span class="n">view_consolidada_Z</span><span class="o">]</span><span class="w">  </span><span class="err">──────►</span><span class="w"> </span><span class="o">[</span><span class="n">entidade_semântica_Z</span><span class="o">]</span>
+<span class="w">  </span><span class="o">[</span><span class="n">esquema_C</span><span class="o">]</span><span class="w">  </span><span class="err">──────────────►</span>
+<span class="n">SAP</span><span class="w"> </span><span class="n">HANA</span><span class="w">                                                             </span><span class="err">│</span>
+<span class="w">  </span><span class="o">[</span><span class="n">tabela_D</span><span class="o">]</span><span class="w">   </span><span class="err">──────────────►</span><span class="w">                                       </span><span class="err">▼</span>
+<span class="w">                                                           </span><span class="n">Consumidores</span><span class="w"> </span><span class="n">downstream</span>
+<span class="w">                                                           </span><span class="err">─────────────────────</span>
+<span class="w">                                                           </span><span class="nf">Power</span><span class="w"> </span><span class="n">BI</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">BI</span><span class="w"> </span><span class="n">tools</span>
+<span class="w">                                                           </span><span class="n">Squads</span><span class="w"> </span><span class="n">de</span><span class="w"> </span><span class="n">analytics</span>
+<span class="w">                                                           </span><span class="n">Relatórios</span><span class="w"> </span><span class="n">regulatórios</span>
 
-                    ┌──────────────────────────────────────┐
-                    │  SAP Information Steward             │
-                    │  (monitoramento de qualidade         │
-                    │   ao longo do pipeline)              │
-                    └──────────────────────────────────────┘
+<span class="w">                    </span><span class="err">┌──────────────────────────────────────┐</span>
+<span class="w">                    </span><span class="err">│</span><span class="w">  </span><span class="n">SAP</span><span class="w"> </span><span class="n">Information</span><span class="w"> </span><span class="n">Steward</span><span class="w">             </span><span class="err">│</span>
+<span class="w">                    </span><span class="err">│</span><span class="w">  </span><span class="p">(</span><span class="n">monitoramento</span><span class="w"> </span><span class="n">de</span><span class="w"> </span><span class="n">qualidade</span><span class="w">         </span><span class="err">│</span>
+<span class="w">                    </span><span class="err">│</span><span class="w">   </span><span class="n">ao</span><span class="w"> </span><span class="n">longo</span><span class="w"> </span><span class="n">do</span><span class="w"> </span><span class="n">pipeline</span><span class="p">)</span><span class="w">              </span><span class="err">│</span>
+<span class="w">                    </span><span class="err">└──────────────────────────────────────┘</span>
 
-                    ┌──────────────────────────────────────┐
-                    │  Azure Synapse + Databricks          │
-                    │  (processamento para alimentação     │
-                    │   de camadas analíticas específicas) │
-                    └──────────────────────────────────────┘
-</code></pre>
+<span class="w">                    </span><span class="err">┌──────────────────────────────────────┐</span>
+<span class="w">                    </span><span class="err">│</span><span class="w">  </span><span class="n">Azure</span><span class="w"> </span><span class="n">Synapse</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Databricks</span><span class="w">          </span><span class="err">│</span>
+<span class="w">                    </span><span class="err">│</span><span class="w">  </span><span class="p">(</span><span class="n">processamento</span><span class="w"> </span><span class="n">para</span><span class="w"> </span><span class="n">alimentação</span><span class="w">     </span><span class="err">│</span>
+<span class="w">                    </span><span class="err">│</span><span class="w">   </span><span class="n">de</span><span class="w"> </span><span class="n">camadas</span><span class="w"> </span><span class="n">analíticas</span><span class="w"> </span><span class="n">específicas</span><span class="p">)</span><span class="w"> </span><span class="err">│</span>
+<span class="w">                    </span><span class="err">└──────────────────────────────────────┘</span>
+</code></pre></div>
 
 <p><strong>TDV como camada intermediária:</strong> a decisão de manter o TDV como estágio intermediário antes do SAP Datasphere não foi arquitetural apenas — foi pragmática. O TDV já estava em produção e as views construídas nele representavam contratos implícitos de dados que os consumidores conheciam. Migrar direto de Oracle para SAP Datasphere teria exigido reescrever toda a semântica de uma vez. A abordagem em dois estágios permitiu validar a consolidação Oracle → TDV antes de avançar para TDV → Datasphere.</p>
 <hr />
@@ -194,7 +194,7 @@ SAP HANA                                                             │
 <p><strong>Ecossistemas heterogêneos exigem neutralidade técnica.</strong> Trabalhar com Oracle, SAP, Azure e ferramentas de qualidade ao mesmo tempo — sem preferência ideológica por nenhum — é uma competência em si. O melhor design de integração respeita os pontos fortes de cada componente ao invés de forçar tudo em uma única pilha.</p>
     </div>
 
-    <nav class="article-nav"><a href="03-homologacao-byte-a-byte.html">← Case 03 · Homologação Byte-a-Byte</a><span></span></nav>
+    <nav class="article-nav"><a href="03-homologacao-byte-a-byte.html">← Case 03 · Homologação Byte-a-Byte</a><a href="05-medallion-databricks-free-edition.html">Case 05 · Medallion Free Edition →</a></nav>
 </article>
 
 <footer>

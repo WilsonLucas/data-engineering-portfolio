@@ -45,6 +45,15 @@ PAGES = [
         "Case Study 04 · Corporativo",
         ("../index.html#cases", "Voltar ao portfolio"),
         ("03-homologacao-byte-a-byte.html", "← Case 03 · Homologação Byte-a-Byte"),
+        ("05-medallion-databricks-free-edition.html", "Case 05 · Medallion Free Edition →"),
+    ),
+    (
+        "case-studies/05-medallion-databricks-free-edition.md",
+        "case-studies/05-medallion-databricks-free-edition.html",
+        "Case 05 · Medallion + Unity Catalog em Databricks Free Edition",
+        "Case Study 05 · Processo Seletivo (Repo Público)",
+        ("../index.html#cases", "Voltar ao portfolio"),
+        ("04-migracao-camada-semantica.html", "← Case 04 · Migração Camada Semântica"),
         None,
     ),
     # Technical Notes

@@ -89,7 +89,7 @@
 </table>
 <hr />
 <h2>Arquitetura do Ambiente</h2>
-<pre class="codehilite"><code>Ambiente PROD (read-only)          Ambiente DEV
+<div class="codehilite"><pre><span></span><code>Ambiente PROD (read-only)          Ambiente DEV
 ──────────────────────────         ──────────────────────────
 SQL Server on-prem                 Synapse Spark Pool
   [procedures T-SQL legadas]         [notebooks PySpark (novo)]
@@ -110,27 +110,27 @@ SQL Server on-prem                 Synapse Spark Pool
                                │
                     Metodologia de homologação
                     (3 blocos de validação)
-</code></pre>
+</code></pre></div>
 
 <hr />
 <h2>A Solução do Acesso Cross-Environment</h2>
 <p>O bloqueio fundamental era: o ambiente de desenvolvimento não tinha dados suficientes para uma validação completa. A cópia de dados de prod para dev era inviável (volume e compliance). A solução foi usar o Synapse Serverless SQL com <code>OPENROWSET</code> e passthrough AAD para que o ambiente de dev lesse diretamente os dados de produção, sem movimentação de dados.</p>
-<pre class="codehilite"><code class="language-sql">-- Query executada em DEV, lendo PROD via Serverless SQL
-SELECT
-    pk_coluna,
-    coluna_a,
-    coluna_b,
-    coluna_c
-FROM OPENROWSET(
-    BULK 'https://&lt;storage-prod&gt;.dfs.core.windows.net/&lt;container&gt;/&lt;path&gt;/',
-    FORMAT = 'DELTA'
-) WITH (
-    pk_coluna    VARCHAR(50),
-    coluna_a     DECIMAL(18,2),
-    coluna_b     VARCHAR(200),
-    coluna_c     DATE
-) AS prod_data
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="c1">-- Query executada em DEV, lendo PROD via Serverless SQL</span>
+<span class="k">SELECT</span>
+<span class="w">    </span><span class="n">pk_coluna</span><span class="p">,</span>
+<span class="w">    </span><span class="n">coluna_a</span><span class="p">,</span>
+<span class="w">    </span><span class="n">coluna_b</span><span class="p">,</span>
+<span class="w">    </span><span class="n">coluna_c</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">OPENROWSET</span><span class="p">(</span>
+<span class="w">    </span><span class="n">BULK</span><span class="w"> </span><span class="s1">&#39;https://&lt;storage-prod&gt;.dfs.core.windows.net/&lt;container&gt;/&lt;path&gt;/&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">FORMAT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;DELTA&#39;</span>
+<span class="p">)</span><span class="w"> </span><span class="k">WITH</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">pk_coluna</span><span class="w">    </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">),</span>
+<span class="w">    </span><span class="n">coluna_a</span><span class="w">     </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span>
+<span class="w">    </span><span class="n">coluna_b</span><span class="w">     </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">200</span><span class="p">),</span>
+<span class="w">    </span><span class="n">coluna_c</span><span class="w">     </span><span class="nb">DATE</span>
+<span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">prod_data</span>
+</code></pre></div>
 
 <p><strong>Por que funciona:</strong> O Synapse Serverless SQL (<code>-ondemand</code> endpoint) usa o token AAD do usuário autenticado para acessar o storage — sem mover dados, sem criar cópias intermediárias, com controle de acesso pelo RBAC do Azure.</p>
 <hr />
@@ -138,142 +138,142 @@ FROM OPENROWSET(
 <p>A metodologia foi desenvolvida em três blocos independentes que juntos provam equivalência completa.</p>
 <h3>Bloco 1 — Universo (Cobertura de Chaves Primárias)</h3>
 <p>Objetivo: garantir que o novo sistema processa exatamente o mesmo universo de registros que o legado — nem mais, nem menos.</p>
-<pre class="codehilite"><code class="language-python"># Leitura da tabela nova (DEV/lake)
-df_lake = spark.read.format(&quot;delta&quot;).load(&quot;&lt;path_dev&gt;&quot;)
+<div class="codehilite"><pre><span></span><code><span class="c1"># Leitura da tabela nova (DEV/lake)</span>
+<span class="n">df_lake</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;delta&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;&lt;path_dev&gt;&quot;</span><span class="p">)</span>
 
-# Leitura da base espelho (PROD via Serverless SQL)
-df_espelho = spark.read \
-    .format(&quot;com.microsoft.azure.synapse.spark&quot;) \
-    .option(&quot;url&quot;, &quot;jdbc:sqlserver://&lt;serverless&gt;-ondemand.sql.azuresynapse.net&quot;) \
-    .option(&quot;query&quot;, &quot;SELECT pk FROM &lt;tabela_espelho&gt;&quot;) \
-    .load()
+<span class="c1"># Leitura da base espelho (PROD via Serverless SQL)</span>
+<span class="n">df_espelho</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">read</span> \
+    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;com.microsoft.azure.synapse.spark&quot;</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s2">&quot;url&quot;</span><span class="p">,</span> <span class="s2">&quot;jdbc:sqlserver://&lt;serverless&gt;-ondemand.sql.azuresynapse.net&quot;</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s2">&quot;query&quot;</span><span class="p">,</span> <span class="s2">&quot;SELECT pk FROM &lt;tabela_espelho&gt;&quot;</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">load</span><span class="p">()</span>
 
-# FULL OUTER JOIN para encontrar divergências de universo
-df_universo = df_lake.select(&quot;pk&quot;).alias(&quot;lake&quot;) \
-    .join(df_espelho.select(&quot;pk&quot;).alias(&quot;espelho&quot;), on=&quot;pk&quot;, how=&quot;full_outer&quot;)
+<span class="c1"># FULL OUTER JOIN para encontrar divergências de universo</span>
+<span class="n">df_universo</span> <span class="o">=</span> <span class="n">df_lake</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;pk&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">&quot;lake&quot;</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">df_espelho</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;pk&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">&quot;espelho&quot;</span><span class="p">),</span> <span class="n">on</span><span class="o">=</span><span class="s2">&quot;pk&quot;</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s2">&quot;full_outer&quot;</span><span class="p">)</span>
 
-pk_comuns         = df_universo.filter(&quot;lake.pk IS NOT NULL AND espelho.pk IS NOT NULL&quot;)
-pk_apenas_lake    = df_universo.filter(&quot;espelho.pk IS NULL&quot;)
-pk_apenas_espelho = df_universo.filter(&quot;lake.pk IS NULL&quot;)
+<span class="n">pk_comuns</span>         <span class="o">=</span> <span class="n">df_universo</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="s2">&quot;lake.pk IS NOT NULL AND espelho.pk IS NOT NULL&quot;</span><span class="p">)</span>
+<span class="n">pk_apenas_lake</span>    <span class="o">=</span> <span class="n">df_universo</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="s2">&quot;espelho.pk IS NULL&quot;</span><span class="p">)</span>
+<span class="n">pk_apenas_espelho</span> <span class="o">=</span> <span class="n">df_universo</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="s2">&quot;lake.pk IS NULL&quot;</span><span class="p">)</span>
 
-print(f&quot;PKs comuns: {pk_comuns.count()}&quot;)
-print(f&quot;PKs apenas no lake (novo): {pk_apenas_lake.count()}&quot;)
-print(f&quot;PKs apenas no espelho (legado): {pk_apenas_espelho.count()}&quot;)
-</code></pre>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;PKs comuns: </span><span class="si">{</span><span class="n">pk_comuns</span><span class="o">.</span><span class="n">count</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;PKs apenas no lake (novo): </span><span class="si">{</span><span class="n">pk_apenas_lake</span><span class="o">.</span><span class="n">count</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;PKs apenas no espelho (legado): </span><span class="si">{</span><span class="n">pk_apenas_espelho</span><span class="o">.</span><span class="n">count</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
 
 <p><strong>Resultado neste projeto:</strong> 4,1M+ PKs comuns, 0 divergências de universo após correção dos filtros de data.</p>
 <hr />
 <h3>Bloco 2 — Diff por Coluna (Validação de Valores)</h3>
 <p>Objetivo: para cada coluna, quantificar e classificar as divergências entre o lago e o espelho, usando apenas as PKs comuns.</p>
-<pre class="codehilite"><code class="language-python">colunas_para_validar = [c for c in df_lake.columns if c != &quot;pk&quot;]
+<div class="codehilite"><pre><span></span><code><span class="n">colunas_para_validar</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">df_lake</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">c</span> <span class="o">!=</span> <span class="s2">&quot;pk&quot;</span><span class="p">]</span>
 
-resultados = []
+<span class="n">resultados</span> <span class="o">=</span> <span class="p">[]</span>
 
-for coluna in colunas_para_validar:
-    df_diff = pk_comuns.join(df_lake.select(&quot;pk&quot;, coluna).alias(&quot;L&quot;), on=&quot;pk&quot;) \
-                       .join(df_espelho.select(&quot;pk&quot;, coluna).alias(&quot;E&quot;), on=&quot;pk&quot;)
+<span class="k">for</span> <span class="n">coluna</span> <span class="ow">in</span> <span class="n">colunas_para_validar</span><span class="p">:</span>
+    <span class="n">df_diff</span> <span class="o">=</span> <span class="n">pk_comuns</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">df_lake</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;pk&quot;</span><span class="p">,</span> <span class="n">coluna</span><span class="p">)</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">&quot;L&quot;</span><span class="p">),</span> <span class="n">on</span><span class="o">=</span><span class="s2">&quot;pk&quot;</span><span class="p">)</span> \
+                       <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">df_espelho</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;pk&quot;</span><span class="p">,</span> <span class="n">coluna</span><span class="p">)</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">&quot;E&quot;</span><span class="p">),</span> <span class="n">on</span><span class="o">=</span><span class="s2">&quot;pk&quot;</span><span class="p">)</span>
 
-    total = df_diff.count()
+    <span class="n">total</span> <span class="o">=</span> <span class="n">df_diff</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
 
-    # Classificação dos tipos de divergência
-    null_vs_valor = df_diff.filter(
-        F.col(f&quot;L.{coluna}&quot;).isNull() &amp; F.col(f&quot;E.{coluna}&quot;).isNotNull()
-    ).count()
+    <span class="c1"># Classificação dos tipos de divergência</span>
+    <span class="n">null_vs_valor</span> <span class="o">=</span> <span class="n">df_diff</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+        <span class="n">F</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;L.</span><span class="si">{</span><span class="n">coluna</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">isNull</span><span class="p">()</span> <span class="o">&amp;</span> <span class="n">F</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;E.</span><span class="si">{</span><span class="n">coluna</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">isNotNull</span><span class="p">()</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
 
-    valor_vs_null = df_diff.filter(
-        F.col(f&quot;L.{coluna}&quot;).isNotNull() &amp; F.col(f&quot;E.{coluna}&quot;).isNull()
-    ).count()
+    <span class="n">valor_vs_null</span> <span class="o">=</span> <span class="n">df_diff</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+        <span class="n">F</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;L.</span><span class="si">{</span><span class="n">coluna</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">isNotNull</span><span class="p">()</span> <span class="o">&amp;</span> <span class="n">F</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;E.</span><span class="si">{</span><span class="n">coluna</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">isNull</span><span class="p">()</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
 
-    valor_vs_valor = df_diff.filter(
-        F.col(f&quot;L.{coluna}&quot;).isNotNull() &amp;
-        F.col(f&quot;E.{coluna}&quot;).isNotNull() &amp;
-        (F.col(f&quot;L.{coluna}&quot;) != F.col(f&quot;E.{coluna}&quot;))
-    ).count()
+    <span class="n">valor_vs_valor</span> <span class="o">=</span> <span class="n">df_diff</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+        <span class="n">F</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;L.</span><span class="si">{</span><span class="n">coluna</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">isNotNull</span><span class="p">()</span> <span class="o">&amp;</span>
+        <span class="n">F</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;E.</span><span class="si">{</span><span class="n">coluna</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">isNotNull</span><span class="p">()</span> <span class="o">&amp;</span>
+        <span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;L.</span><span class="si">{</span><span class="n">coluna</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="n">F</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;E.</span><span class="si">{</span><span class="n">coluna</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
 
-    divergencias = null_vs_valor + valor_vs_null + valor_vs_valor
+    <span class="n">divergencias</span> <span class="o">=</span> <span class="n">null_vs_valor</span> <span class="o">+</span> <span class="n">valor_vs_null</span> <span class="o">+</span> <span class="n">valor_vs_valor</span>
 
-    resultados.append({
-        &quot;coluna&quot;: coluna,
-        &quot;total&quot;: total,
-        &quot;divergencias&quot;: divergencias,
-        &quot;null_vs_valor&quot;: null_vs_valor,
-        &quot;valor_vs_null&quot;: valor_vs_null,
-        &quot;valor_vs_valor&quot;: valor_vs_valor,
-        &quot;status&quot;: &quot;PASS&quot; if divergencias == 0 else &quot;FAIL&quot;
-    })
-</code></pre>
+    <span class="n">resultados</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+        <span class="s2">&quot;coluna&quot;</span><span class="p">:</span> <span class="n">coluna</span><span class="p">,</span>
+        <span class="s2">&quot;total&quot;</span><span class="p">:</span> <span class="n">total</span><span class="p">,</span>
+        <span class="s2">&quot;divergencias&quot;</span><span class="p">:</span> <span class="n">divergencias</span><span class="p">,</span>
+        <span class="s2">&quot;null_vs_valor&quot;</span><span class="p">:</span> <span class="n">null_vs_valor</span><span class="p">,</span>
+        <span class="s2">&quot;valor_vs_null&quot;</span><span class="p">:</span> <span class="n">valor_vs_null</span><span class="p">,</span>
+        <span class="s2">&quot;valor_vs_valor&quot;</span><span class="p">:</span> <span class="n">valor_vs_valor</span><span class="p">,</span>
+        <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;PASS&quot;</span> <span class="k">if</span> <span class="n">divergencias</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">&quot;FAIL&quot;</span>
+    <span class="p">})</span>
+</code></pre></div>
 
 <p><strong>Resultado neste projeto:</strong> 76 colunas auditadas, 21 com PASS absoluto (zero divergências), demais com causa raiz documentada.</p>
 <hr />
 <h3>Bloco 3 — Distribuição de Pares (Causa Raiz)</h3>
 <p>Objetivo: para colunas com <code>FAIL</code>, entender o padrão das divergências. Não apenas &ldquo;quantas linhas divergem&rdquo;, mas &ldquo;qual é o mapeamento de valor legado para valor novo&rdquo;.</p>
-<pre class="codehilite"><code class="language-python"># Para cada coluna com divergência, gerar a distribuição dos pares
-def analisa_pares(df_diff, coluna, top_n=20):
-    return df_diff.filter(
-        F.col(f&quot;L.{coluna}&quot;) != F.col(f&quot;E.{coluna}&quot;)
-    ).groupBy(
-        F.col(f&quot;L.{coluna}&quot;).alias(&quot;valor_lake&quot;),
-        F.col(f&quot;E.{coluna}&quot;).alias(&quot;valor_espelho&quot;)
-    ).count() \
-     .orderBy(F.desc(&quot;count&quot;)) \
-     .limit(top_n)
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="c1"># Para cada coluna com divergência, gerar a distribuição dos pares</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">analisa_pares</span><span class="p">(</span><span class="n">df_diff</span><span class="p">,</span> <span class="n">coluna</span><span class="p">,</span> <span class="n">top_n</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">df_diff</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+        <span class="n">F</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;L.</span><span class="si">{</span><span class="n">coluna</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="n">F</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;E.</span><span class="si">{</span><span class="n">coluna</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">groupBy</span><span class="p">(</span>
+        <span class="n">F</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;L.</span><span class="si">{</span><span class="n">coluna</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">&quot;valor_lake&quot;</span><span class="p">),</span>
+        <span class="n">F</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;E.</span><span class="si">{</span><span class="n">coluna</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">&quot;valor_espelho&quot;</span><span class="p">)</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> \
+     <span class="o">.</span><span class="n">orderBy</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">desc</span><span class="p">(</span><span class="s2">&quot;count&quot;</span><span class="p">))</span> \
+     <span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="n">top_n</span><span class="p">)</span>
+</code></pre></div>
 
 <p><strong>Exemplo de insight gerado:</strong> a coluna <code>cd_municipio</code> divergia em 12.000 linhas porque o legado usava código IBGE sem zeros à esquerda, enquanto o novo sistema preservava o formato original da fonte. Causa raiz documentada → decisão de negócio: qual formato é o correto para o downstream.</p>
 <hr />
 <h2>CLI Própria — SynapseCheck (<code>sc</code>)</h2>
 <p>Para reduzir a dependência do Synapse Studio em tarefas de diagnóstico do dia a dia, desenvolvi uma CLI Python read-only com os seguintes comandos:</p>
-<pre class="codehilite"><code>sc config                    # Valida setup (credenciais, conectividade)
-sc storage &quot;&lt;path&gt;&quot;          # Lista paths ADLS (similar a ls)
-sc tables                    # Lista tabelas conhecidas no registry
-sc inspect &lt;tabela&gt;          # Schema Delta (lê _delta_log sem Spark)
-sc notebooks                 # Lista notebooks do workspace Synapse
-sc status -d 7               # Status de pipeline runs dos últimos 7 dias
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="n">sc</span><span class="w"> </span><span class="n">config</span><span class="w">                    </span><span class="p">#</span><span class="w"> </span><span class="n">Valida</span><span class="w"> </span><span class="n">setup</span><span class="w"> </span><span class="p">(</span><span class="n">credenciais</span><span class="p">,</span><span class="w"> </span><span class="n">conectividade</span><span class="p">)</span>
+<span class="n">sc</span><span class="w"> </span><span class="n">storage</span><span class="w"> </span><span class="s">&quot;&lt;path&gt;&quot;</span><span class="w">          </span><span class="p">#</span><span class="w"> </span><span class="n">Lista</span><span class="w"> </span><span class="n">paths</span><span class="w"> </span><span class="n">ADLS</span><span class="w"> </span><span class="p">(</span><span class="n">similar</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">ls</span><span class="p">)</span>
+<span class="n">sc</span><span class="w"> </span><span class="n">tables</span><span class="w">                    </span><span class="p">#</span><span class="w"> </span><span class="n">Lista</span><span class="w"> </span><span class="n">tabelas</span><span class="w"> </span><span class="n">conhecidas</span><span class="w"> </span><span class="n">no</span><span class="w"> </span><span class="n">registry</span>
+<span class="n">sc</span><span class="w"> </span><span class="n">inspect</span><span class="w"> </span><span class="o">&lt;</span><span class="n">tabela</span><span class="o">&gt;</span><span class="w">          </span><span class="p">#</span><span class="w"> </span><span class="n">Schema</span><span class="w"> </span><span class="n">Delta</span><span class="w"> </span><span class="p">(</span><span class="n">lê</span><span class="w"> </span><span class="n">_delta_log</span><span class="w"> </span><span class="n">sem</span><span class="w"> </span><span class="n">Spark</span><span class="p">)</span>
+<span class="n">sc</span><span class="w"> </span><span class="n">notebooks</span><span class="w">                 </span><span class="p">#</span><span class="w"> </span><span class="n">Lista</span><span class="w"> </span><span class="n">notebooks</span><span class="w"> </span><span class="k">do</span><span class="w"> </span><span class="n">workspace</span><span class="w"> </span><span class="n">Synapse</span>
+<span class="n">sc</span><span class="w"> </span><span class="n">status</span><span class="w"> </span><span class="o">-</span><span class="n">d</span><span class="w"> </span><span class="mh">7</span><span class="w">               </span><span class="p">#</span><span class="w"> </span><span class="n">Status</span><span class="w"> </span><span class="n">de</span><span class="w"> </span><span class="n">pipeline</span><span class="w"> </span><span class="n">runs</span><span class="w"> </span><span class="n">dos</span><span class="w"> </span><span class="err">ú</span><span class="n">ltimos</span><span class="w"> </span><span class="mh">7</span><span class="w"> </span><span class="n">dias</span>
+</code></pre></div>
 
 <p><strong>Inovação técnica interna:</strong> o comando <code>sc inspect</code> lê o schema Delta diretamente dos arquivos <code>_delta_log</code> via parsing do transaction log — sem precisar de uma sessão Spark ativa, em segundos ao invés de minutos de startup de cluster.</p>
-<pre class="codehilite"><code class="language-python">import json
-from pathlib import Path
+<div class="codehilite"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
-def infer_schema_from_delta_log(delta_log_path: str) -&gt; dict:
-    &quot;&quot;&quot;
-    Lê o schema de uma tabela Delta diretamente do _delta_log,
-    sem iniciar uma sessão Spark.
-    &quot;&quot;&quot;
-    log_files = sorted(Path(delta_log_path).glob(&quot;*.json&quot;))
+<span class="k">def</span><span class="w"> </span><span class="nf">infer_schema_from_delta_log</span><span class="p">(</span><span class="n">delta_log_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Lê o schema de uma tabela Delta diretamente do _delta_log,</span>
+<span class="sd">    sem iniciar uma sessão Spark.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">log_files</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">delta_log_path</span><span class="p">)</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*.json&quot;</span><span class="p">))</span>
 
-    for log_file in reversed(log_files):
-        with open(log_file) as f:
-            for line in f:
-                entry = json.loads(line)
-                if &quot;metaData&quot; in entry:
-                    schema_str = entry[&quot;metaData&quot;][&quot;schemaString&quot;]
-                    return json.loads(schema_str)
+    <span class="k">for</span> <span class="n">log_file</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">log_files</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">log_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">entry</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                <span class="k">if</span> <span class="s2">&quot;metaData&quot;</span> <span class="ow">in</span> <span class="n">entry</span><span class="p">:</span>
+                    <span class="n">schema_str</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;metaData&quot;</span><span class="p">][</span><span class="s2">&quot;schemaString&quot;</span><span class="p">]</span>
+                    <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">schema_str</span><span class="p">)</span>
 
-    raise ValueError(&quot;Schema não encontrado no delta_log&quot;)
-</code></pre>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Schema não encontrado no delta_log&quot;</span><span class="p">)</span>
+</code></pre></div>
 
 <p><strong>Leitura de Parquet sem cluster:</strong> para inspeção de arquivos Parquet de 2GB+, implementei download parcial (últimos 2MB, onde o footer do Parquet está) + reconstrução via <code>pyarrow</code>, permitindo obter schema e estatísticas de coluna sem subir cluster.</p>
-<pre class="codehilite"><code class="language-python">import pyarrow.parquet as pq
-import io
+<div class="codehilite"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow.parquet</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pq</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
 
-def read_parquet_footer(storage_client, blob_path: str) -&gt; pq.ParquetFile:
-    &quot;&quot;&quot;
-    Lê footer de Parquet &gt;= 2GB sem baixar o arquivo inteiro.
-    Resolve o erro &quot;Message type not found&quot; causado por INT96 timestamps.
-    &quot;&quot;&quot;
-    # Tamanho do arquivo
-    blob = storage_client.get_blob_client(container=..., blob=blob_path)
-    size = blob.get_blob_properties().size
+<span class="k">def</span><span class="w"> </span><span class="nf">read_parquet_footer</span><span class="p">(</span><span class="n">storage_client</span><span class="p">,</span> <span class="n">blob_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pq</span><span class="o">.</span><span class="n">ParquetFile</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Lê footer de Parquet &gt;= 2GB sem baixar o arquivo inteiro.</span>
+<span class="sd">    Resolve o erro &quot;Message type not found&quot; causado por INT96 timestamps.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Tamanho do arquivo</span>
+    <span class="n">blob</span> <span class="o">=</span> <span class="n">storage_client</span><span class="o">.</span><span class="n">get_blob_client</span><span class="p">(</span><span class="n">container</span><span class="o">=...</span><span class="p">,</span> <span class="n">blob</span><span class="o">=</span><span class="n">blob_path</span><span class="p">)</span>
+    <span class="n">size</span> <span class="o">=</span> <span class="n">blob</span><span class="o">.</span><span class="n">get_blob_properties</span><span class="p">()</span><span class="o">.</span><span class="n">size</span>
 
-    # Baixar apenas os últimos 2MB (footer + magic bytes)
-    offset = max(0, size - 2 * 1024 * 1024)
-    footer_bytes = blob.download_blob(offset=offset, length=2 * 1024 * 1024).readall()
+    <span class="c1"># Baixar apenas os últimos 2MB (footer + magic bytes)</span>
+    <span class="n">offset</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">size</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">)</span>
+    <span class="n">footer_bytes</span> <span class="o">=</span> <span class="n">blob</span><span class="o">.</span><span class="n">download_blob</span><span class="p">(</span><span class="n">offset</span><span class="o">=</span><span class="n">offset</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">2</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">)</span><span class="o">.</span><span class="n">readall</span><span class="p">()</span>
 
-    # Reconstruir via pyarrow
-    buffer = io.BytesIO(footer_bytes)
-    return pq.ParquetFile(buffer)
-</code></pre>
+    <span class="c1"># Reconstruir via pyarrow</span>
+    <span class="n">buffer</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">footer_bytes</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">pq</span><span class="o">.</span><span class="n">ParquetFile</span><span class="p">(</span><span class="n">buffer</span><span class="p">)</span>
+</code></pre></div>
 
 <hr />
 <h2>Decisões Técnicas-Chave</h2>

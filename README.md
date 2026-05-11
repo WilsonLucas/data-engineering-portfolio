@@ -36,7 +36,7 @@ Alternativas rápidas:
 | Seção | Conteúdo |
 |---|---|
 | [**Landing page**](https://wilsonlucas.github.io/data-engineering-portfolio/) | Portfolio visual completo |
-| [**Case Studies**](./case-studies/) | 4 projetos reais documentados (anonimizados por NDA) |
+| [**Case Studies**](./case-studies/) | 5 projetos documentados (4 anonimizados por NDA + 1 público de processo seletivo) |
 | [**Padrões Técnicos**](./technical-notes/) | 3 padrões reutilizáveis extraídos dos projetos |
 | [**Slides**](./PRESENTATION/) | Apresentação em 19 slides single-file HTML |
 | [**Bio expandida**](./SOBRE.md) | Narrativa de trajetória e filosofia de trabalho |
@@ -57,6 +57,7 @@ Alternativas rápidas:
 | 02 | [Folha de Pagamento — 40M+ Linhas](./case-studies/02-folha-pagamento-40M-linhas.md) | Operadora de saúde | Synapse · Databricks · Delta Lake · PySpark |
 | 03 | [Homologação Byte-a-Byte com CLI Própria](./case-studies/03-homologacao-byte-a-byte.md) | Setor público | Synapse Serverless SQL · OPENROWSET · Python · pyarrow |
 | 04 | [Migração de Camada Semântica Corporativa](./case-studies/04-migracao-camada-semantica.md) | Corporativo | TDV · SAP Datasphere · SAP HANA · Oracle |
+| 05 | [Medallion + Unity Catalog em Databricks Free Edition](./case-studies/05-medallion-databricks-free-edition.md) ⭐ **público** | Case técnico de processo seletivo (2026) | Databricks Free Edition · Unity Catalog · Delta Lake · PySpark · pytest |
 
 ### Padrões Técnicos
 

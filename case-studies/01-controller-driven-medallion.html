@@ -97,30 +97,30 @@
 </table>
 <hr />
 <h2>Arquitetura</h2>
-<pre class="codehilite"><code>SQL Server              ADLS Gen2                 Azure Databricks
-on-premises             ─────────                 ────────────────
-                        landing/                  &lt;catalog&gt;.bronze
-  [tabela_A]  ─────►  [tabela_A.csv]  ─────►    [tabela_A]  (Delta)
-  [tabela_B]  ─────►  [tabela_B.csv]  ─────►    [tabela_B]  (Delta)
-  [...]       ─────►  [...]           ─────►    [...]       (Delta)
-  433 tabelas          (zona bruta,               433 tabelas
-                        sem transformação)         433 tabelas
-                                                  ──────────────
-                                                  &lt;catalog&gt;.silver
-                                                  [tabela_X] (Delta)
-                                                  [tabela_Y] (Delta)
-                                                  [...]
-                                                  35 tabelas
-                                        ▲
-                                        │
-                              &lt;catalog&gt;.controller
-                              ┌─────────────────────────┐
-                              │ source_to_lake     (399) │
-                              │ landing_to_bronze  (360) │
-                              │ silver_notebooks    (24) │
-                              │ bckup_source              │
-                              └─────────────────────────┘
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">SQL</span><span class="w"> </span><span class="n">Server</span><span class="w">              </span><span class="n">ADLS</span><span class="w"> </span><span class="n">Gen2</span><span class="w">                 </span><span class="n">Azure</span><span class="w"> </span><span class="n">Databricks</span>
+<span class="k">on</span><span class="o">-</span><span class="n">premises</span><span class="w">             </span><span class="err">─────────</span><span class="w">                 </span><span class="err">────────────────</span>
+<span class="w">                        </span><span class="n">landing</span><span class="o">/</span><span class="w">                  </span><span class="o">&lt;</span><span class="k">catalog</span><span class="o">&gt;</span><span class="p">.</span><span class="n">bronze</span>
+<span class="w">  </span><span class="o">[</span><span class="n">tabela_A</span><span class="o">]</span><span class="w">  </span><span class="err">─────►</span><span class="w">  </span><span class="o">[</span><span class="n">tabela_A.csv</span><span class="o">]</span><span class="w">  </span><span class="err">─────►</span><span class="w">    </span><span class="o">[</span><span class="n">tabela_A</span><span class="o">]</span><span class="w">  </span><span class="p">(</span><span class="n">Delta</span><span class="p">)</span>
+<span class="w">  </span><span class="o">[</span><span class="n">tabela_B</span><span class="o">]</span><span class="w">  </span><span class="err">─────►</span><span class="w">  </span><span class="o">[</span><span class="n">tabela_B.csv</span><span class="o">]</span><span class="w">  </span><span class="err">─────►</span><span class="w">    </span><span class="o">[</span><span class="n">tabela_B</span><span class="o">]</span><span class="w">  </span><span class="p">(</span><span class="n">Delta</span><span class="p">)</span>
+<span class="w">  </span><span class="o">[</span><span class="n">...</span><span class="o">]</span><span class="w">       </span><span class="err">─────►</span><span class="w">  </span><span class="o">[</span><span class="n">...</span><span class="o">]</span><span class="w">           </span><span class="err">─────►</span><span class="w">    </span><span class="o">[</span><span class="n">...</span><span class="o">]</span><span class="w">       </span><span class="p">(</span><span class="n">Delta</span><span class="p">)</span>
+<span class="w">  </span><span class="mi">433</span><span class="w"> </span><span class="n">tabelas</span><span class="w">          </span><span class="p">(</span><span class="n">zona</span><span class="w"> </span><span class="n">bruta</span><span class="p">,</span><span class="w">               </span><span class="mi">433</span><span class="w"> </span><span class="n">tabelas</span>
+<span class="w">                        </span><span class="n">sem</span><span class="w"> </span><span class="n">transformação</span><span class="p">)</span><span class="w">         </span><span class="mi">433</span><span class="w"> </span><span class="n">tabelas</span>
+<span class="w">                                                  </span><span class="err">──────────────</span>
+<span class="w">                                                  </span><span class="o">&lt;</span><span class="k">catalog</span><span class="o">&gt;</span><span class="p">.</span><span class="n">silver</span>
+<span class="w">                                                  </span><span class="o">[</span><span class="n">tabela_X</span><span class="o">]</span><span class="w"> </span><span class="p">(</span><span class="n">Delta</span><span class="p">)</span>
+<span class="w">                                                  </span><span class="o">[</span><span class="n">tabela_Y</span><span class="o">]</span><span class="w"> </span><span class="p">(</span><span class="n">Delta</span><span class="p">)</span>
+<span class="w">                                                  </span><span class="o">[</span><span class="n">...</span><span class="o">]</span>
+<span class="w">                                                  </span><span class="mi">35</span><span class="w"> </span><span class="n">tabelas</span>
+<span class="w">                                        </span><span class="err">▲</span>
+<span class="w">                                        </span><span class="err">│</span>
+<span class="w">                              </span><span class="o">&lt;</span><span class="k">catalog</span><span class="o">&gt;</span><span class="p">.</span><span class="n">controller</span>
+<span class="w">                              </span><span class="err">┌─────────────────────────┐</span>
+<span class="w">                              </span><span class="err">│</span><span class="w"> </span><span class="n">source_to_lake</span><span class="w">     </span><span class="p">(</span><span class="mi">399</span><span class="p">)</span><span class="w"> </span><span class="err">│</span>
+<span class="w">                              </span><span class="err">│</span><span class="w"> </span><span class="n">landing_to_bronze</span><span class="w">  </span><span class="p">(</span><span class="mi">360</span><span class="p">)</span><span class="w"> </span><span class="err">│</span>
+<span class="w">                              </span><span class="err">│</span><span class="w"> </span><span class="n">silver_notebooks</span><span class="w">    </span><span class="p">(</span><span class="mi">24</span><span class="p">)</span><span class="w"> </span><span class="err">│</span>
+<span class="w">                              </span><span class="err">│</span><span class="w"> </span><span class="n">bckup_source</span><span class="w">              </span><span class="err">│</span>
+<span class="w">                              </span><span class="err">└─────────────────────────┘</span>
+</code></pre></div>
 
 <p><strong>Camada Landing:</strong> recebe os arquivos extraídos do SQL Server via ADF, no formato original, sem transformação. Funciona como zona de aterrissagem imutável — a fonte de verdade do que chegou.</p>
 <p><strong>Camada Bronze:</strong> conversão dos arquivos landing para formato Delta Lake. Schema idêntico à fonte, sem regras de negócio aplicadas. Cada tabela tem metadados de auditoria (<code>insert_date</code>, <code>update_date</code>) adicionados automaticamente.</p>
@@ -133,34 +133,34 @@ on-premises             ─────────                 ────
 <p><strong><code>landing_to_bronze</code> (360 registros):</strong> Define o mapeamento entre arquivos landing e tabelas Bronze de destino, incluindo schema esperado, estratégia de escrita e eventuais transformações de tipo necessárias na conversão.</p>
 <p><strong><code>silver_notebooks</code> (24 registros):</strong> Lista os notebooks Silver a serem executados pelo orquestrador, com um campo <code>seq</code> que define o nível de paralelismo intra-nível. Notebooks com o mesmo valor de <code>seq</code> podem rodar em paralelo; notebooks com <code>seq</code> distintos rodam sequencialmente entre si, respeitando dependências.</p>
 <p><strong><code>bckup_source</code>:</strong> Snapshot versionado do estado das outras três tabelas controller, permitindo rollback e auditoria de mudanças de configuração ao longo do tempo.</p>
-<pre class="codehilite"><code>Execução da pipeline (simplificada):
+<div class="codehilite"><pre><span></span><code><span class="nx">Execução</span><span class="w"> </span><span class="nx">da</span><span class="w"> </span><span class="nx">pipeline</span><span class="w"> </span><span class="p">(</span><span class="nx">simplificada</span><span class="p">):</span>
 
-ADF Pipeline
-├── Fase 1: Ler source_to_lake → distribuir extração SQL Server por batch_flag
-│   ├── Lote 1: tabelas A, B, C ... (paralelo)
-│   └── Lote 2: tabelas D, E, F ... (paralelo, após lote 1)
-│
-├── Fase 2: Ler landing_to_bronze → converter arquivos → Delta Bronze
-│   └── Todos em paralelo (sem dependências entre si)
-│
-└── Fase 3: Ler silver_notebooks → executar notebooks por seq
-    ├── seq=1: notebooks X, Y (paralelo)
-    ├── seq=2: notebooks W, Z (paralelo, após seq=1)
-    └── seq=3: notebook final (após seq=2)
-</code></pre>
+<span class="nx">ADF</span><span class="w"> </span><span class="nx">Pipeline</span>
+<span class="err">├──</span><span class="w"> </span><span class="nx">Fase</span><span class="w"> </span><span class="mi">1</span><span class="p">:</span><span class="w"> </span><span class="nx">Ler</span><span class="w"> </span><span class="nx">source_to_lake</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="nx">distribuir</span><span class="w"> </span><span class="nx">extração</span><span class="w"> </span><span class="nx">SQL</span><span class="w"> </span><span class="nx">Server</span><span class="w"> </span><span class="nx">por</span><span class="w"> </span><span class="nx">batch_flag</span>
+<span class="err">│</span><span class="w">   </span><span class="err">├──</span><span class="w"> </span><span class="nx">Lote</span><span class="w"> </span><span class="mi">1</span><span class="p">:</span><span class="w"> </span><span class="nx">tabelas</span><span class="w"> </span><span class="nx">A</span><span class="p">,</span><span class="w"> </span><span class="nx">B</span><span class="p">,</span><span class="w"> </span><span class="nx">C</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">(</span><span class="nx">paralelo</span><span class="p">)</span>
+<span class="err">│</span><span class="w">   </span><span class="err">└──</span><span class="w"> </span><span class="nx">Lote</span><span class="w"> </span><span class="mi">2</span><span class="p">:</span><span class="w"> </span><span class="nx">tabelas</span><span class="w"> </span><span class="nx">D</span><span class="p">,</span><span class="w"> </span><span class="nx">E</span><span class="p">,</span><span class="w"> </span><span class="nx">F</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">(</span><span class="nx">paralelo</span><span class="p">,</span><span class="w"> </span><span class="nx">após</span><span class="w"> </span><span class="nx">lote</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+<span class="err">│</span>
+<span class="err">├──</span><span class="w"> </span><span class="nx">Fase</span><span class="w"> </span><span class="mi">2</span><span class="p">:</span><span class="w"> </span><span class="nx">Ler</span><span class="w"> </span><span class="nx">landing_to_bronze</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="nx">converter</span><span class="w"> </span><span class="nx">arquivos</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="nx">Delta</span><span class="w"> </span><span class="nx">Bronze</span>
+<span class="err">│</span><span class="w">   </span><span class="err">└──</span><span class="w"> </span><span class="nx">Todos</span><span class="w"> </span><span class="nx">em</span><span class="w"> </span><span class="nx">paralelo</span><span class="w"> </span><span class="p">(</span><span class="nx">sem</span><span class="w"> </span><span class="nx">dependências</span><span class="w"> </span><span class="nx">entre</span><span class="w"> </span><span class="nx">si</span><span class="p">)</span>
+<span class="err">│</span>
+<span class="err">└──</span><span class="w"> </span><span class="nx">Fase</span><span class="w"> </span><span class="mi">3</span><span class="p">:</span><span class="w"> </span><span class="nx">Ler</span><span class="w"> </span><span class="nx">silver_notebooks</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="nx">executar</span><span class="w"> </span><span class="nx">notebooks</span><span class="w"> </span><span class="nx">por</span><span class="w"> </span><span class="nx">seq</span>
+<span class="w">    </span><span class="err">├──</span><span class="w"> </span><span class="nx">seq</span><span class="p">=</span><span class="mi">1</span><span class="p">:</span><span class="w"> </span><span class="nx">notebooks</span><span class="w"> </span><span class="nx">X</span><span class="p">,</span><span class="w"> </span><span class="nx">Y</span><span class="w"> </span><span class="p">(</span><span class="nx">paralelo</span><span class="p">)</span>
+<span class="w">    </span><span class="err">├──</span><span class="w"> </span><span class="nx">seq</span><span class="p">=</span><span class="mi">2</span><span class="p">:</span><span class="w"> </span><span class="nx">notebooks</span><span class="w"> </span><span class="nx">W</span><span class="p">,</span><span class="w"> </span><span class="nx">Z</span><span class="w"> </span><span class="p">(</span><span class="nx">paralelo</span><span class="p">,</span><span class="w"> </span><span class="nx">após</span><span class="w"> </span><span class="nx">seq</span><span class="p">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="w">    </span><span class="err">└──</span><span class="w"> </span><span class="nx">seq</span><span class="p">=</span><span class="mi">3</span><span class="p">:</span><span class="w"> </span><span class="nx">notebook</span><span class="w"> </span><span class="k">final</span><span class="w"> </span><span class="p">(</span><span class="nx">após</span><span class="w"> </span><span class="nx">seq</span><span class="p">=</span><span class="mi">2</span><span class="p">)</span>
+</code></pre></div>
 
 <hr />
 <h2>Decisões Técnicas-Chave</h2>
 <h3>1. Overwrite → MERGE atômico ACID</h3>
 <p><strong>Problema:</strong> A carga inicial usava <code>overwrite</code> para gravar as tabelas Silver. Isso criava uma janela de inconsistência de 5 a 15 minutos durante cada carga — qualquer query de BI executada nesse intervalo retornava dados parciais ou inconsistentes.</p>
 <p><strong>Decisão:</strong> Migrar para MERGE atômico ACID com a cláusula <code>WHEN NOT MATCHED BY SOURCE DELETE</code>.</p>
-<pre class="codehilite"><code class="language-sql">MERGE INTO silver.tabela_destino AS target
-USING (SELECT * FROM bronze.tabela_origem WHERE particao = :data) AS source
-ON target.chave_negocio = source.chave_negocio
-WHEN MATCHED THEN UPDATE SET *
-WHEN NOT MATCHED BY TARGET THEN INSERT *
-WHEN NOT MATCHED BY SOURCE THEN DELETE
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="n">MERGE</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">silver</span><span class="p">.</span><span class="n">tabela_destino</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">target</span>
+<span class="k">USING</span><span class="w"> </span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">bronze</span><span class="p">.</span><span class="n">tabela_origem</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">particao</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">:</span><span class="k">data</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="k">source</span>
+<span class="k">ON</span><span class="w"> </span><span class="n">target</span><span class="p">.</span><span class="n">chave_negocio</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">source</span><span class="p">.</span><span class="n">chave_negocio</span>
+<span class="k">WHEN</span><span class="w"> </span><span class="n">MATCHED</span><span class="w"> </span><span class="k">THEN</span><span class="w"> </span><span class="k">UPDATE</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="o">*</span>
+<span class="k">WHEN</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="n">MATCHED</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">TARGET</span><span class="w"> </span><span class="k">THEN</span><span class="w"> </span><span class="k">INSERT</span><span class="w"> </span><span class="o">*</span>
+<span class="k">WHEN</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="n">MATCHED</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="k">SOURCE</span><span class="w"> </span><span class="k">THEN</span><span class="w"> </span><span class="k">DELETE</span>
+</code></pre></div>
 
 <p><strong>Trade-off avaliado:</strong> O MERGE é mais lento que o overwrite e exige chaves de negócio estáveis. No contexto deste projeto, as tabelas Silver têm chaves bem definidas (herança das procedures T-SQL) e a eliminação da janela de inconsistência foi considerada inegociável pelo negócio.</p>
 <p><strong>Resultado:</strong> Zero reclamações de dados inconsistentes em BI após a migração para MERGE.</p>
@@ -168,13 +168,13 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE
 <h3>2. Schema Evolution com auditoria de campo</h3>
 <p><strong>Problema:</strong> A migração de procedures T-SQL para PySpark revelou que a coluna de data de referência tinha nome diferente entre os dois ambientes (<code>dt_base</code> no legado vs. convenção nova).</p>
 <p><strong>Decisão:</strong> Formalizar o padrão de campos de auditoria — <code>insert_date</code> e <code>update_date</code> — e documentar a evolução de schema como parte do processo de homologação.</p>
-<pre class="codehilite"><code class="language-python"># Configuração padrão em todos os notebooks Silver
-spark.conf.set(&quot;spark.databricks.delta.schema.autoMerge.enabled&quot;, &quot;true&quot;)
+<div class="codehilite"><pre><span></span><code><span class="c1"># Configuração padrão em todos os notebooks Silver</span>
+<span class="n">spark</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;spark.databricks.delta.schema.autoMerge.enabled&quot;</span><span class="p">,</span> <span class="s2">&quot;true&quot;</span><span class="p">)</span>
 
-# Campos de auditoria adicionados automaticamente
-df = df.withColumn(&quot;insert_date&quot;, to_utc_timestamp(current_timestamp(), &quot;GMT-3&quot;)) \
-       .withColumn(&quot;update_date&quot;, to_utc_timestamp(current_timestamp(), &quot;GMT-3&quot;))
-</code></pre>
+<span class="c1"># Campos de auditoria adicionados automaticamente</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">withColumn</span><span class="p">(</span><span class="s2">&quot;insert_date&quot;</span><span class="p">,</span> <span class="n">to_utc_timestamp</span><span class="p">(</span><span class="n">current_timestamp</span><span class="p">(),</span> <span class="s2">&quot;GMT-3&quot;</span><span class="p">))</span> \
+       <span class="o">.</span><span class="n">withColumn</span><span class="p">(</span><span class="s2">&quot;update_date&quot;</span><span class="p">,</span> <span class="n">to_utc_timestamp</span><span class="p">(</span><span class="n">current_timestamp</span><span class="p">(),</span> <span class="s2">&quot;GMT-3&quot;</span><span class="p">))</span>
+</code></pre></div>
 
 <p><strong>Trade-off avaliado:</strong> O <code>autoMerge.enabled</code> pode mascarar mudanças de schema não intencionais. Mitigamos com alertas de monitoramento e com o processo de homologação que valida o schema antes de promover de dev para prod.</p>
 <hr />
@@ -187,35 +187,35 @@ df = df.withColumn(&quot;insert_date&quot;, to_utc_timestamp(current_timestamp()
 <h3>4. Automação via Databricks CLI v0.297+</h3>
 <p><strong>Problema:</strong> Deploy manual de notebooks entre ambientes (dev → prod) era lento, sujeito a erros e não rastreável.</p>
 <p><strong>Decisão:</strong> Automatizar deploy e validação via Databricks CLI com scripts Git Bash.</p>
-<pre class="codehilite"><code class="language-bash"># Configuração necessária no Git Bash (Windows) para evitar conversão de paths
-export MSYS_NO_PATHCONV=1
+<div class="codehilite"><pre><span></span><code><span class="c1"># Configuração necessária no Git Bash (Windows) para evitar conversão de paths</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">MSYS_NO_PATHCONV</span><span class="o">=</span><span class="m">1</span>
 
-# Sintaxe nova CLI v0.297+ (jobs submit, não databricks runs submit)
-databricks jobs submit --json '{
-  &quot;run_name&quot;: &quot;deploy_silver_notebook&quot;,
-  &quot;existing_cluster_id&quot;: &quot;&lt;cluster_id&gt;&quot;,
-  &quot;notebook_task&quot;: {
-    &quot;notebook_path&quot;: &quot;/Shared/silver/tabela_x&quot;
-  }
-}'
+<span class="c1"># Sintaxe nova CLI v0.297+ (jobs submit, não databricks runs submit)</span>
+databricks<span class="w"> </span><span class="nb">jobs</span><span class="w"> </span>submit<span class="w"> </span>--json<span class="w"> </span><span class="s1">&#39;{</span>
+<span class="s1">  &quot;run_name&quot;: &quot;deploy_silver_notebook&quot;,</span>
+<span class="s1">  &quot;existing_cluster_id&quot;: &quot;&lt;cluster_id&gt;&quot;,</span>
+<span class="s1">  &quot;notebook_task&quot;: {</span>
+<span class="s1">    &quot;notebook_path&quot;: &quot;/Shared/silver/tabela_x&quot;</span>
+<span class="s1">  }</span>
+<span class="s1">}&#39;</span>
 
-# Verificar output do run
-databricks jobs get-run-output --run-id &lt;run_id&gt;
-</code></pre>
+<span class="c1"># Verificar output do run</span>
+databricks<span class="w"> </span><span class="nb">jobs</span><span class="w"> </span>get-run-output<span class="w"> </span>--run-id<span class="w"> </span>&lt;run_id&gt;
+</code></pre></div>
 
 <p><strong>Trade-off avaliado:</strong> A CLI v0.297+ quebrou a sintaxe da versão anterior em vários pontos. A decisão foi documentar a versão mínima requerida e manter um script de setup de ambiente que valida a versão antes de executar.</p>
 <hr />
 <h3>5. Template padronizado de notebook Silver</h3>
 <p><strong>Problema:</strong> Notebooks criados ad hoc por diferentes pessoas tinham estruturas incompatíveis, dificultando revisão, debug e onboarding.</p>
 <p><strong>Decisão:</strong> Criar um template obrigatório para todos os notebooks Silver com estrutura fixa.</p>
-<pre class="codehilite"><code># Estrutura obrigatória de notebook Silver:
-#
+<div class="codehilite"><pre><span></span><code><span class="gh">#</span> Estrutura obrigatória de notebook Silver:
+<span class="gh">#</span>
 # [Bloco 1] Header Markdown: nome da tabela, responsável, data, versão
-# [Bloco 2] %run ../ingest_functions_uc  ← funções compartilhadas via %run
-# [Bloco 3] Variáveis de configuração (catalog, schema, tabela, partition_date)
-# [Bloco 4] Leitura da Bronze + transformações PySpark
-# [Bloco 5] Chamada a carga_automatica() com parâmetros da tabela
-</code></pre>
+<span class="gh">#</span> [Bloco 2] %run ../ingest_functions_uc  ← funções compartilhadas via %run
+<span class="gh">#</span> [Bloco 3] Variáveis de configuração (catalog, schema, tabela, partition_date)
+<span class="gh">#</span> [Bloco 4] Leitura da Bronze + transformações PySpark
+<span class="gh">#</span> [Bloco 5] Chamada a carga_automatica() com parâmetros da tabela
+</code></pre></div>
 
 <p><strong>Resultado:</strong> Onboarding de novos notebooks reduziu de 2-3 horas para 20-30 minutos usando o template como base.</p>
 <hr />

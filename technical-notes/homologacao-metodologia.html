@@ -53,7 +53,7 @@
 </ol>
 <hr />
 <h2>Arquitetura da Validação (3 Blocos)</h2>
-<pre class="codehilite"><code>BLOCO 1 — Universo
+<div class="codehilite"><pre><span></span><code>BLOCO 1 — Universo
 ┌───────────────────────────────────────────────────────────┐
 │ FULL OUTER JOIN entre PKs do novo sistema e PKs do legado │
 │                                                           │
@@ -89,37 +89,37 @@ BLOCO 3 — Causa Raiz
 │                                                           │
 │ Resultado: causa raiz identificada e categorizada         │
 └───────────────────────────────────────────────────────────┘
-</code></pre>
+</code></pre></div>
 
 <hr />
 <h2>Implementação — Bloco 1: Universo</h2>
-<pre class="codehilite"><code class="language-python">from pyspark.sql import functions as F
+<div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pyspark.sql</span><span class="w"> </span><span class="kn">import</span> <span class="n">functions</span> <span class="k">as</span> <span class="n">F</span>
 
-# Leitura das duas fontes
-df_novo = spark.read.format(&quot;delta&quot;).load(&quot;&lt;path_novo_sistema&gt;&quot;)
-df_legado = spark.read.format(&quot;delta&quot;).load(&quot;&lt;path_legado&gt;&quot;)
-# ou: df_legado = spark.read.jdbc(...) para bases relacionais
+<span class="c1"># Leitura das duas fontes</span>
+<span class="n">df_novo</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;delta&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;&lt;path_novo_sistema&gt;&quot;</span><span class="p">)</span>
+<span class="n">df_legado</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;delta&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;&lt;path_legado&gt;&quot;</span><span class="p">)</span>
+<span class="c1"># ou: df_legado = spark.read.jdbc(...) para bases relacionais</span>
 
-# FULL OUTER JOIN nas PKs
-df_universo = df_novo.select(&quot;pk&quot;).alias(&quot;novo&quot;) \
-    .join(
-        df_legado.select(&quot;pk&quot;).alias(&quot;legado&quot;),
-        on=&quot;pk&quot;,
-        how=&quot;full_outer&quot;
-    )
+<span class="c1"># FULL OUTER JOIN nas PKs</span>
+<span class="n">df_universo</span> <span class="o">=</span> <span class="n">df_novo</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;pk&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">&quot;novo&quot;</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="n">df_legado</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;pk&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">&quot;legado&quot;</span><span class="p">),</span>
+        <span class="n">on</span><span class="o">=</span><span class="s2">&quot;pk&quot;</span><span class="p">,</span>
+        <span class="n">how</span><span class="o">=</span><span class="s2">&quot;full_outer&quot;</span>
+    <span class="p">)</span>
 
-# Classificação
-pk_comuns = df_universo.filter(
-    F.col(&quot;novo.pk&quot;).isNotNull() &amp; F.col(&quot;legado.pk&quot;).isNotNull()
-)
-pk_apenas_novo = df_universo.filter(F.col(&quot;legado.pk&quot;).isNull())
-pk_apenas_legado = df_universo.filter(F.col(&quot;novo.pk&quot;).isNull())
+<span class="c1"># Classificação</span>
+<span class="n">pk_comuns</span> <span class="o">=</span> <span class="n">df_universo</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+    <span class="n">F</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;novo.pk&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">isNotNull</span><span class="p">()</span> <span class="o">&amp;</span> <span class="n">F</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;legado.pk&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">isNotNull</span><span class="p">()</span>
+<span class="p">)</span>
+<span class="n">pk_apenas_novo</span> <span class="o">=</span> <span class="n">df_universo</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;legado.pk&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">isNull</span><span class="p">())</span>
+<span class="n">pk_apenas_legado</span> <span class="o">=</span> <span class="n">df_universo</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;novo.pk&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">isNull</span><span class="p">())</span>
 
-# Report
-print(f&quot;PKs comuns:          {pk_comuns.count():&gt;10,}&quot;)
-print(f&quot;PKs apenas no novo:  {pk_apenas_novo.count():&gt;10,}&quot;)
-print(f&quot;PKs apenas no legado:{pk_apenas_legado.count():&gt;10,}&quot;)
-</code></pre>
+<span class="c1"># Report</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;PKs comuns:          </span><span class="si">{</span><span class="n">pk_comuns</span><span class="o">.</span><span class="n">count</span><span class="p">()</span><span class="si">:</span><span class="s2">&gt;10,</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;PKs apenas no novo:  </span><span class="si">{</span><span class="n">pk_apenas_novo</span><span class="o">.</span><span class="n">count</span><span class="p">()</span><span class="si">:</span><span class="s2">&gt;10,</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;PKs apenas no legado:</span><span class="si">{</span><span class="n">pk_apenas_legado</span><span class="o">.</span><span class="n">count</span><span class="p">()</span><span class="si">:</span><span class="s2">&gt;10,</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
 
 <p><strong>Interpretação:</strong>
 - <code>pk_apenas_novo &gt; 0</code>: o novo sistema processa registros que o legado não conhecia — pode ser bug ou dado novo legítimo
@@ -127,82 +127,82 @@ print(f&quot;PKs apenas no legado:{pk_apenas_legado.count():&gt;10,}&quot;)
 - Ambos zerados: universo idêntico, pode avançar para o Bloco 2</p>
 <hr />
 <h2>Implementação — Bloco 2: Diff por Coluna</h2>
-<pre class="codehilite"><code class="language-python"># Definir colunas a validar (excluir PKs e metadados de auditoria)
-colunas = [c for c in df_novo.columns
-           if c not in (&quot;pk&quot;, &quot;insert_date&quot;, &quot;update_date&quot;, &quot;partition_date&quot;)]
+<div class="codehilite"><pre><span></span><code><span class="c1"># Definir colunas a validar (excluir PKs e metadados de auditoria)</span>
+<span class="n">colunas</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">df_novo</span><span class="o">.</span><span class="n">columns</span>
+           <span class="k">if</span> <span class="n">c</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;pk&quot;</span><span class="p">,</span> <span class="s2">&quot;insert_date&quot;</span><span class="p">,</span> <span class="s2">&quot;update_date&quot;</span><span class="p">,</span> <span class="s2">&quot;partition_date&quot;</span><span class="p">)]</span>
 
-# Join interno nas PKs comuns
-df_join = pk_comuns_df \
-    .join(df_novo.alias(&quot;N&quot;), on=&quot;pk&quot;) \
-    .join(df_legado.alias(&quot;L&quot;), on=&quot;pk&quot;)
+<span class="c1"># Join interno nas PKs comuns</span>
+<span class="n">df_join</span> <span class="o">=</span> <span class="n">pk_comuns_df</span> \
+    <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">df_novo</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">&quot;N&quot;</span><span class="p">),</span> <span class="n">on</span><span class="o">=</span><span class="s2">&quot;pk&quot;</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">df_legado</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">&quot;L&quot;</span><span class="p">),</span> <span class="n">on</span><span class="o">=</span><span class="s2">&quot;pk&quot;</span><span class="p">)</span>
 
-resultados = []
+<span class="n">resultados</span> <span class="o">=</span> <span class="p">[]</span>
 
-for col in colunas:
-    # Total de linhas no universo comum
-    total = df_join.count()
+<span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">colunas</span><span class="p">:</span>
+    <span class="c1"># Total de linhas no universo comum</span>
+    <span class="n">total</span> <span class="o">=</span> <span class="n">df_join</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
 
-    # Contar cada tipo de divergência
-    null_vs_valor = df_join.filter(
-        F.col(f&quot;N.{col}&quot;).isNull() &amp; F.col(f&quot;L.{col}&quot;).isNotNull()
-    ).count()
+    <span class="c1"># Contar cada tipo de divergência</span>
+    <span class="n">null_vs_valor</span> <span class="o">=</span> <span class="n">df_join</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+        <span class="n">F</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;N.</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">isNull</span><span class="p">()</span> <span class="o">&amp;</span> <span class="n">F</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;L.</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">isNotNull</span><span class="p">()</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
 
-    valor_vs_null = df_join.filter(
-        F.col(f&quot;N.{col}&quot;).isNotNull() &amp; F.col(f&quot;L.{col}&quot;).isNull()
-    ).count()
+    <span class="n">valor_vs_null</span> <span class="o">=</span> <span class="n">df_join</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+        <span class="n">F</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;N.</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">isNotNull</span><span class="p">()</span> <span class="o">&amp;</span> <span class="n">F</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;L.</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">isNull</span><span class="p">()</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
 
-    valor_vs_valor = df_join.filter(
-        F.col(f&quot;N.{col}&quot;).isNotNull() &amp;
-        F.col(f&quot;L.{col}&quot;).isNotNull() &amp;
-        (F.col(f&quot;N.{col}&quot;).cast(&quot;string&quot;) != F.col(f&quot;L.{col}&quot;).cast(&quot;string&quot;))
-    ).count()
+    <span class="n">valor_vs_valor</span> <span class="o">=</span> <span class="n">df_join</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+        <span class="n">F</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;N.</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">isNotNull</span><span class="p">()</span> <span class="o">&amp;</span>
+        <span class="n">F</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;L.</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">isNotNull</span><span class="p">()</span> <span class="o">&amp;</span>
+        <span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;N.</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="s2">&quot;string&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="n">F</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;L.</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="s2">&quot;string&quot;</span><span class="p">))</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
 
-    total_div = null_vs_valor + valor_vs_null + valor_vs_valor
+    <span class="n">total_div</span> <span class="o">=</span> <span class="n">null_vs_valor</span> <span class="o">+</span> <span class="n">valor_vs_null</span> <span class="o">+</span> <span class="n">valor_vs_valor</span>
 
-    resultados.append({
-        &quot;coluna&quot;:        col,
-        &quot;total_linhas&quot;:  total,
-        &quot;divergencias&quot;:  total_div,
-        &quot;pct_divergencia&quot;: round(total_div / total * 100, 2) if total &gt; 0 else 0,
-        &quot;null_vs_valor&quot;: null_vs_valor,
-        &quot;valor_vs_null&quot;: valor_vs_null,
-        &quot;valor_vs_valor&quot;: valor_vs_valor,
-        &quot;status&quot;:        &quot;PASS&quot; if total_div == 0 else &quot;FAIL&quot;
-    })
+    <span class="n">resultados</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+        <span class="s2">&quot;coluna&quot;</span><span class="p">:</span>        <span class="n">col</span><span class="p">,</span>
+        <span class="s2">&quot;total_linhas&quot;</span><span class="p">:</span>  <span class="n">total</span><span class="p">,</span>
+        <span class="s2">&quot;divergencias&quot;</span><span class="p">:</span>  <span class="n">total_div</span><span class="p">,</span>
+        <span class="s2">&quot;pct_divergencia&quot;</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">total_div</span> <span class="o">/</span> <span class="n">total</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="k">if</span> <span class="n">total</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;null_vs_valor&quot;</span><span class="p">:</span> <span class="n">null_vs_valor</span><span class="p">,</span>
+        <span class="s2">&quot;valor_vs_null&quot;</span><span class="p">:</span> <span class="n">valor_vs_null</span><span class="p">,</span>
+        <span class="s2">&quot;valor_vs_valor&quot;</span><span class="p">:</span> <span class="n">valor_vs_valor</span><span class="p">,</span>
+        <span class="s2">&quot;status&quot;</span><span class="p">:</span>        <span class="s2">&quot;PASS&quot;</span> <span class="k">if</span> <span class="n">total_div</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">&quot;FAIL&quot;</span>
+    <span class="p">})</span>
 
-# Exibir resultado
-df_resultado = spark.createDataFrame(resultados)
-df_resultado.orderBy(&quot;status&quot;, F.desc(&quot;divergencias&quot;)).show(50, truncate=False)
-</code></pre>
+<span class="c1"># Exibir resultado</span>
+<span class="n">df_resultado</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">createDataFrame</span><span class="p">(</span><span class="n">resultados</span><span class="p">)</span>
+<span class="n">df_resultado</span><span class="o">.</span><span class="n">orderBy</span><span class="p">(</span><span class="s2">&quot;status&quot;</span><span class="p">,</span> <span class="n">F</span><span class="o">.</span><span class="n">desc</span><span class="p">(</span><span class="s2">&quot;divergencias&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="n">truncate</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
 
 <hr />
 <h2>Implementação — Bloco 3: Causa Raiz</h2>
-<pre class="codehilite"><code class="language-python">def analisa_causa_raiz(df_join, coluna: str, top_n: int = 20):
-    &quot;&quot;&quot;
-    Para uma coluna com FAIL, retorna a distribuição dos pares divergentes.
-    Permite identificar o padrão da divergência (ex: formato, encoding, regra).
-    &quot;&quot;&quot;
-    return df_join.filter(
-        F.col(f&quot;N.{coluna}&quot;).cast(&quot;string&quot;) != F.col(f&quot;L.{coluna}&quot;).cast(&quot;string&quot;)
-    ).groupBy(
-        F.col(f&quot;N.{coluna}&quot;).alias(&quot;valor_novo&quot;),
-        F.col(f&quot;L.{coluna}&quot;).alias(&quot;valor_legado&quot;)
-    ).agg(
-        F.count(&quot;*&quot;).alias(&quot;ocorrencias&quot;)
-    ).orderBy(
-        F.desc(&quot;ocorrencias&quot;)
-    ).limit(top_n)
+<div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">analisa_causa_raiz</span><span class="p">(</span><span class="n">df_join</span><span class="p">,</span> <span class="n">coluna</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">top_n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Para uma coluna com FAIL, retorna a distribuição dos pares divergentes.</span>
+<span class="sd">    Permite identificar o padrão da divergência (ex: formato, encoding, regra).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">df_join</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+        <span class="n">F</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;N.</span><span class="si">{</span><span class="n">coluna</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="s2">&quot;string&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="n">F</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;L.</span><span class="si">{</span><span class="n">coluna</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="s2">&quot;string&quot;</span><span class="p">)</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">groupBy</span><span class="p">(</span>
+        <span class="n">F</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;N.</span><span class="si">{</span><span class="n">coluna</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">&quot;valor_novo&quot;</span><span class="p">),</span>
+        <span class="n">F</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;L.</span><span class="si">{</span><span class="n">coluna</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">&quot;valor_legado&quot;</span><span class="p">)</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">agg</span><span class="p">(</span>
+        <span class="n">F</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">&quot;ocorrencias&quot;</span><span class="p">)</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">orderBy</span><span class="p">(</span>
+        <span class="n">F</span><span class="o">.</span><span class="n">desc</span><span class="p">(</span><span class="s2">&quot;ocorrencias&quot;</span><span class="p">)</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="n">top_n</span><span class="p">)</span>
 
-# Executar para cada coluna com FAIL
-colunas_fail = [r[&quot;coluna&quot;] for r in resultados if r[&quot;status&quot;] == &quot;FAIL&quot;]
+<span class="c1"># Executar para cada coluna com FAIL</span>
+<span class="n">colunas_fail</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="s2">&quot;coluna&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">resultados</span> <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;FAIL&quot;</span><span class="p">]</span>
 
-for col in colunas_fail:
-    print(f&quot;\n=== Causa raiz: {col} ===&quot;)
-    analisa_causa_raiz(df_join, col).show(truncate=False)
-</code></pre>
+<span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">colunas_fail</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== Causa raiz: </span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2"> ===&quot;</span><span class="p">)</span>
+    <span class="n">analisa_causa_raiz</span><span class="p">(</span><span class="n">df_join</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">truncate</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
 
 <p><strong>Exemplo de output e interpretação:</strong></p>
-<pre class="codehilite"><code>=== Causa raiz: cd_municipio ===
+<div class="codehilite"><pre><span></span><code>=== Causa raiz: cd_municipio ===
 +------------+-------------+-----------+
 |valor_novo  |valor_legado |ocorrencias|
 +------------+-------------+-----------+
@@ -212,71 +212,71 @@ for col in colunas_fail:
 +------------+-------------+-----------+
 
 Causa raiz identificada:
-- Linha 1: possível divergência de tipo (INT vs. STRING), CAST resolve
-- Linha 2: coluna não mapeada no novo sistema — bug de transformação
-- Linha 3: legado tem erro de dado (código incorreto) — o novo sistema está correto
-</code></pre>
+<span class="k">-</span> Linha 1: possível divergência de tipo (INT vs. STRING), CAST resolve
+<span class="k">-</span> Linha 2: coluna não mapeada no novo sistema — bug de transformação
+<span class="k">-</span> Linha 3: legado tem erro de dado (código incorreto) — o novo sistema está correto
+</code></pre></div>
 
 <hr />
 <h2>Validação Cross-Environment com OPENROWSET</h2>
 <p>Em projetos onde o ambiente de dev tem acesso read-only ao storage de prod, o OPENROWSET do Synapse Serverless SQL permite validar sem mover dados:</p>
-<pre class="codehilite"><code class="language-sql">-- Query executada no endpoint -ondemand do Synapse
--- Permite que DEV leia PROD diretamente via token AAD
+<div class="codehilite"><pre><span></span><code><span class="c1">-- Query executada no endpoint -ondemand do Synapse</span>
+<span class="c1">-- Permite que DEV leia PROD diretamente via token AAD</span>
 
-SELECT pk, coluna_a, coluna_b
-FROM OPENROWSET(
-    BULK 'https://&lt;storage-prod&gt;.dfs.core.windows.net/&lt;container&gt;/&lt;path&gt;/',
-    FORMAT = 'DELTA'
-) WITH (
-    pk       VARCHAR(50),
-    coluna_a DECIMAL(18,2),
-    coluna_b VARCHAR(200)
-) AS prod_data
-</code></pre>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">pk</span><span class="p">,</span><span class="w"> </span><span class="n">coluna_a</span><span class="p">,</span><span class="w"> </span><span class="n">coluna_b</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">OPENROWSET</span><span class="p">(</span>
+<span class="w">    </span><span class="n">BULK</span><span class="w"> </span><span class="s1">&#39;https://&lt;storage-prod&gt;.dfs.core.windows.net/&lt;container&gt;/&lt;path&gt;/&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">FORMAT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;DELTA&#39;</span>
+<span class="p">)</span><span class="w"> </span><span class="k">WITH</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">pk</span><span class="w">       </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">),</span>
+<span class="w">    </span><span class="n">coluna_a</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span>
+<span class="w">    </span><span class="n">coluna_b</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span>
+<span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">prod_data</span>
+</code></pre></div>
 
 <p>Em PySpark, usar o connector JDBC para ler via Serverless SQL:</p>
-<pre class="codehilite"><code class="language-python">df_legado = spark.read \
-    .format(&quot;com.microsoft.azure.synapse.spark&quot;) \
-    .option(&quot;url&quot;, &quot;jdbc:sqlserver://&lt;workspace&gt;-ondemand.sql.azuresynapse.net;...&quot;) \
-    .option(&quot;query&quot;, &quot;SELECT pk, coluna_a FROM &lt;view_sobre_prod&gt;&quot;) \
-    .load()
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="n">df_legado</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">read</span> \
+    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;com.microsoft.azure.synapse.spark&quot;</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s2">&quot;url&quot;</span><span class="p">,</span> <span class="s2">&quot;jdbc:sqlserver://&lt;workspace&gt;-ondemand.sql.azuresynapse.net;...&quot;</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s2">&quot;query&quot;</span><span class="p">,</span> <span class="s2">&quot;SELECT pk, coluna_a FROM &lt;view_sobre_prod&gt;&quot;</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">load</span><span class="p">()</span>
+</code></pre></div>
 
 <hr />
 <h2>Template de Relatório de Homologação</h2>
 <p>Ao final da validação, o relatório deve conter:</p>
-<pre class="codehilite"><code>RELATÓRIO DE HOMOLOGAÇÃO — &lt;Nome da Tabela&gt;
-Data: YYYY-MM-DD
-Validado por: [nome]
-Ambiente novo: &lt;endpoint/path&gt;
-Ambiente legado: &lt;endpoint/path&gt;
+<div class="codehilite"><pre><span></span><code><span class="n">RELATÓRIO</span><span class="w"> </span><span class="n">DE</span><span class="w"> </span><span class="n">HOMOLOGAÇÃO</span><span class="w"> </span><span class="err">—</span><span class="w"> </span><span class="o">&lt;</span><span class="n">Nome</span><span class="w"> </span><span class="n">da</span><span class="w"> </span><span class="n">Tabela</span><span class="o">&gt;</span>
+<span class="k">Data</span><span class="err">:</span><span class="w"> </span><span class="n">YYYY</span><span class="o">-</span><span class="n">MM</span><span class="o">-</span><span class="n">DD</span>
+<span class="n">Validado</span><span class="w"> </span><span class="nl">por</span><span class="p">:</span><span class="w"> </span><span class="o">[</span><span class="n">nome</span><span class="o">]</span>
+<span class="n">Ambiente</span><span class="w"> </span><span class="nl">novo</span><span class="p">:</span><span class="w"> </span><span class="o">&lt;</span><span class="n">endpoint</span><span class="o">/</span><span class="k">path</span><span class="o">&gt;</span>
+<span class="n">Ambiente</span><span class="w"> </span><span class="nl">legado</span><span class="p">:</span><span class="w"> </span><span class="o">&lt;</span><span class="n">endpoint</span><span class="o">/</span><span class="k">path</span><span class="o">&gt;</span>
 
-BLOCO 1 — UNIVERSO
-  PKs comuns:           X,XXX,XXX
-  PKs apenas no novo:   0
-  PKs apenas no legado: 0
-  Status: PASS
+<span class="n">BLOCO</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="err">—</span><span class="w"> </span><span class="n">UNIVERSO</span>
+<span class="w">  </span><span class="n">PKs</span><span class="w"> </span><span class="nl">comuns</span><span class="p">:</span><span class="w">           </span><span class="n">X</span><span class="p">,</span><span class="n">XXX</span><span class="p">,</span><span class="n">XXX</span>
+<span class="w">  </span><span class="n">PKs</span><span class="w"> </span><span class="n">apenas</span><span class="w"> </span><span class="k">no</span><span class="w"> </span><span class="nl">novo</span><span class="p">:</span><span class="w">   </span><span class="mi">0</span>
+<span class="w">  </span><span class="n">PKs</span><span class="w"> </span><span class="n">apenas</span><span class="w"> </span><span class="k">no</span><span class="w"> </span><span class="nl">legado</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">  </span><span class="nl">Status</span><span class="p">:</span><span class="w"> </span><span class="n">PASS</span>
 
-BLOCO 2 — DIFF POR COLUNA (resumo)
-  Total de colunas validadas: XX
-  Colunas com PASS absoluto: XX
-  Colunas com FAIL:           XX
+<span class="n">BLOCO</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="err">—</span><span class="w"> </span><span class="n">DIFF</span><span class="w"> </span><span class="n">POR</span><span class="w"> </span><span class="n">COLUNA</span><span class="w"> </span><span class="p">(</span><span class="n">resumo</span><span class="p">)</span>
+<span class="w">  </span><span class="n">Total</span><span class="w"> </span><span class="n">de</span><span class="w"> </span><span class="n">colunas</span><span class="w"> </span><span class="nl">validadas</span><span class="p">:</span><span class="w"> </span><span class="n">XX</span>
+<span class="w">  </span><span class="n">Colunas</span><span class="w"> </span><span class="n">com</span><span class="w"> </span><span class="n">PASS</span><span class="w"> </span><span class="nl">absoluto</span><span class="p">:</span><span class="w"> </span><span class="n">XX</span>
+<span class="w">  </span><span class="n">Colunas</span><span class="w"> </span><span class="n">com</span><span class="w"> </span><span class="nl">FAIL</span><span class="p">:</span><span class="w">           </span><span class="n">XX</span>
 
-  Detalhes por coluna:
-  coluna_a   PASS    (0 divergências)
-  coluna_b   PASS    (0 divergências)
-  coluna_c   FAIL    (1.200 divergências — 0,3% do universo)
-  ...
+<span class="w">  </span><span class="n">Detalhes</span><span class="w"> </span><span class="n">por</span><span class="w"> </span><span class="nl">coluna</span><span class="p">:</span>
+<span class="w">  </span><span class="n">coluna_a</span><span class="w">   </span><span class="n">PASS</span><span class="w">    </span><span class="p">(</span><span class="mi">0</span><span class="w"> </span><span class="n">divergências</span><span class="p">)</span>
+<span class="w">  </span><span class="n">coluna_b</span><span class="w">   </span><span class="n">PASS</span><span class="w">    </span><span class="p">(</span><span class="mi">0</span><span class="w"> </span><span class="n">divergências</span><span class="p">)</span>
+<span class="w">  </span><span class="n">coluna_c</span><span class="w">   </span><span class="n">FAIL</span><span class="w">    </span><span class="p">(</span><span class="mf">1.200</span><span class="w"> </span><span class="n">divergências</span><span class="w"> </span><span class="err">—</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="o">%</span><span class="w"> </span><span class="n">do</span><span class="w"> </span><span class="n">universo</span><span class="p">)</span>
+<span class="w">  </span><span class="p">...</span>
 
-BLOCO 3 — CAUSA RAIZ (para colunas com FAIL)
-  coluna_c:
-    Causa raiz: código de município sem padding de zeros à esquerda no legado.
-    Decisão: novo sistema está correto (código IBGE com 7 dígitos).
-    Ação: nenhuma — divergência aceita.
+<span class="n">BLOCO</span><span class="w"> </span><span class="mi">3</span><span class="w"> </span><span class="err">—</span><span class="w"> </span><span class="n">CAUSA</span><span class="w"> </span><span class="n">RAIZ</span><span class="w"> </span><span class="p">(</span><span class="n">para</span><span class="w"> </span><span class="n">colunas</span><span class="w"> </span><span class="n">com</span><span class="w"> </span><span class="n">FAIL</span><span class="p">)</span>
+<span class="w">  </span><span class="nl">coluna_c</span><span class="p">:</span>
+<span class="w">    </span><span class="n">Causa</span><span class="w"> </span><span class="nl">raiz</span><span class="p">:</span><span class="w"> </span><span class="n">código</span><span class="w"> </span><span class="n">de</span><span class="w"> </span><span class="n">município</span><span class="w"> </span><span class="n">sem</span><span class="w"> </span><span class="n">padding</span><span class="w"> </span><span class="n">de</span><span class="w"> </span><span class="n">zeros</span><span class="w"> </span><span class="n">à</span><span class="w"> </span><span class="n">esquerda</span><span class="w"> </span><span class="k">no</span><span class="w"> </span><span class="n">legado</span><span class="p">.</span>
+<span class="w">    </span><span class="nl">Decisão</span><span class="p">:</span><span class="w"> </span><span class="n">novo</span><span class="w"> </span><span class="n">sistema</span><span class="w"> </span><span class="n">está</span><span class="w"> </span><span class="n">correto</span><span class="w"> </span><span class="p">(</span><span class="n">código</span><span class="w"> </span><span class="n">IBGE</span><span class="w"> </span><span class="n">com</span><span class="w"> </span><span class="mi">7</span><span class="w"> </span><span class="n">dígitos</span><span class="p">).</span>
+<span class="w">    </span><span class="nl">Ação</span><span class="p">:</span><span class="w"> </span><span class="n">nenhuma</span><span class="w"> </span><span class="err">—</span><span class="w"> </span><span class="n">divergência</span><span class="w"> </span><span class="n">aceita</span><span class="p">.</span>
 
-RESULTADO FINAL: APROVADO PARA GO-LIVE
-Pendências documentadas: 1 divergência aceita em coluna_c (ver acima)
-</code></pre>
+<span class="n">RESULTADO</span><span class="w"> </span><span class="nl">FINAL</span><span class="p">:</span><span class="w"> </span><span class="n">APROVADO</span><span class="w"> </span><span class="n">PARA</span><span class="w"> </span><span class="k">GO</span><span class="o">-</span><span class="n">LIVE</span>
+<span class="n">Pendências</span><span class="w"> </span><span class="nl">documentadas</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="n">divergência</span><span class="w"> </span><span class="n">aceita</span><span class="w"> </span><span class="n">em</span><span class="w"> </span><span class="n">coluna_c</span><span class="w"> </span><span class="p">(</span><span class="n">ver</span><span class="w"> </span><span class="n">acima</span><span class="p">)</span>
+</code></pre></div>
 
 <hr />
 <h2>Quando NÃO Usar Esta Metodologia</h2>

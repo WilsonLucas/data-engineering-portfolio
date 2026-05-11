@@ -97,32 +97,32 @@
 </table>
 <hr />
 <h2>Arquitetura</h2>
-<pre class="codehilite"><code>Sistema RH               ADLS Gen2                  Azure Databricks
-(legado, .txt)           ─────────                  ────────────────
-                         transient/                  trusted/
-  folha_pag.txt ──────► [arquivo bruto]  ─────────► [Delta Bronze]
-  beneficios.txt ─────► [arquivo bruto]  ─────────► [Delta Bronze]
-  encargos.txt ───────► [arquivo bruto]  ─────────► [Delta Bronze]
-  [...]                                              [...]
-  .txt ISO-8859-1                                    schema tipado
-  separador pipe                                     metadados audit
-  decimal vírgula
-                                                     refined/
-                                                     ────────────────
-                                                     [fato_folha_pag]
-                                                     [fato_rescisoes]
-                                                     [fato_encargos]
-                                                     [fato_beneficios]
-                                                     [fato_benef_dep]
-                                                     [fato_jornada]
-                                                     [fato_endivida]
-                                                     [fato_horas_ext]
-                                                     8 tabelas FATO
-                                                          │
-                                                          ▼
-                                                    Synapse Serverless SQL
-                                                    (views para Power BI)
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="n">Sistema</span><span class="w"> </span><span class="n">RH</span><span class="w">               </span><span class="n">ADLS</span><span class="w"> </span><span class="n">Gen2</span><span class="w">                  </span><span class="n">Azure</span><span class="w"> </span><span class="n">Databricks</span>
+<span class="p">(</span><span class="n">legado</span><span class="p">,</span><span class="w"> </span><span class="p">.</span><span class="n">txt</span><span class="p">)</span><span class="w">           </span><span class="err">─────────</span><span class="w">                  </span><span class="err">────────────────</span>
+<span class="w">                         </span><span class="n">transient</span><span class="o">/</span><span class="w">                  </span><span class="n">trusted</span><span class="o">/</span>
+<span class="w">  </span><span class="n">folha_pag</span><span class="p">.</span><span class="n">txt</span><span class="w"> </span><span class="err">──────►</span><span class="w"> </span><span class="p">[</span><span class="n">arquivo</span><span class="w"> </span><span class="n">bruto</span><span class="p">]</span><span class="w">  </span><span class="err">─────────►</span><span class="w"> </span><span class="p">[</span><span class="n">Delta</span><span class="w"> </span><span class="n">Bronze</span><span class="p">]</span>
+<span class="w">  </span><span class="n">beneficios</span><span class="p">.</span><span class="n">txt</span><span class="w"> </span><span class="err">─────►</span><span class="w"> </span><span class="p">[</span><span class="n">arquivo</span><span class="w"> </span><span class="n">bruto</span><span class="p">]</span><span class="w">  </span><span class="err">─────────►</span><span class="w"> </span><span class="p">[</span><span class="n">Delta</span><span class="w"> </span><span class="n">Bronze</span><span class="p">]</span>
+<span class="w">  </span><span class="n">encargos</span><span class="p">.</span><span class="n">txt</span><span class="w"> </span><span class="err">───────►</span><span class="w"> </span><span class="p">[</span><span class="n">arquivo</span><span class="w"> </span><span class="n">bruto</span><span class="p">]</span><span class="w">  </span><span class="err">─────────►</span><span class="w"> </span><span class="p">[</span><span class="n">Delta</span><span class="w"> </span><span class="n">Bronze</span><span class="p">]</span>
+<span class="w">  </span><span class="p">[...]</span><span class="w">                                              </span><span class="p">[...]</span>
+<span class="w">  </span><span class="p">.</span><span class="n">txt</span><span class="w"> </span><span class="n">ISO</span><span class="mi">-8859-1</span><span class="w">                                    </span><span class="n">schema</span><span class="w"> </span><span class="n">tipado</span>
+<span class="w">  </span><span class="n">separador</span><span class="w"> </span><span class="n">pipe</span><span class="w">                                     </span><span class="n">metadados</span><span class="w"> </span><span class="n">audit</span>
+<span class="w">  </span><span class="n">decimal</span><span class="w"> </span><span class="n">vírgula</span>
+<span class="w">                                                     </span><span class="n">refined</span><span class="o">/</span>
+<span class="w">                                                     </span><span class="err">────────────────</span>
+<span class="w">                                                     </span><span class="p">[</span><span class="n">fato_folha_pag</span><span class="p">]</span>
+<span class="w">                                                     </span><span class="p">[</span><span class="n">fato_rescisoes</span><span class="p">]</span>
+<span class="w">                                                     </span><span class="p">[</span><span class="n">fato_encargos</span><span class="p">]</span>
+<span class="w">                                                     </span><span class="p">[</span><span class="n">fato_beneficios</span><span class="p">]</span>
+<span class="w">                                                     </span><span class="p">[</span><span class="n">fato_benef_dep</span><span class="p">]</span>
+<span class="w">                                                     </span><span class="p">[</span><span class="n">fato_jornada</span><span class="p">]</span>
+<span class="w">                                                     </span><span class="p">[</span><span class="n">fato_endivida</span><span class="p">]</span>
+<span class="w">                                                     </span><span class="p">[</span><span class="n">fato_horas_ext</span><span class="p">]</span>
+<span class="w">                                                     </span><span class="mi">8</span><span class="w"> </span><span class="n">tabelas</span><span class="w"> </span><span class="n">FATO</span>
+<span class="w">                                                          </span><span class="err">│</span>
+<span class="w">                                                          </span><span class="err">▼</span>
+<span class="w">                                                    </span><span class="n">Synapse</span><span class="w"> </span><span class="n">Serverless</span><span class="w"> </span><span class="n">SQL</span>
+<span class="w">                                                    </span><span class="p">(</span><span class="n">views</span><span class="w"> </span><span class="n">para</span><span class="w"> </span><span class="n">Power</span><span class="w"> </span><span class="n">BI</span><span class="p">)</span>
+</code></pre></div>
 
 <p><strong>Camada Transient/Raw:</strong> arquivos .txt recebidos no estado bruto, sem alteração. Preservação da fonte como auditoria de origem.</p>
 <p><strong>Camada Trusted (Bronze):</strong> conversão para Delta com schema inferido e tipado. Correção de encoding, decimal e separador feita nesta etapa.</p>
@@ -132,103 +132,103 @@
 <h3>1. Fix de decimal brasileiro — BL02</h3>
 <p><strong>Problema:</strong> O sistema de RH exporta valores monetários no formato brasileiro: ponto como separador de milhar e vírgula como separador decimal (ex: <code>1.234,56</code>). Um <code>CAST</code> direto para <code>DECIMAL(18,2)</code> retorna <code>NULL</code> silenciosamente para qualquer valor acima de 999.</p>
 <p><strong>Solução:</strong></p>
-<pre class="codehilite"><code class="language-python">from pyspark.sql import functions as F
+<div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pyspark.sql</span><span class="w"> </span><span class="kn">import</span> <span class="n">functions</span> <span class="k">as</span> <span class="n">F</span>
 
-# Padrão aplicado em todos os campos monetários
-df = df.withColumn(
-    &quot;vl_verba&quot;,
-    F.col(&quot;vl_verba_raw&quot;)
-     .cast(&quot;string&quot;)
-     .pipe(lambda c: F.regexp_replace(c, r&quot;\.&quot;, &quot;&quot;))   # remove separador de milhar
-     .pipe(lambda c: F.regexp_replace(c, &quot;,&quot;, &quot;.&quot;))    # normaliza decimal
-     .cast(&quot;decimal(18,2)&quot;)
-)
-</code></pre>
+<span class="c1"># Padrão aplicado em todos os campos monetários</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">withColumn</span><span class="p">(</span>
+    <span class="s2">&quot;vl_verba&quot;</span><span class="p">,</span>
+    <span class="n">F</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;vl_verba_raw&quot;</span><span class="p">)</span>
+     <span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="s2">&quot;string&quot;</span><span class="p">)</span>
+     <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="k">lambda</span> <span class="n">c</span><span class="p">:</span> <span class="n">F</span><span class="o">.</span><span class="n">regexp_replace</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;\.&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>   <span class="c1"># remove separador de milhar</span>
+     <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="k">lambda</span> <span class="n">c</span><span class="p">:</span> <span class="n">F</span><span class="o">.</span><span class="n">regexp_replace</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="s2">&quot;,&quot;</span><span class="p">,</span> <span class="s2">&quot;.&quot;</span><span class="p">))</span>    <span class="c1"># normaliza decimal</span>
+     <span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="s2">&quot;decimal(18,2)&quot;</span><span class="p">)</span>
+<span class="p">)</span>
+</code></pre></div>
 
 <p>Em SQL:</p>
-<pre class="codehilite"><code class="language-sql">CAST(REPLACE(REPLACE(TRIM(vl_verba_raw), '.', ''), ',', '.') AS DECIMAL(18,2))
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">CAST</span><span class="p">(</span><span class="k">REPLACE</span><span class="p">(</span><span class="k">REPLACE</span><span class="p">(</span><span class="k">TRIM</span><span class="p">(</span><span class="n">vl_verba_raw</span><span class="p">),</span><span class="w"> </span><span class="s1">&#39;.&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="p">),</span><span class="w"> </span><span class="s1">&#39;,&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;.&#39;</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+</code></pre></div>
 
 <p><strong>Impacto:</strong> Sem esse fix, qualquer soma ou média de valores monetários retornava <code>NULL</code> ou valores drasticamente subestimados — erro silencioso que só aparece ao comparar totais com o sistema de origem.</p>
 <hr />
 <h3>2. Dynamic Partition Overwrite para duplicatas legítimas — BL16</h3>
 <p><strong>Problema:</strong> O arquivo <code>ContratadosRC.txt</code> contém linhas 100% idênticas por design de negócio — o mesmo funcionário pode aparecer até 21 vezes na mesma competência (ex: múltiplos vínculos ou lotações simultâneas). Um MERGE com chave composta falha silenciosamente: não consegue resolver qual das 21 linhas idênticas deve &ldquo;ganhar&rdquo;.</p>
 <p><strong>Análise do problema:</strong></p>
-<pre class="codehilite"><code>Arquivo fonte — exemplo simplificado:
-id_func | competencia | tipo_vinculo | vl_salario
-001     | 2025-01     | EFETIVO      | 5000,00
-001     | 2025-01     | EFETIVO      | 5000,00   ← idêntico ao anterior
-001     | 2025-01     | EFETIVO      | 5000,00   ← idêntico (21 vezes)
+<div class="codehilite"><pre><span></span><code><span class="n">Arquivo</span><span class="w"> </span><span class="n">fonte</span><span class="w"> </span><span class="err">—</span><span class="w"> </span><span class="n">exemplo</span><span class="w"> </span><span class="n">simplificado</span><span class="p">:</span>
+<span class="n">id_func</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">competencia</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">tipo_vinculo</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">vl_salario</span>
+<span class="mi">001</span><span class="w">     </span><span class="o">|</span><span class="w"> </span><span class="mi">2025</span><span class="o">-</span><span class="mi">01</span><span class="w">     </span><span class="o">|</span><span class="w"> </span><span class="n">EFETIVO</span><span class="w">      </span><span class="o">|</span><span class="w"> </span><span class="mi">5000</span><span class="p">,</span><span class="mi">00</span>
+<span class="mi">001</span><span class="w">     </span><span class="o">|</span><span class="w"> </span><span class="mi">2025</span><span class="o">-</span><span class="mi">01</span><span class="w">     </span><span class="o">|</span><span class="w"> </span><span class="n">EFETIVO</span><span class="w">      </span><span class="o">|</span><span class="w"> </span><span class="mi">5000</span><span class="p">,</span><span class="mi">00</span><span class="w">   </span><span class="err">←</span><span class="w"> </span><span class="n">idêntico</span><span class="w"> </span><span class="n">ao</span><span class="w"> </span><span class="n">anterior</span>
+<span class="mi">001</span><span class="w">     </span><span class="o">|</span><span class="w"> </span><span class="mi">2025</span><span class="o">-</span><span class="mi">01</span><span class="w">     </span><span class="o">|</span><span class="w"> </span><span class="n">EFETIVO</span><span class="w">      </span><span class="o">|</span><span class="w"> </span><span class="mi">5000</span><span class="p">,</span><span class="mi">00</span><span class="w">   </span><span class="err">←</span><span class="w"> </span><span class="n">idêntico</span><span class="w"> </span><span class="p">(</span><span class="mi">21</span><span class="w"> </span><span class="n">vezes</span><span class="p">)</span>
 
-MERGE com ON (id_func, competencia, tipo_vinculo, vl_salario)
-→ falha: &quot;Cannot perform a MERGE operation when multiple source rows
-  match the same target row&quot;
-</code></pre>
+<span class="n">MERGE</span><span class="w"> </span><span class="n">com</span><span class="w"> </span><span class="n">ON</span><span class="w"> </span><span class="p">(</span><span class="n">id_func</span><span class="p">,</span><span class="w"> </span><span class="n">competencia</span><span class="p">,</span><span class="w"> </span><span class="n">tipo_vinculo</span><span class="p">,</span><span class="w"> </span><span class="n">vl_salario</span><span class="p">)</span>
+<span class="err">→</span><span class="w"> </span><span class="n">falha</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Cannot perform a MERGE operation when multiple source rows</span>
+<span class="w">  </span><span class="k">match</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">same</span><span class="w"> </span><span class="n">target</span><span class="w"> </span><span class="n">row</span><span class="s2">&quot;</span>
+</code></pre></div>
 
 <p><strong>Solução:</strong> Dynamic Partition Overwrite — reescreve a partição inteira de competência, preservando todas as duplicatas.</p>
-<pre class="codehilite"><code class="language-python">spark.conf.set(&quot;spark.sql.sources.partitionOverwriteMode&quot;, &quot;dynamic&quot;)
+<div class="codehilite"><pre><span></span><code><span class="n">spark</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;spark.sql.sources.partitionOverwriteMode&quot;</span><span class="p">,</span> <span class="s2">&quot;dynamic&quot;</span><span class="p">)</span>
 
-df_competencia.write \
-    .format(&quot;delta&quot;) \
-    .mode(&quot;overwrite&quot;) \
-    .option(&quot;partitionOverwriteMode&quot;, &quot;dynamic&quot;) \
-    .partitionBy(&quot;partition_date&quot;) \
-    .saveAsTable(&quot;refined.fato_folha_contratados&quot;)
-</code></pre>
+<span class="n">df_competencia</span><span class="o">.</span><span class="n">write</span> \
+    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;delta&quot;</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">mode</span><span class="p">(</span><span class="s2">&quot;overwrite&quot;</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s2">&quot;partitionOverwriteMode&quot;</span><span class="p">,</span> <span class="s2">&quot;dynamic&quot;</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">partitionBy</span><span class="p">(</span><span class="s2">&quot;partition_date&quot;</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">saveAsTable</span><span class="p">(</span><span class="s2">&quot;refined.fato_folha_contratados&quot;</span><span class="p">)</span>
+</code></pre></div>
 
 <p><strong>Trade-off:</strong> O Dynamic Partition Overwrite perde a atomicidade linha-a-linha do MERGE. Para essa tabela específica, é semanticamente correto porque o contrato de qualidade é &ldquo;a partição de competência deve ser idêntica à fonte&rdquo; — e não &ldquo;cada linha individual deve ser rastreável por chave&rdquo;.</p>
 <hr />
 <h3>3. Timezone GMT-3 explícito — problema silencioso de auditoria</h3>
 <p><strong>Problema:</strong> O <code>current_timestamp()</code> do Spark retorna UTC. Campos de auditoria (<code>insert_date</code>, <code>update_date</code>) com UTC em um sistema que opera em GMT-3 geram confusão em relatórios de auditoria que comparam timestamps com eventos do sistema de origem.</p>
 <p><strong>Solução:</strong></p>
-<pre class="codehilite"><code class="language-python">from pyspark.sql import functions as F
+<div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pyspark.sql</span><span class="w"> </span><span class="kn">import</span> <span class="n">functions</span> <span class="k">as</span> <span class="n">F</span>
 
-df = df.withColumn(
-    &quot;insert_date&quot;,
-    F.to_utc_timestamp(F.current_timestamp(), &quot;GMT+3&quot;)
-).withColumn(
-    &quot;update_date&quot;,
-    F.to_utc_timestamp(F.current_timestamp(), &quot;GMT+3&quot;)
-)
-</code></pre>
+<span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">withColumn</span><span class="p">(</span>
+    <span class="s2">&quot;insert_date&quot;</span><span class="p">,</span>
+    <span class="n">F</span><span class="o">.</span><span class="n">to_utc_timestamp</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">current_timestamp</span><span class="p">(),</span> <span class="s2">&quot;GMT+3&quot;</span><span class="p">)</span>
+<span class="p">)</span><span class="o">.</span><span class="n">withColumn</span><span class="p">(</span>
+    <span class="s2">&quot;update_date&quot;</span><span class="p">,</span>
+    <span class="n">F</span><span class="o">.</span><span class="n">to_utc_timestamp</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">current_timestamp</span><span class="p">(),</span> <span class="s2">&quot;GMT+3&quot;</span><span class="p">)</span>
+<span class="p">)</span>
+</code></pre></div>
 
 <p><strong>Nota:</strong> <code>GMT+3</code> na API do Spark equivale a <code>UTC-3</code> (o sinal é invertido nessa função específica). Documentar explicitamente esse comportamento contraintuitivo foi necessário para evitar regressões.</p>
 <hr />
 <h3>4. FSCK REPAIR após VACUUM — BL07</h3>
 <p><strong>Problema:</strong> O VACUUM do Delta Lake, por padrão, retém arquivos por 7 dias (<code>delta.deletedFileRetentionDuration</code>). Em um ambiente com múltiplas reescritas por dia, os logs Delta (<code>_delta_log</code>) podem referenciar arquivos físicos que foram removidos por uma limpeza manual anterior ao período de retenção. O resultado é uma tabela cujo log diz que um arquivo existe, mas o arquivo não está no storage — queries falham com <code>FileNotFoundException</code>.</p>
 <p><strong>Diagnóstico:</strong></p>
-<pre class="codehilite"><code class="language-python"># Verificar integridade da tabela
-spark.sql(&quot;DESCRIBE DETAIL refined.fato_folha_beneficios&quot;).show()
+<div class="codehilite"><pre><span></span><code><span class="c1"># Verificar integridade da tabela</span>
+<span class="n">spark</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s2">&quot;DESCRIBE DETAIL refined.fato_folha_beneficios&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
-# Tentar SELECT simples para confirmar o erro
-spark.sql(&quot;SELECT COUNT(*) FROM refined.fato_folha_beneficios&quot;).show()
-# → FileNotFoundException: arquivo X não encontrado em &lt;path&gt;
-</code></pre>
+<span class="c1"># Tentar SELECT simples para confirmar o erro</span>
+<span class="n">spark</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s2">&quot;SELECT COUNT(*) FROM refined.fato_folha_beneficios&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="c1"># → FileNotFoundException: arquivo X não encontrado em &lt;path&gt;</span>
+</code></pre></div>
 
 <p><strong>Solução:</strong></p>
-<pre class="codehilite"><code class="language-sql">-- Reparar o log Delta removendo referências a arquivos inexistentes
-FSCK REPAIR TABLE refined.fato_folha_beneficios
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="c1">-- Reparar o log Delta removendo referências a arquivos inexistentes</span>
+<span class="n">FSCK</span><span class="w"> </span><span class="n">REPAIR</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">refined</span><span class="p">.</span><span class="n">fato_folha_beneficios</span>
+</code></pre></div>
 
 <p><strong>Lição:</strong> VACUUM deve sempre usar o período de retenção padrão (7 dias) ou superior, nunca ser executado com <code>RETAIN 0 HOURS</code> em produção. O FSCK REPAIR resolve o estado corrompido, mas não é substituto para práticas corretas de VACUUM.</p>
 <hr />
 <h3>5. Propagação de novas colunas no MERGE — BL14</h3>
 <p><strong>Problema:</strong> A função <code>CargasAutomaticas()</code> usa a lista de colunas da tabela Delta de destino para construir o <code>UPDATE SET</code> do MERGE. Quando uma nova coluna é adicionada ao schema da fonte, o <code>autoMerge.enabled</code> adiciona a coluna à tabela Delta, mas o MERGE construído dinamicamente não inclui a nova coluna no <code>UPDATE SET</code> — então linhas existentes têm <code>NULL</code> na nova coluna mesmo após re-execução.</p>
 <p><strong>Solução:</strong></p>
-<pre class="codehilite"><code class="language-python"># Workaround: após adicionar coluna via autoMerge, fazer backfill explícito
-# para registros existentes que ficaram com NULL
+<div class="codehilite"><pre><span></span><code><span class="c1"># Workaround: após adicionar coluna via autoMerge, fazer backfill explícito</span>
+<span class="c1"># para registros existentes que ficaram com NULL</span>
 
-spark.sql(&quot;&quot;&quot;
-    ALTER TABLE refined.fato_folha_pagamento
-    ADD COLUMN nova_coluna STRING
-&quot;&quot;&quot;)
+<span class="n">spark</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    ALTER TABLE refined.fato_folha_pagamento</span>
+<span class="s2">    ADD COLUMN nova_coluna STRING</span>
+<span class="s2">&quot;&quot;&quot;</span><span class="p">)</span>
 
-spark.sql(&quot;&quot;&quot;
-    UPDATE refined.fato_folha_pagamento
-    SET nova_coluna = &lt;expressao_de_backfill&gt;
-    WHERE nova_coluna IS NULL
-&quot;&quot;&quot;)
-</code></pre>
+<span class="n">spark</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    UPDATE refined.fato_folha_pagamento</span>
+<span class="s2">    SET nova_coluna = &lt;expressao_de_backfill&gt;</span>
+<span class="s2">    WHERE nova_coluna IS NULL</span>
+<span class="s2">&quot;&quot;&quot;</span><span class="p">)</span>
+</code></pre></div>
 
 <p><strong>Mitigação estrutural:</strong> Documentar o processo de adição de coluna como um procedimento de duas etapas — ALTER TABLE + backfill — e não como uma operação implícita do autoMerge.</p>
 <hr />

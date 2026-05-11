@@ -49,7 +49,7 @@
 <p>A <strong>controller-driven architecture</strong> inverte essa lógica: a configuração vive em tabelas de dados (Delta), não em código. O código processa o que a tabela diz. Adicionar uma nova tabela à pipeline é uma operação de dados (INSERT), não uma operação de código (commit).</p>
 <hr />
 <h2>Princípio Central</h2>
-<pre class="codehilite"><code>Arquitetura convencional:
+<div class="codehilite"><pre><span></span><code>Arquitetura convencional:
   código define QUAIS tabelas processar
   código define COMO processar cada tabela
   → N tabelas = N configurações de código
@@ -58,33 +58,33 @@ Arquitetura controller-driven:
   tabela Delta define QUAIS tabelas processar e COM QUAIS PARÂMETROS
   código define COMO processar (genérico, parametrizado)
   → N tabelas = N linhas na tabela controller
-</code></pre>
+</code></pre></div>
 
 <hr />
 <h2>Estrutura das Tabelas Controller</h2>
 <p>A implementação típica usa 3-4 tabelas Delta em um schema dedicado (<code>&lt;catalog&gt;.controller</code>):</p>
 <h3>1. Tabela de Extração da Fonte (<code>source_to_lake</code>)</h3>
 <p>Define quais tabelas da fonte devem ser extraídas, com qual query e para qual destino.</p>
-<pre class="codehilite"><code class="language-sql">-- DDL simplificado
-CREATE TABLE controller.source_to_lake (
-    id_tabela       INTEGER,
-    schema_fonte    STRING,       -- schema no SQL Server de origem
-    tabela_fonte    STRING,       -- nome da tabela de origem
-    query_override  STRING,       -- query customizada (NULL = SELECT * sem filtro)
-    path_destino    STRING,       -- path no ADLS de destino (landing zone)
-    batch_flag      INTEGER,      -- agrupa tabelas em lotes para paralelismo ADF
-    ativo           BOOLEAN,      -- flag para habilitar/desabilitar extração
-    dt_atualizacao  TIMESTAMP
-);
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="c1">-- DDL simplificado</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">controller</span><span class="p">.</span><span class="n">source_to_lake</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id_tabela</span><span class="w">       </span><span class="nb">INTEGER</span><span class="p">,</span>
+<span class="w">    </span><span class="n">schema_fonte</span><span class="w">    </span><span class="n">STRING</span><span class="p">,</span><span class="w">       </span><span class="c1">-- schema no SQL Server de origem</span>
+<span class="w">    </span><span class="n">tabela_fonte</span><span class="w">    </span><span class="n">STRING</span><span class="p">,</span><span class="w">       </span><span class="c1">-- nome da tabela de origem</span>
+<span class="w">    </span><span class="n">query_override</span><span class="w">  </span><span class="n">STRING</span><span class="p">,</span><span class="w">       </span><span class="c1">-- query customizada (NULL = SELECT * sem filtro)</span>
+<span class="w">    </span><span class="n">path_destino</span><span class="w">    </span><span class="n">STRING</span><span class="p">,</span><span class="w">       </span><span class="c1">-- path no ADLS de destino (landing zone)</span>
+<span class="w">    </span><span class="n">batch_flag</span><span class="w">      </span><span class="nb">INTEGER</span><span class="p">,</span><span class="w">      </span><span class="c1">-- agrupa tabelas em lotes para paralelismo ADF</span>
+<span class="w">    </span><span class="n">ativo</span><span class="w">           </span><span class="nb">BOOLEAN</span><span class="p">,</span><span class="w">      </span><span class="c1">-- flag para habilitar/desabilitar extração</span>
+<span class="w">    </span><span class="n">dt_atualizacao</span><span class="w">  </span><span class="k">TIMESTAMP</span>
+<span class="p">);</span>
+</code></pre></div>
 
 <p><strong>Exemplo de dados:</strong></p>
-<pre class="codehilite"><code>id | schema_fonte | tabela_fonte  | batch_flag | ativo
+<div class="codehilite"><pre><span></span><code>id | schema_fonte | tabela_fonte  | batch_flag | ativo
 1  | dbo          | tb_apolice    | 1          | true
 2  | dbo          | tb_sinistro   | 1          | true
 3  | dbo          | tb_segurado   | 2          | true
 4  | dbo          | tb_historico  | 2          | false  ← desabilitada sem alterar código
-</code></pre>
+</code></pre></div>
 
 <p>O ADF lê esta tabela via <code>Lookup</code> e distribui a extração por <code>batch_flag</code>:
 - <code>batch_flag = 1</code>: primeiro lote (paralelo entre si)
@@ -92,154 +92,154 @@ CREATE TABLE controller.source_to_lake (
 <hr />
 <h3>2. Tabela de Ingestão Landing → Bronze (<code>landing_to_bronze</code>)</h3>
 <p>Define o mapeamento entre arquivos na zona landing e tabelas Bronze de destino.</p>
-<pre class="codehilite"><code class="language-sql">CREATE TABLE controller.landing_to_bronze (
-    id_tabela           INTEGER,
-    path_landing        STRING,       -- path do arquivo na landing zone
-    catalog_destino     STRING,       -- catalog Unity Catalog de destino
-    schema_destino      STRING,       -- schema de destino
-    tabela_destino      STRING,       -- nome da tabela Delta de destino
-    schema_override     STRING,       -- schema explícito (NULL = inferência automática)
-    estrategia_escrita  STRING,       -- &quot;merge&quot; ou &quot;overwrite&quot; ou &quot;append&quot;
-    partition_col       STRING,       -- coluna de partição (NULL = sem partição)
-    ativo               BOOLEAN
-);
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">controller</span><span class="p">.</span><span class="n">landing_to_bronze</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id_tabela</span><span class="w">           </span><span class="nb">INTEGER</span><span class="p">,</span>
+<span class="w">    </span><span class="n">path_landing</span><span class="w">        </span><span class="n">STRING</span><span class="p">,</span><span class="w">       </span><span class="c1">-- path do arquivo na landing zone</span>
+<span class="w">    </span><span class="n">catalog_destino</span><span class="w">     </span><span class="n">STRING</span><span class="p">,</span><span class="w">       </span><span class="c1">-- catalog Unity Catalog de destino</span>
+<span class="w">    </span><span class="n">schema_destino</span><span class="w">      </span><span class="n">STRING</span><span class="p">,</span><span class="w">       </span><span class="c1">-- schema de destino</span>
+<span class="w">    </span><span class="n">tabela_destino</span><span class="w">      </span><span class="n">STRING</span><span class="p">,</span><span class="w">       </span><span class="c1">-- nome da tabela Delta de destino</span>
+<span class="w">    </span><span class="n">schema_override</span><span class="w">     </span><span class="n">STRING</span><span class="p">,</span><span class="w">       </span><span class="c1">-- schema explícito (NULL = inferência automática)</span>
+<span class="w">    </span><span class="n">estrategia_escrita</span><span class="w">  </span><span class="n">STRING</span><span class="p">,</span><span class="w">       </span><span class="c1">-- &quot;merge&quot; ou &quot;overwrite&quot; ou &quot;append&quot;</span>
+<span class="w">    </span><span class="n">partition_col</span><span class="w">       </span><span class="n">STRING</span><span class="p">,</span><span class="w">       </span><span class="c1">-- coluna de partição (NULL = sem partição)</span>
+<span class="w">    </span><span class="n">ativo</span><span class="w">               </span><span class="nb">BOOLEAN</span>
+<span class="p">);</span>
+</code></pre></div>
 
 <hr />
 <h3>3. Tabela de Orquestração Silver (<code>silver_notebooks</code>)</h3>
 <p>Declara quais notebooks Silver executar e em que ordem/paralelismo.</p>
-<pre class="codehilite"><code class="language-sql">CREATE TABLE controller.silver_notebooks (
-    id_notebook         INTEGER,
-    path_notebook       STRING,       -- path do notebook no workspace Databricks
-    seq                 INTEGER,      -- nível de execução (mesmo seq = paralelo)
-    timeout_minutos     INTEGER,      -- timeout máximo de execução
-    ativo               BOOLEAN,
-    dt_atualizacao      TIMESTAMP
-);
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">controller</span><span class="p">.</span><span class="n">silver_notebooks</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id_notebook</span><span class="w">         </span><span class="nb">INTEGER</span><span class="p">,</span>
+<span class="w">    </span><span class="n">path_notebook</span><span class="w">       </span><span class="n">STRING</span><span class="p">,</span><span class="w">       </span><span class="c1">-- path do notebook no workspace Databricks</span>
+<span class="w">    </span><span class="n">seq</span><span class="w">                 </span><span class="nb">INTEGER</span><span class="p">,</span><span class="w">      </span><span class="c1">-- nível de execução (mesmo seq = paralelo)</span>
+<span class="w">    </span><span class="n">timeout_minutos</span><span class="w">     </span><span class="nb">INTEGER</span><span class="p">,</span><span class="w">      </span><span class="c1">-- timeout máximo de execução</span>
+<span class="w">    </span><span class="n">ativo</span><span class="w">               </span><span class="nb">BOOLEAN</span><span class="p">,</span>
+<span class="w">    </span><span class="n">dt_atualizacao</span><span class="w">      </span><span class="k">TIMESTAMP</span>
+<span class="p">);</span>
+</code></pre></div>
 
 <p><strong>O campo <code>seq</code> é o coração da orquestração:</strong></p>
-<pre class="codehilite"><code>seq=1: [notebook_clientes] [notebook_apolices] [notebook_produtos]  ← paralelo
-seq=2: [notebook_sinistros] [notebook_cobertura]                    ← paralelo, após seq=1
-seq=3: [notebook_fato_pricipal]                                     ← após seq=2
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="n">seq</span><span class="o">=</span><span class="mi">1</span><span class="err">:</span><span class="w"> </span><span class="o">[</span><span class="n">notebook_clientes</span><span class="o">]</span><span class="w"> </span><span class="o">[</span><span class="n">notebook_apolices</span><span class="o">]</span><span class="w"> </span><span class="o">[</span><span class="n">notebook_produtos</span><span class="o">]</span><span class="w">  </span><span class="err">←</span><span class="w"> </span><span class="n">paralelo</span>
+<span class="n">seq</span><span class="o">=</span><span class="mi">2</span><span class="err">:</span><span class="w"> </span><span class="o">[</span><span class="n">notebook_sinistros</span><span class="o">]</span><span class="w"> </span><span class="o">[</span><span class="n">notebook_cobertura</span><span class="o">]</span><span class="w">                    </span><span class="err">←</span><span class="w"> </span><span class="n">paralelo</span><span class="p">,</span><span class="w"> </span><span class="n">após</span><span class="w"> </span><span class="n">seq</span><span class="o">=</span><span class="mi">1</span>
+<span class="n">seq</span><span class="o">=</span><span class="mi">3</span><span class="err">:</span><span class="w"> </span><span class="o">[</span><span class="n">notebook_fato_pricipal</span><span class="o">]</span><span class="w">                                     </span><span class="err">←</span><span class="w"> </span><span class="n">após</span><span class="w"> </span><span class="n">seq</span><span class="o">=</span><span class="mi">2</span>
+</code></pre></div>
 
 <p>Adicionar dependência entre notebooks é uma questão de ajustar o <code>seq</code> — sem alterar o orquestrador.</p>
 <hr />
 <h3>4. Backup da Controller (<code>bckup_source</code>)</h3>
 <p>Snapshot versionado das outras tabelas controller, para auditoria e rollback.</p>
-<pre class="codehilite"><code class="language-sql">CREATE TABLE controller.bckup_source (
-    tabela_origem   STRING,
-    snapshot_json   STRING,       -- conteúdo serializado da tabela em JSON
-    dt_snapshot     TIMESTAMP,
-    motivo          STRING        -- &quot;pré-deploy&quot;, &quot;pré-reprocessamento&quot;, etc.
-);
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">controller</span><span class="p">.</span><span class="n">bckup_source</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">tabela_origem</span><span class="w">   </span><span class="n">STRING</span><span class="p">,</span>
+<span class="w">    </span><span class="n">snapshot_json</span><span class="w">   </span><span class="n">STRING</span><span class="p">,</span><span class="w">       </span><span class="c1">-- conteúdo serializado da tabela em JSON</span>
+<span class="w">    </span><span class="n">dt_snapshot</span><span class="w">     </span><span class="k">TIMESTAMP</span><span class="p">,</span>
+<span class="w">    </span><span class="n">motivo</span><span class="w">          </span><span class="n">STRING</span><span class="w">        </span><span class="c1">-- &quot;pré-deploy&quot;, &quot;pré-reprocessamento&quot;, etc.</span>
+<span class="p">);</span>
+</code></pre></div>
 
 <hr />
 <h2>Como o Orquestrador Consume as Controller Tables</h2>
 <h3>No Azure Data Factory — Fase de Extração</h3>
-<pre class="codehilite"><code class="language-json">// Atividade Lookup — lê a tabela controller
-{
-  &quot;name&quot;: &quot;LookupSourceTables&quot;,
-  &quot;type&quot;: &quot;Lookup&quot;,
-  &quot;typeProperties&quot;: {
-    &quot;source&quot;: {
-      &quot;type&quot;: &quot;AzureSqlSource&quot;,
-      &quot;sqlReaderQuery&quot;: &quot;SELECT * FROM controller.source_to_lake WHERE ativo = 1 AND batch_flag = @{pipeline().parameters.batch_num} ORDER BY id_tabela&quot;
-    }
-  }
-}
+<div class="codehilite"><pre><span></span><code><span class="c1">// Atividade Lookup — lê a tabela controller</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;LookupSourceTables&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Lookup&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;typeProperties&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;source&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;AzureSqlSource&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;sqlReaderQuery&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;SELECT * FROM controller.source_to_lake WHERE ativo = 1 AND batch_flag = @{pipeline().parameters.batch_num} ORDER BY id_tabela&quot;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
 
-// Atividade ForEach — itera sobre o resultado do Lookup
-{
-  &quot;name&quot;: &quot;ForEachTable&quot;,
-  &quot;type&quot;: &quot;ForEach&quot;,
-  &quot;typeProperties&quot;: {
-    &quot;isSequential&quot;: false,          // paralelo dentro do lote
-    &quot;batchCount&quot;: 10,               // máximo 10 em paralelo
-    &quot;items&quot;: &quot;@activity('LookupSourceTables').output.value&quot;,
-    &quot;activities&quot;: [
-      {
-        &quot;name&quot;: &quot;CopyToLanding&quot;,
-        &quot;type&quot;: &quot;Copy&quot;,
-        &quot;typeProperties&quot;: {
-          &quot;source&quot;: {
-            &quot;sqlReaderQuery&quot;: &quot;@{if(equals(item().query_override, null), concat('SELECT * FROM ', item().schema_fonte, '.', item().tabela_fonte), item().query_override)}&quot;
-          },
-          &quot;sink&quot;: {
-            &quot;storeSettings&quot;: {
-              &quot;folderPath&quot;: &quot;@item().path_destino&quot;
-            }
-          }
-        }
-      }
-    ]
-  }
-}
-</code></pre>
+<span class="c1">// Atividade ForEach — itera sobre o resultado do Lookup</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ForEachTable&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ForEach&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;typeProperties&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;isSequential&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">          </span><span class="c1">// paralelo dentro do lote</span>
+<span class="w">    </span><span class="nt">&quot;batchCount&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w">               </span><span class="c1">// máximo 10 em paralelo</span>
+<span class="w">    </span><span class="nt">&quot;items&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;@activity(&#39;LookupSourceTables&#39;).output.value&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;activities&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;CopyToLanding&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Copy&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;typeProperties&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">&quot;source&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;sqlReaderQuery&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;@{if(equals(item().query_override, null), concat(&#39;SELECT * FROM &#39;, item().schema_fonte, &#39;.&#39;, item().tabela_fonte), item().query_override)}&quot;</span>
+<span class="w">          </span><span class="p">},</span>
+<span class="w">          </span><span class="nt">&quot;sink&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;storeSettings&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">              </span><span class="nt">&quot;folderPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;@item().path_destino&quot;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">          </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
 
 <h3>No Databricks — Fase de Orquestração Silver</h3>
-<pre class="codehilite"><code class="language-python"># Notebook orquestrador — lê silver_notebooks e executa por seq
-from pyspark.sql import functions as F
+<div class="codehilite"><pre><span></span><code><span class="c1"># Notebook orquestrador — lê silver_notebooks e executa por seq</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyspark.sql</span><span class="w"> </span><span class="kn">import</span> <span class="n">functions</span> <span class="k">as</span> <span class="n">F</span>
 
-df_notebooks = spark.read.format(&quot;delta&quot;) \
-    .load(f&quot;{catalog}.controller.silver_notebooks&quot;) \
-    .filter(&quot;ativo = true&quot;) \
-    .orderBy(&quot;seq&quot;, &quot;id_notebook&quot;)
+<span class="n">df_notebooks</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;delta&quot;</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">catalog</span><span class="si">}</span><span class="s2">.controller.silver_notebooks&quot;</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="s2">&quot;ativo = true&quot;</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">orderBy</span><span class="p">(</span><span class="s2">&quot;seq&quot;</span><span class="p">,</span> <span class="s2">&quot;id_notebook&quot;</span><span class="p">)</span>
 
-# Agrupa por seq para controlar paralelismo
-niveis = df_notebooks.select(&quot;seq&quot;).distinct().orderBy(&quot;seq&quot;).collect()
+<span class="c1"># Agrupa por seq para controlar paralelismo</span>
+<span class="n">niveis</span> <span class="o">=</span> <span class="n">df_notebooks</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;seq&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">distinct</span><span class="p">()</span><span class="o">.</span><span class="n">orderBy</span><span class="p">(</span><span class="s2">&quot;seq&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
 
-for nivel in niveis:
-    seq_atual = nivel.seq
-    notebooks_nivel = df_notebooks.filter(f&quot;seq = {seq_atual}&quot;).collect()
+<span class="k">for</span> <span class="n">nivel</span> <span class="ow">in</span> <span class="n">niveis</span><span class="p">:</span>
+    <span class="n">seq_atual</span> <span class="o">=</span> <span class="n">nivel</span><span class="o">.</span><span class="n">seq</span>
+    <span class="n">notebooks_nivel</span> <span class="o">=</span> <span class="n">df_notebooks</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;seq = </span><span class="si">{</span><span class="n">seq_atual</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
 
-    # Executar notebooks do mesmo nível em paralelo via threads
-    from concurrent.futures import ThreadPoolExecutor
+    <span class="c1"># Executar notebooks do mesmo nível em paralelo via threads</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">concurrent.futures</span><span class="w"> </span><span class="kn">import</span> <span class="n">ThreadPoolExecutor</span>
 
-    def executa_notebook(row):
-        dbutils.notebook.run(
-            path=row.path_notebook,
-            timeout_seconds=row.timeout_minutos * 60,
-            arguments={&quot;partition_date&quot;: partition_date}
-        )
+    <span class="k">def</span><span class="w"> </span><span class="nf">executa_notebook</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
+        <span class="n">dbutils</span><span class="o">.</span><span class="n">notebook</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+            <span class="n">path</span><span class="o">=</span><span class="n">row</span><span class="o">.</span><span class="n">path_notebook</span><span class="p">,</span>
+            <span class="n">timeout_seconds</span><span class="o">=</span><span class="n">row</span><span class="o">.</span><span class="n">timeout_minutos</span> <span class="o">*</span> <span class="mi">60</span><span class="p">,</span>
+            <span class="n">arguments</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;partition_date&quot;</span><span class="p">:</span> <span class="n">partition_date</span><span class="p">}</span>
+        <span class="p">)</span>
 
-    with ThreadPoolExecutor(max_workers=len(notebooks_nivel)) as executor:
-        futures = [executor.submit(executa_notebook, nb) for nb in notebooks_nivel]
-        for f in futures:
-            f.result()  # levanta exceção se algum notebook falhar
+    <span class="k">with</span> <span class="n">ThreadPoolExecutor</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">notebooks_nivel</span><span class="p">))</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
+        <span class="n">futures</span> <span class="o">=</span> <span class="p">[</span><span class="n">executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">executa_notebook</span><span class="p">,</span> <span class="n">nb</span><span class="p">)</span> <span class="k">for</span> <span class="n">nb</span> <span class="ow">in</span> <span class="n">notebooks_nivel</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">futures</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>  <span class="c1"># levanta exceção se algum notebook falhar</span>
 
-    print(f&quot;Nível seq={seq_atual} concluído ({len(notebooks_nivel)} notebooks)&quot;)
-</code></pre>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Nível seq=</span><span class="si">{</span><span class="n">seq_atual</span><span class="si">}</span><span class="s2"> concluído (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">notebooks_nivel</span><span class="p">)</span><span class="si">}</span><span class="s2"> notebooks)&quot;</span><span class="p">)</span>
+</code></pre></div>
 
 <hr />
 <h2>Operações Comuns via Controller Tables</h2>
 <h3>Adicionar uma nova tabela à pipeline</h3>
-<pre class="codehilite"><code class="language-sql">-- Adicionar extração do SQL Server
-INSERT INTO controller.source_to_lake
-(id_tabela, schema_fonte, tabela_fonte, path_destino, batch_flag, ativo)
-VALUES (400, 'dbo', 'tb_nova_tabela', 'landing/tb_nova_tabela/', 2, true);
+<div class="codehilite"><pre><span></span><code><span class="c1">-- Adicionar extração do SQL Server</span>
+<span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">controller</span><span class="p">.</span><span class="n">source_to_lake</span>
+<span class="p">(</span><span class="n">id_tabela</span><span class="p">,</span><span class="w"> </span><span class="n">schema_fonte</span><span class="p">,</span><span class="w"> </span><span class="n">tabela_fonte</span><span class="p">,</span><span class="w"> </span><span class="n">path_destino</span><span class="p">,</span><span class="w"> </span><span class="n">batch_flag</span><span class="p">,</span><span class="w"> </span><span class="n">ativo</span><span class="p">)</span>
+<span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="mi">400</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;dbo&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;tb_nova_tabela&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;landing/tb_nova_tabela/&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="k">true</span><span class="p">);</span>
 
--- Adicionar mapeamento landing → Bronze
-INSERT INTO controller.landing_to_bronze
-(id_tabela, path_landing, catalog_destino, schema_destino, tabela_destino, estrategia_escrita, ativo)
-VALUES (400, 'landing/tb_nova_tabela/', 'catalog_prod', 'bronze', 'tb_nova_tabela', 'merge', true);
-</code></pre>
+<span class="c1">-- Adicionar mapeamento landing → Bronze</span>
+<span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">controller</span><span class="p">.</span><span class="n">landing_to_bronze</span>
+<span class="p">(</span><span class="n">id_tabela</span><span class="p">,</span><span class="w"> </span><span class="n">path_landing</span><span class="p">,</span><span class="w"> </span><span class="n">catalog_destino</span><span class="p">,</span><span class="w"> </span><span class="n">schema_destino</span><span class="p">,</span><span class="w"> </span><span class="n">tabela_destino</span><span class="p">,</span><span class="w"> </span><span class="n">estrategia_escrita</span><span class="p">,</span><span class="w"> </span><span class="n">ativo</span><span class="p">)</span>
+<span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="mi">400</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;landing/tb_nova_tabela/&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;catalog_prod&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;bronze&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;tb_nova_tabela&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;merge&#39;</span><span class="p">,</span><span class="w"> </span><span class="k">true</span><span class="p">);</span>
+</code></pre></div>
 
 <p>Resultado: na próxima execução da pipeline, a nova tabela é extraída, convertida para Delta Bronze e processada automaticamente. Zero mudança de código.</p>
 <h3>Desabilitar temporariamente uma tabela</h3>
-<pre class="codehilite"><code class="language-sql">UPDATE controller.source_to_lake
-SET ativo = false
-WHERE tabela_fonte = 'tb_problematica';
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">UPDATE</span><span class="w"> </span><span class="n">controller</span><span class="p">.</span><span class="n">source_to_lake</span>
+<span class="k">SET</span><span class="w"> </span><span class="n">ativo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">false</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">tabela_fonte</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;tb_problematica&#39;</span><span class="p">;</span>
+</code></pre></div>
 
 <h3>Ajustar paralelismo do orquestrador Silver</h3>
-<pre class="codehilite"><code class="language-sql">-- Mover notebook para executar antes (seq menor)
-UPDATE controller.silver_notebooks
-SET seq = 1
-WHERE path_notebook LIKE '%tb_clientes%';
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="c1">-- Mover notebook para executar antes (seq menor)</span>
+<span class="k">UPDATE</span><span class="w"> </span><span class="n">controller</span><span class="p">.</span><span class="n">silver_notebooks</span>
+<span class="k">SET</span><span class="w"> </span><span class="n">seq</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">path_notebook</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">&#39;%tb_clientes%&#39;</span><span class="p">;</span>
+</code></pre></div>
 
 <hr />
 <h2>Quando Usar Controller-driven Architecture</h2>

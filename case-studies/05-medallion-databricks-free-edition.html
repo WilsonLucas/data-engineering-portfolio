@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Case 05 · Medallion + Unity Catalog em Databricks Free Edition — Portfolio de Engenharia de Dados de Wilson Lucas.">
+<title>Case 05 · Medallion + Unity Catalog em Databricks Free Edition | Wilson Lucas · Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Newsreader:ital,wght@0,400;0,500;1,400;1,500&family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="navbar-inner">
+        <div class="navbar-brand"><a href="../index.html" style="color: inherit;">Wilson Lucas · <em>Portfolio</em></a></div>
+        <div class="navbar-links">
+            <a href="../index.html#sobre">Sobre</a>
+            <a href="../index.html#stack">Stack</a>
+            <a href="../index.html#cases">Case Studies</a>
+            <a href="../index.html#padroes">Padrões</a>
+            <a href="../index.html#contato">Contato</a>
+        </div>
+    </div>
+</nav>
+
+<header class="article-header">
+    <div class="container">
+        <a href="../index.html#cases" class="back-link">Voltar ao portfolio</a>
+        <div class="section-label">// Case Study 05 · Processo Seletivo (Repo Público)</div>
+    </div>
+</header>
+
+<article class="container">
+    <div class="article-content">
+<h1>Case Study 05 — Medallion + Unity Catalog em Databricks Free Edition</h1>
+<p><strong>Setor:</strong> Consultoria de tecnologia (case técnico de processo seletivo, 2026)
+<strong>Empregador:</strong> N/A — projeto pessoal de processo seletivo
+<strong>Papel:</strong> Engenheiro de Dados Sênior — solução end-to-end individual</p>
+<hr />
+<h2>Setor e Perfil do Projeto</h2>
+<p>Case técnico aplicado em processo seletivo para vaga de Engenheiro de Dados Sênior em consultoria especializada em Databricks. Diferente dos demais case studies deste portfolio (anonimizados por NDA de clientes da consultoria), <strong>este case é integralmente público e reproduzível</strong> — o repositório no GitHub está aberto, os dados são sintéticos sem informação sensível e qualquer recrutador pode clonar e rodar localmente em um workspace Free Edition.</p>
+<p>O contexto fictício do enunciado: empresa de serviços com operação nacional cujos dados estão distribuídos em 9 fontes brutas heterogêneas (ERP, CRM, API, planilhas, sistema legado, atendimento, logística), sem base consolidada para consumo analítico. O candidato deve estruturar a solução end-to-end e entregar tabelas finais prontas para um Analista de BI montar dashboards.</p>
+<hr />
+<h2>Problema</h2>
+<p><strong>Técnico:</strong> Como ingerir 9 fontes em 5 formatos heterogêneos (CSV <code>;</code>, CSV <code>,</code>, JSON aninhado, NDJSON, XLSX, TXT pipe-delimited), tratar qualidade variável dos dados (51 issues mapeadas) sem destruir registros problemáticos, modelar em star schema dimensional com SCD2 demonstrativa, e aplicar governança Unity Catalog completa — tudo em <strong>Databricks Free Edition</strong> (substituiu Community Edition em jun/2025; só serverless, sem DLT, sem Workflows agendados, sem RBAC granular).</p>
+<p><strong>Operacional:</strong> Como entregar não apenas uma solução funcional mas uma solução que demonstre profundidade arquitetural em vaga sênior — incluindo decisões justificadas (ADRs), catálogo vivo, observabilidade, testes automatizados e narrativa visual.</p>
+<p><strong>Escala do desafio:</strong>
+- 403 pedidos, 995 itens, 72 produtos, 180 clientes pós-dedup, 7 canais, 6 regiões canônicas, 40 vendedores, 325 entregas, 270 ocorrências
+- 9 fontes em 5 formatos diferentes
+- Reconciliação end-to-end Bronze=Silver=Gold = R$ 1.707.675,84 (zero divergência aceita)
+- Prazo: 4 dias corridos</p>
+<hr />
+<h2>Stack Aplicada</h2>
+<table>
+<thead>
+<tr>
+<th>Componente</th>
+<th>Tecnologia</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Plataforma</td>
+<td>Databricks Free Edition (serverless)</td>
+</tr>
+<tr>
+<td>Catalog</td>
+<td>Unity Catalog (catalog <code>workspace</code>)</td>
+</tr>
+<tr>
+<td>Storage</td>
+<td>UC Managed Volumes (substitui DBFS legado)</td>
+</tr>
+<tr>
+<td>Formato</td>
+<td>Delta Lake 3.x (com <code>delta.columnMapping.mode=name</code>)</td>
+</tr>
+<tr>
+<td>Engine</td>
+<td>Photon Spark 4.1 (ANSI SQL mode estrito)</td>
+</tr>
+<tr>
+<td>Linguagem</td>
+<td>PySpark + Spark SQL + Python 3.10+</td>
+</tr>
+<tr>
+<td>Orquestração</td>
+<td>Databricks Multi-task Jobs (DAG JSON, 13 tasks)</td>
+</tr>
+<tr>
+<td>Versionamento</td>
+<td>Git + GitHub Pages</td>
+</tr>
+<tr>
+<td>Qualidade</td>
+<td>pytest + chispa offline (Spark local[1])</td>
+</tr>
+<tr>
+<td>Lint/format</td>
+<td>black + ruff (configurado em pyproject.toml)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>Arquitetura</h2>
+<div class="codehilite"><pre><span></span><code><span class="mf">9</span><span class="w"> </span><span class="n">fontes</span><span class="w"> </span><span class="n">brutas</span><span class="w"> </span><span class="p">(</span><span class="n">UC</span><span class="w"> </span><span class="n">Volume</span><span class="p">:</span><span class="w"> </span><span class="n">workspace</span><span class="mf">.</span><span class="n">landing</span><span class="mf">.</span><span class="n">sources</span><span class="p">)</span>
+<span class="w">   </span><span class="err">├──</span><span class="w"> </span><span class="n">erp_pedidos_cabecalho</span><span class="mf">.</span><span class="n">csv</span><span class="w"> </span><span class="p">(</span><span class="n">CSV</span><span class="w"> </span><span class="p">;)</span>
+<span class="w">   </span><span class="err">├──</span><span class="w"> </span><span class="n">erp_pedidos_itens</span><span class="mf">.</span><span class="n">csv</span><span class="w">     </span><span class="p">(</span><span class="n">CSV</span><span class="w"> </span><span class="p">,)</span>
+<span class="w">   </span><span class="err">├──</span><span class="w"> </span><span class="n">cadastro_produtos_api_dump</span><span class="mf">.</span><span class="n">json</span><span class="w"> </span><span class="p">(</span><span class="n">JSON</span><span class="w"> </span><span class="n">aninhado</span><span class="p">)</span>
+<span class="w">   </span><span class="err">├──</span><span class="w"> </span><span class="n">crm_clientes_export</span><span class="mf">.</span><span class="n">xlsx</span>
+<span class="w">   </span><span class="err">├──</span><span class="w"> </span><span class="n">comercial_canais</span><span class="mf">.</span><span class="n">xlsx</span>
+<span class="w">   </span><span class="err">├──</span><span class="w"> </span><span class="n">vendedores</span><span class="mf">.</span><span class="n">csv</span>
+<span class="w">   </span><span class="err">├──</span><span class="w"> </span><span class="n">legado_regioes_pipe</span><span class="mf">.</span><span class="n">txt</span>
+<span class="w">   </span><span class="err">├──</span><span class="w"> </span><span class="nb">log</span><span class="n">istica_entregas</span><span class="mf">.</span><span class="n">json</span>
+<span class="w">   </span><span class="err">└──</span><span class="w"> </span><span class="n">atendimento_ocorrencias</span><span class="mf">.</span><span class="n">ndjson</span>
+<span class="w">        </span><span class="err">│</span>
+<span class="w">        </span><span class="err">▼</span>
+<span class="n">workspace</span><span class="mf">.</span><span class="n">bronze</span><span class="w">  </span><span class="p">(</span><span class="mf">9</span><span class="w"> </span><span class="nb">tab</span><span class="n">elas</span><span class="w"> </span><span class="n">string</span><span class="o">-</span><span class="n">typed</span><span class="p">,</span><span class="w"> </span><span class="n">ADR</span><span class="o">-</span><span class="mf">001</span><span class="p">)</span>
+<span class="w">        </span><span class="err">│</span>
+<span class="w">        </span><span class="err">▼</span>
+<span class="n">workspace</span><span class="mf">.</span><span class="n">silver</span><span class="w">  </span><span class="p">(</span><span class="mf">9</span><span class="w"> </span><span class="nb">tab</span><span class="n">elas</span><span class="w"> </span><span class="n">tipadas</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">DQ</span><span class="w"> </span><span class="n">flags</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">quarantine</span><span class="w"> </span><span class="n">pattern</span><span class="p">,</span><span class="w"> </span><span class="n">ADR</span><span class="o">-</span><span class="mf">005</span><span class="p">)</span>
+<span class="w">        </span><span class="err">│</span>
+<span class="w">        </span><span class="err">▼</span>
+<span class="n">workspace</span><span class="mf">.</span><span class="kr">go</span><span class="n">ld</span><span class="w">    </span><span class="p">(</span><span class="mf">6</span><span class="w"> </span><span class="kd">dim</span><span class="n">s</span><span class="w"> </span><span class="n">SCD1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="n">SCD2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">4</span><span class="w"> </span><span class="n">facts</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="n">view</span><span class="w"> </span><span class="n">consolidada</span><span class="p">,</span><span class="w"> </span><span class="n">ADR</span><span class="o">-</span><span class="mf">002</span><span class="w"> </span><span class="n">e</span><span class="w"> </span><span class="n">ADR</span><span class="o">-</span><span class="mf">003</span><span class="p">)</span>
+<span class="w">        </span><span class="err">│</span>
+<span class="w">        </span><span class="err">▼</span>
+<span class="n">Analista</span><span class="w"> </span><span class="n">BI</span><span class="w"> </span><span class="p">(</span><span class="n">vw_kpi_business</span><span class="w"> </span><span class="n">pré</span><span class="o">-</span><span class="n">joinada</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="kd">dim</span><span class="n">_cliente_history</span><span class="w"> </span><span class="n">range</span><span class="w"> </span><span class="n">join</span><span class="p">)</span>
+</code></pre></div>
+
+<p><strong>Camada Landing:</strong> UC Volume managed hospedando os 9 arquivos originais. Substitui DBFS legado.</p>
+<p><strong>Camada Bronze:</strong> ingestão 1:1 sem transformação. Tipos string preservam formato original (decisão documentada em ADR-001 — preserva valor para auditoria forense; casts ficam restritos ao Silver com <code>try_cast</code> ANSI-safe via <code>F.expr</code>).</p>
+<p><strong>Camada Silver:</strong> parsing multi-formato (datas em yyyy-MM-dd, dd/MM/yyyy, ISO 8601 com &lsquo;T&rsquo;; decimais BR com vírgula), dedup determinístico via window functions com <code>row_number</code>, padronização de enums, DQ flags inline (<code>_dq_status</code> + <code>_dq_reasons</code> array). Pattern quarantine para <code>_dq_status='rejected'</code> documentado em ADR-005.</p>
+<p><strong>Camada Gold:</strong> star schema dimensional. 6 dimensões SCD Type 1 (<code>dim_cliente</code>, <code>dim_produto</code>, <code>dim_canal</code>, <code>dim_regiao</code>, <code>dim_vendedor</code>, <code>dim_data</code> enriquecida com 12 feriados nacionais BR 2025) + 1 SCD Type 2 demonstrativa (<code>dim_cliente_history</code> com hash MD5 sobre 4 colunas tracking + MERGE pattern Delta + range join sem surrogate key). 4 facts (pedido, item, entrega, ocorrência) com FK informational e CHECK constraint enforced. 1 view consolidada <code>vw_kpi_business</code> pré-joinada para BI.</p>
+<hr />
+<h2>Decisões Técnicas-Chave (5 ADRs Nygard PT-BR)</h2>
+<h3>ADR-001 — Bronze como string-typed</h3>
+<p>Em ANSI SQL mode estrito (default no Photon Spark 4.1 do Free Edition), qualquer cast falho lança <code>CAST_INVALID_INPUT</code> em runtime — interrompendo o job. <code>inferSchema=True</code> em CSV é não-determinístico em datasets pequenos. Adotamos Bronze string-typed: ler tudo como STRING preservando o conteúdo original byte-a-byte; tipos finais são responsabilidade exclusiva do Silver via <code>try_cast</code>, <code>try_to_date</code>, <code>try_to_timestamp</code> chamados via <code>F.expr</code> (funções não expostas como wrappers Python).</p>
+<h3>ADR-002 — SCD1 padrão + SCD2 demonstrativa em tabela paralela</h3>
+<p><code>dim_cliente</code> permanece SCD1 (overwrite, estado atual). <code>dim_cliente_history</code> é tabela paralela SCD2 com hash MD5 sobre <code>(segmento, UF, cidade, status)</code>. <code>effective_date = _ingestion_timestamp</code> (documentado como surrogate para business date desconhecida). FK natural com range join (<code>fact.data_id BETWEEN h.effective_date AND h.end_date</code>) — surrogate key documentada como follow-up para produção. MERGE pattern Delta para ingestões subsequentes.</p>
+<h3>ADR-003 — Medallion 3-camadas + landing com schemas curtos</h3>
+<p>Schemas namespaced no catalog <code>workspace</code>: <code>bronze</code>, <code>silver</code>, <code>gold</code>, <code>landing</code>. Sem prefixo redundante — pattern canônico do Databricks Engineering Blog. Versão anterior usava <code>case_&lt;projeto&gt;_*</code> (poluía o Catalog Explorer com prefixo desnecessário em ambiente single-tenant). Refatorado durante o sprint aproveitando re-run obrigatório pós-bug-fix.</p>
+<h3>ADR-004 — Free Edition vs Premium (limitações conscientes)</h3>
+<p>Sem DLT (Delta Live Tables), sem Workflows agendados, sem RBAC granular além do owner do workspace, sem <code>system.access.audit_log</code>. Cada limitação tem mitigação arquitetural documentada: DLT substituída por DQ flags + quarantine manuais (ADR-005); Workflows substituídos por <code>databricks jobs submit</code> on-demand; RBAC documentado via tags UC. Roadmap explícito de migração para Premium incluído.</p>
+<h3>ADR-005 — DQ flags + Quarantine pattern (equivalente arquitetural a DLT)</h3>
+<p>Classificação por <strong>TIPO</strong> de issue (não por contagem): PK/FK/null obrigatório → <code>rejected</code>; formato/enum não canônico → <code>warning</code>; sem issues → <code>clean</code>. Quarantine pattern: split sobre o <code>bronze_df</code> ANTES dos casts; <code>silver.quarantine_&lt;entity&gt;</code> preserva colunas originais string-typed do bronze + 4 metadados (<code>_quarantine_timestamp</code>, <code>_quarantine_reason</code>, <code>_source_file</code>, <code>_ingestion_timestamp</code>). Auditoria forense de cada registro rejeitado mantém valor original.</p>
+<hr />
+<h2>Bug Raiz Descoberto Durante Auditoria Forense</h2>
+<p>Durante o sprint de uplift via SDD (<code>/brainstorm</code> → <code>/define-m</code> → <code>/design-m</code> → <code>/build</code> → <code>/ship</code>), 2 specialists em paralelo identificaram bugs aparentemente independentes em direções opostas:</p>
+<ul>
+<li><strong>silver_pedidos</strong> marcava <code>rejected = 0</code> artificialmente (pattern <code>otherwise(F.lit("warning"))</code> impedia o terceiro estado de ser atingido)</li>
+<li><strong>silver_ocorrencias</strong> marcava 270/270 tickets como <code>rejected</code> (pattern <code>F.lit(F.concat(...))</code> força não-null serializado, enchendo o array de razões)</li>
+</ul>
+<p>Investigação SQL direta revelou a <strong>causa raiz comum</strong>: <code>F.array_remove(arr, NULL)</code> em SQL retorna NULL (porque <code>NULL = NULL</code> é NULL, não TRUE — semântica three-valued logic). Estava em todos os 6 silvers e mascarava qualquer lógica DQ subsequente.</p>
+<div class="codehilite"><pre><span></span><code><span class="c1">-- Bug latente em produção</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">array_remove</span><span class="p">(</span><span class="nb">array</span><span class="p">(</span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;real&#39;</span><span class="p">),</span><span class="w"> </span><span class="k">NULL</span><span class="p">)</span>
+<span class="c1">-- retorna NULL (array inteiro), não [&#39;real&#39;]</span>
+
+<span class="c1">-- Fix correto</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">array_compact</span><span class="p">(</span><span class="nb">array</span><span class="p">(</span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;real&#39;</span><span class="p">))</span>
+<span class="c1">-- retorna [&#39;real&#39;]</span>
+</code></pre></div>
+
+<p><strong>Resolução:</strong> substituir <code>F.array_remove(arr, None)</code> por <code>F.array_compact(arr)</code> em 6 silvers via regex multi-line. Distribuição DQ pós-fix: silver_pedidos com 24 rejected reais, silver_ocorrencias com 8 rejected, 193 warning, 69 clean — distribuição realista pela primeira vez.</p>
+<p><strong>Lição aprendida:</strong> code review futuro deve grep por <code>F.lit(F.&lt;func&gt;(...))</code> como red flag (uso indevido de <code>F.lit</code> em expressões Column).</p>
+<hr />
+<h2>Governança Unity Catalog (Catálogo Vivo)</h2>
+<p>Aplicada via script idempotente <code>01_apply_governance.py</code> cobrindo 28 tabelas:</p>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>COMMENT ON TABLE em todas as tabelas</td>
+<td>100% (28/28)</td>
+</tr>
+<tr>
+<td>COMMENT ON COLUMN em colunas business gold</td>
+<td>100%</td>
+</tr>
+<tr>
+<td>Tags UC fixas (owner, layer, classification, pii, data_domain)</td>
+<td>5 em todas as 28</td>
+</tr>
+<tr>
+<td>TBLPROPERTIES Delta retention (<code>logRetentionDuration=30 days</code>)</td>
+<td>Aplicado em gold</td>
+</tr>
+<tr>
+<td>CHECK constraint enforced em fact_pedido</td>
+<td><code>chk_net_amount_nonneg</code></td>
+</tr>
+<tr>
+<td>Pattern <code>DROP CONSTRAINT IF EXISTS</code> antes de <code>ADD CONSTRAINT</code></td>
+<td>Garante idempotência</td>
+</tr>
+</tbody>
+</table>
+<p>Vocabulário controlado das 5 tags documentado em <code>docs/NAMING_CONVENTIONS.md</code>. Fallback automático via função <code>fallback_comment(table, column)</code> para colunas business não mapeadas explicitamente — garante 100% de cobertura mesmo em tabelas com schemas evolutivos.</p>
+<hr />
+<h2>Resultado</h2>
+<table>
+<thead>
+<tr>
+<th>Métrica</th>
+<th>Valor</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pipeline end-to-end wall-clock</td>
+<td>~6 minutos (Free Edition serverless, 13 tasks)</td>
+</tr>
+<tr>
+<td>Reconciliação Bronze=Silver=Gold</td>
+<td>R$ 1.707.675,84 (mantida pós rename schemas + 3 bug fixes)</td>
+</tr>
+<tr>
+<td>Tabelas com COMMENT non-empty</td>
+<td>28/28 (100%)</td>
+</tr>
+<tr>
+<td>Tags UC fixas por tabela</td>
+<td>5 em todas</td>
+</tr>
+<tr>
+<td>ADRs Nygard PT-BR</td>
+<td>5</td>
+</tr>
+<tr>
+<td>Documentos de apoio</td>
+<td>8 (TABLES, GLOSSARY, NAMING_CONVENTIONS, BI_RUNBOOK, data_model com bus matrix, data_quality, business_questions, architecture)</td>
+</tr>
+<tr>
+<td>Testes pytest+chispa</td>
+<td>15 casos (Camada 1 Python puro + Camada 2 Spark local)</td>
+</tr>
+<tr>
+<td>HTML deliverables (GitHub Pages)</td>
+<td>2 (slides 12 páginas + diagrama interativo)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>Diferenciais vs Solução Mínima Esperada</h2>
+<p>O enunciado do case pedia uma solução funcional com notebooks + documentação técnica + resumo executivo. Esta entrega adicionou:</p>
+<ul>
+<li><strong>5 ADRs Nygard PT-BR</strong> documentando decisões com Contexto/Decisão/Consequências</li>
+<li><strong>Bus Matrix Kimball</strong> mapeando dimensões conformed × facts no <code>data_model.md</code></li>
+<li><strong>SCD Type 2 demonstrativa</strong> com hash MD5 + range join + MERGE pattern (paralela a SCD1)</li>
+<li><strong><code>dim_data</code> enriquecida</strong> com 12 feriados nacionais BR 2025 + <code>eh_dia_util</code> derivado + <code>semana_iso</code></li>
+<li><strong>Governança UC viva</strong> via script idempotente (COMMENT + TAG + CHECK constraint)</li>
+<li><strong>Suite pytest + chispa offline</strong> com 15 casos cobrindo funções utils + DQ logic</li>
+<li><strong>Slides HTML magazine-quality</strong> (12 páginas) renderizados via GitHub Pages</li>
+<li><strong>Diagrama de arquitetura interativo</strong> mostrando as 28 tabelas com info de granularidade</li>
+<li><strong>Data dictionary, glossário, naming conventions, BI runbook</strong> (4 docs adicionais)</li>
+</ul>
+<hr />
+<h2>Repositório Público</h2>
+<p><strong>Código completo:</strong> <a href="https://github.com/WilsonLucas/case-data-engineer">github.com/WilsonLucas/case-data-engineer</a></p>
+<p><strong>Slides renderizados:</strong> <a href="https://wilsonlucas.github.io/case-data-engineer/docs/slides/case_levva.html">wilsonlucas.github.io/case-data-engineer/docs/slides/case_levva.html</a></p>
+<p><strong>Diagrama interativo:</strong> <a href="https://wilsonlucas.github.io/case-data-engineer/docs/architecture.html">wilsonlucas.github.io/case-data-engineer/docs/architecture.html</a></p>
+<hr />
+<h2>Por Que Este Case Está no Portfolio</h2>
+<p>Os demais case studies deste portfolio são anonimizados por NDA de clientes da consultoria — o recrutador lê descrições mas não consegue clicar e ver código real. <strong>Este case inverte essa limitação:</strong> dados sintéticos sem NDA, exigência de publicação em GitHub público é parte do próprio enunciado, e o recrutador pode clonar o repositório e reproduzir o pipeline em qualquer Databricks Free Edition.</p>
+<p>Demonstra na prática: Medallion architecture, Unity Catalog governance, modelagem dimensional Kimball com SCD2, padrões de DQ não-destrutivos, ANSI mode handling, idempotência via Delta Lake, multi-task DAG orchestration, testes pytest, ADRs Nygard, e workflow SDD (Spec-Driven Development) para auditoria forense.</p>
+    </div>
+
+    <nav class="article-nav"><a href="04-migracao-camada-semantica.html">← Case 04 · Migração Camada Semântica</a><span></span></nav>
+</article>
+
+<footer>
+    <div class="container">
+        <p><strong>Wilson Lucas</strong> · Engenheiro de Dados Sênior</p>
+        <p><em>Material conceitual e anonimizado · Nenhum dado de cliente exposto</em></p>
+    </div>
+</footer>
+
+</body>
+</html>

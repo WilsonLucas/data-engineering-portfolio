@@ -46,16 +46,16 @@
 - Um produto vendido pelo mesmo fornecedor em múltiplas condições de entrega distintas, mas com a mesma chave de pedido
 - Registros de auditoria que deliberadamente replicam o estado anterior de uma entidade</p>
 <p>Quando a source contém linhas como:</p>
-<pre class="codehilite"><code>id_func | competencia | tipo_vinculo | vl_salario
-001     | 2025-01     | EFETIVO      | 5000.00
-001     | 2025-01     | EFETIVO      | 5000.00   ← igual à anterior
-001     | 2025-01     | EFETIVO      | 5000.00   ← igual (21 ocorrências)
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="n">id_func</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">competencia</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">tipo_vinculo</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">vl_salario</span>
+<span class="mi">001</span><span class="w">     </span><span class="o">|</span><span class="w"> </span><span class="mi">2025</span><span class="o">-</span><span class="mi">01</span><span class="w">     </span><span class="o">|</span><span class="w"> </span><span class="n">EFETIVO</span><span class="w">      </span><span class="o">|</span><span class="w"> </span><span class="mf">5000.00</span>
+<span class="mi">001</span><span class="w">     </span><span class="o">|</span><span class="w"> </span><span class="mi">2025</span><span class="o">-</span><span class="mi">01</span><span class="w">     </span><span class="o">|</span><span class="w"> </span><span class="n">EFETIVO</span><span class="w">      </span><span class="o">|</span><span class="w"> </span><span class="mf">5000.00</span><span class="w">   </span><span class="err">←</span><span class="w"> </span><span class="n">igual</span><span class="w"> </span><span class="err">à</span><span class="w"> </span><span class="n">anterior</span>
+<span class="mi">001</span><span class="w">     </span><span class="o">|</span><span class="w"> </span><span class="mi">2025</span><span class="o">-</span><span class="mi">01</span><span class="w">     </span><span class="o">|</span><span class="w"> </span><span class="n">EFETIVO</span><span class="w">      </span><span class="o">|</span><span class="w"> </span><span class="mf">5000.00</span><span class="w">   </span><span class="err">←</span><span class="w"> </span><span class="n">igual</span><span class="w"> </span><span class="p">(</span><span class="mi">21</span><span class="w"> </span><span class="n">ocorrências</span><span class="p">)</span>
+</code></pre></div>
 
 <p>E você tenta executar um MERGE com <code>ON (id_func, competencia, tipo_vinculo, vl_salario)</code>, o Delta Lake levanta:</p>
-<pre class="codehilite"><code>AnalysisException: Cannot perform a MERGE operation when multiple source rows
+<div class="codehilite"><pre><span></span><code>AnalysisException: Cannot perform a MERGE operation when multiple source rows
 match the same target row.
-</code></pre>
+</code></pre></div>
 
 <p>Se você tentar criar uma chave artificial (ex: <code>ROW_NUMBER()</code>) para deduplicar, você quebra o significado dos dados — estava correto ter 21 linhas.</p>
 <hr />
@@ -71,77 +71,77 @@ match the same target row.
 <hr />
 <h2>Como Aplicar</h2>
 <h3>Configuração</h3>
-<pre class="codehilite"><code class="language-python"># Ativar Dynamic Partition Overwrite antes da escrita
-# (pode ser configurado no nível de sessão Spark)
-spark.conf.set(&quot;spark.sql.sources.partitionOverwriteMode&quot;, &quot;dynamic&quot;)
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="c1"># Ativar Dynamic Partition Overwrite antes da escrita</span>
+<span class="c1"># (pode ser configurado no nível de sessão Spark)</span>
+<span class="n">spark</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;spark.sql.sources.partitionOverwriteMode&quot;</span><span class="p">,</span> <span class="s2">&quot;dynamic&quot;</span><span class="p">)</span>
+</code></pre></div>
 
 <h3>Escrita da partição</h3>
-<pre class="codehilite"><code class="language-python">df_competencia \
-    .write \
-    .format(&quot;delta&quot;) \
-    .mode(&quot;overwrite&quot;) \
-    .option(&quot;partitionOverwriteMode&quot;, &quot;dynamic&quot;) \
-    .partitionBy(&quot;partition_date&quot;) \
-    .saveAsTable(&quot;schema.tabela_destino&quot;)
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="n">df_competencia</span> \
+    <span class="o">.</span><span class="n">write</span> \
+    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;delta&quot;</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">mode</span><span class="p">(</span><span class="s2">&quot;overwrite&quot;</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s2">&quot;partitionOverwriteMode&quot;</span><span class="p">,</span> <span class="s2">&quot;dynamic&quot;</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">partitionBy</span><span class="p">(</span><span class="s2">&quot;partition_date&quot;</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">saveAsTable</span><span class="p">(</span><span class="s2">&quot;schema.tabela_destino&quot;</span><span class="p">)</span>
+</code></pre></div>
 
 <p>O comportamento do <code>dynamic</code>:
 - Apenas as partições presentes no DataFrame de entrada são reescritas
 - Partições ausentes no DataFrame (competências anteriores) são preservadas intactas
 - A operação é atômica no nível de partição — ou a partição inteira é substituída, ou nenhuma mudança ocorre</p>
 <h3>Comportamento comparado ao modo <code>static</code></h3>
-<pre class="codehilite"><code>Modo static (padrão):
+<div class="codehilite"><pre><span></span><code>Modo static (padrão):
   overwrite + static → apaga TODAS as partições da tabela e reescreve
 
 Modo dynamic:
   overwrite + dynamic → apaga APENAS as partições presentes no DataFrame
-</code></pre>
+</code></pre></div>
 
 <p><strong>Atenção:</strong> o modo <code>static</code> com <code>overwrite</code> apaga toda a tabela — em tabelas particionadas por competência com anos de histórico, isso seria catastrófico.</p>
 <hr />
 <h2>Implementação Típica — Pipeline por Competência</h2>
-<pre class="codehilite"><code class="language-python">from pyspark.sql import functions as F
+<div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pyspark.sql</span><span class="w"> </span><span class="kn">import</span> <span class="n">functions</span> <span class="k">as</span> <span class="n">F</span>
 
-# 1. Ler a competência a processar (parâmetro da pipeline)
-competencia = dbutils.widgets.get(&quot;partition_date&quot;)  # ex: &quot;2025-01&quot;
+<span class="c1"># 1. Ler a competência a processar (parâmetro da pipeline)</span>
+<span class="n">competencia</span> <span class="o">=</span> <span class="n">dbutils</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;partition_date&quot;</span><span class="p">)</span>  <span class="c1"># ex: &quot;2025-01&quot;</span>
 
-# 2. Ler os dados da fonte para essa competência
-df_fonte = spark.read \
-    .format(&quot;csv&quot;) \
-    .option(&quot;sep&quot;, &quot;|&quot;) \
-    .option(&quot;encoding&quot;, &quot;ISO-8859-1&quot;) \
-    .option(&quot;header&quot;, &quot;true&quot;) \
-    .load(f&quot;abfss://raw@&lt;storage&gt;.dfs.core.windows.net/folha/{competencia}/*.txt&quot;)
+<span class="c1"># 2. Ler os dados da fonte para essa competência</span>
+<span class="n">df_fonte</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">read</span> \
+    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;csv&quot;</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s2">&quot;sep&quot;</span><span class="p">,</span> <span class="s2">&quot;|&quot;</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s2">&quot;encoding&quot;</span><span class="p">,</span> <span class="s2">&quot;ISO-8859-1&quot;</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s2">&quot;header&quot;</span><span class="p">,</span> <span class="s2">&quot;true&quot;</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;abfss://raw@&lt;storage&gt;.dfs.core.windows.net/folha/</span><span class="si">{</span><span class="n">competencia</span><span class="si">}</span><span class="s2">/*.txt&quot;</span><span class="p">)</span>
 
-# 3. Aplicar transformações e adicionar coluna de partição
-df_processado = df_fonte \
-    .withColumn(&quot;partition_date&quot;, F.lit(competencia)) \
-    .withColumn(&quot;insert_date&quot;, F.to_utc_timestamp(F.current_timestamp(), &quot;GMT+3&quot;))
+<span class="c1"># 3. Aplicar transformações e adicionar coluna de partição</span>
+<span class="n">df_processado</span> <span class="o">=</span> <span class="n">df_fonte</span> \
+    <span class="o">.</span><span class="n">withColumn</span><span class="p">(</span><span class="s2">&quot;partition_date&quot;</span><span class="p">,</span> <span class="n">F</span><span class="o">.</span><span class="n">lit</span><span class="p">(</span><span class="n">competencia</span><span class="p">))</span> \
+    <span class="o">.</span><span class="n">withColumn</span><span class="p">(</span><span class="s2">&quot;insert_date&quot;</span><span class="p">,</span> <span class="n">F</span><span class="o">.</span><span class="n">to_utc_timestamp</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">current_timestamp</span><span class="p">(),</span> <span class="s2">&quot;GMT+3&quot;</span><span class="p">))</span>
 
-# 4. Configurar e escrever com Dynamic Partition Overwrite
-spark.conf.set(&quot;spark.sql.sources.partitionOverwriteMode&quot;, &quot;dynamic&quot;)
+<span class="c1"># 4. Configurar e escrever com Dynamic Partition Overwrite</span>
+<span class="n">spark</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;spark.sql.sources.partitionOverwriteMode&quot;</span><span class="p">,</span> <span class="s2">&quot;dynamic&quot;</span><span class="p">)</span>
 
-df_processado \
-    .write \
-    .format(&quot;delta&quot;) \
-    .mode(&quot;overwrite&quot;) \
-    .option(&quot;partitionOverwriteMode&quot;, &quot;dynamic&quot;) \
-    .partitionBy(&quot;partition_date&quot;) \
-    .saveAsTable(&quot;refined.fato_folha_pagamento&quot;)
+<span class="n">df_processado</span> \
+    <span class="o">.</span><span class="n">write</span> \
+    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;delta&quot;</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">mode</span><span class="p">(</span><span class="s2">&quot;overwrite&quot;</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s2">&quot;partitionOverwriteMode&quot;</span><span class="p">,</span> <span class="s2">&quot;dynamic&quot;</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">partitionBy</span><span class="p">(</span><span class="s2">&quot;partition_date&quot;</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">saveAsTable</span><span class="p">(</span><span class="s2">&quot;refined.fato_folha_pagamento&quot;</span><span class="p">)</span>
 
-print(f&quot;Partição {competencia} reescrita com sucesso.&quot;)
-</code></pre>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Partição </span><span class="si">{</span><span class="n">competencia</span><span class="si">}</span><span class="s2"> reescrita com sucesso.&quot;</span><span class="p">)</span>
+</code></pre></div>
 
 <hr />
 <h2>Reprocessamento de Competências Históricas</h2>
 <p>Um dos benefícios diretos do Dynamic Partition Overwrite é a simplicidade do reprocessamento histórico. Para reprocessar uma competência específica:</p>
-<pre class="codehilite"><code class="language-python"># Reprocessar apenas 2024-03, sem afetar outras competências
-competencia = &quot;2024-03&quot;
+<div class="codehilite"><pre><span></span><code><span class="c1"># Reprocessar apenas 2024-03, sem afetar outras competências</span>
+<span class="n">competencia</span> <span class="o">=</span> <span class="s2">&quot;2024-03&quot;</span>
 
-# Executa exatamente o mesmo código de carga normal
-# A partição 2024-03 será reescrita; todas as outras ficam intactas
-</code></pre>
+<span class="c1"># Executa exatamente o mesmo código de carga normal</span>
+<span class="c1"># A partição 2024-03 será reescrita; todas as outras ficam intactas</span>
+</code></pre></div>
 
 <p>Isso simplifica pipelines de reprocessamento — não há lógica especial para &ldquo;modo reprocessamento&rdquo; vs. &ldquo;modo carga incremental&rdquo;. O comportamento é o mesmo em ambos os casos.</p>
 <hr />
