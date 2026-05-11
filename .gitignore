@@ -29,3 +29,9 @@ build/
 **/.local/
 SECRETS.md
 DRAFT_*.md
+
+# HTMLs gerados pelo build_site.py - deploy via GitHub Actions, nao commitar.
+# index.html e PRESENTATION/portfolio-slides.html sao hardcoded (mantidos no repo).
+case-studies/*.html
+technical-notes/*.html
+SOBRE.html
