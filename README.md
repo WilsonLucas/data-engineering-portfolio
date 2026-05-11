@@ -36,10 +36,10 @@ Alternativas rápidas:
 | Seção | Conteúdo |
 |---|---|
 | [**Landing page**](https://wilsonlucas.github.io/data-engineering-portfolio/) | Portfolio visual completo |
-| [**Case Studies**](./case-studies/) | 5 projetos documentados (4 anonimizados por NDA + 1 público de processo seletivo) |
-| [**Padrões Técnicos**](./technical-notes/) | 3 padrões reutilizáveis extraídos dos projetos |
-| [**Slides**](./PRESENTATION/) | Apresentação em 19 slides single-file HTML |
-| [**Bio expandida**](./SOBRE.md) | Narrativa de trajetória e filosofia de trabalho |
+| [**Case Studies**](https://wilsonlucas.github.io/data-engineering-portfolio/#cases) | 5 projetos documentados (4 anonimizados por NDA + 1 público de processo seletivo) |
+| [**Padrões Técnicos**](https://wilsonlucas.github.io/data-engineering-portfolio/#padroes) | 3 padrões reutilizáveis extraídos dos projetos |
+| [**Slides**](https://wilsonlucas.github.io/data-engineering-portfolio/PRESENTATION/portfolio-slides.html) | Apresentação em 19 slides single-file HTML |
+| [**Bio expandida**](https://wilsonlucas.github.io/data-engineering-portfolio/SOBRE.html) | Narrativa de trajetória e filosofia de trabalho |
 
 ---
 
@@ -51,21 +51,23 @@ Alternativas rápidas:
 
 ## 📂 Case Studies
 
+Os links abaixo abrem a versão renderizada via GitHub Pages (HTML estilizado com CSS). Para o código-fonte em Markdown, navegue até `case-studies/` ou `technical-notes/` neste repositório.
+
 | # | Projeto | Setor | Stack Central |
 |---|---------|-------|---------------|
-| 01 | [Controller-driven Medallion Architecture](./case-studies/01-controller-driven-medallion.md) | Seguradora nacional | Azure Data Factory · Databricks · Unity Catalog · Delta Lake |
-| 02 | [Folha de Pagamento — 40M+ Linhas](./case-studies/02-folha-pagamento-40M-linhas.md) | Operadora de saúde | Synapse · Databricks · Delta Lake · PySpark |
-| 03 | [Homologação Byte-a-Byte com CLI Própria](./case-studies/03-homologacao-byte-a-byte.md) | Setor público | Synapse Serverless SQL · OPENROWSET · Python · pyarrow |
-| 04 | [Migração de Camada Semântica Corporativa](./case-studies/04-migracao-camada-semantica.md) | Corporativo | TDV · SAP Datasphere · SAP HANA · Oracle |
-| 05 | [Medallion + Unity Catalog em Databricks Free Edition](./case-studies/05-medallion-databricks-free-edition.md) ⭐ **público** | Case técnico de processo seletivo (2026) | Databricks Free Edition · Unity Catalog · Delta Lake · PySpark · pytest |
+| 01 | [Controller-driven Medallion Architecture](https://wilsonlucas.github.io/data-engineering-portfolio/case-studies/01-controller-driven-medallion.html) | Seguradora nacional | Azure Data Factory · Databricks · Unity Catalog · Delta Lake |
+| 02 | [Folha de Pagamento — 40M+ Linhas](https://wilsonlucas.github.io/data-engineering-portfolio/case-studies/02-folha-pagamento-40M-linhas.html) | Operadora de saúde | Synapse · Databricks · Delta Lake · PySpark |
+| 03 | [Homologação Byte-a-Byte com CLI Própria](https://wilsonlucas.github.io/data-engineering-portfolio/case-studies/03-homologacao-byte-a-byte.html) | Setor público | Synapse Serverless SQL · OPENROWSET · Python · pyarrow |
+| 04 | [Migração de Camada Semântica Corporativa](https://wilsonlucas.github.io/data-engineering-portfolio/case-studies/04-migracao-camada-semantica.html) | Corporativo | TDV · SAP Datasphere · SAP HANA · Oracle |
+| 05 | [Medallion + Unity Catalog em Databricks Free Edition](https://wilsonlucas.github.io/data-engineering-portfolio/case-studies/05-medallion-databricks-free-edition.html) ⭐ **público** | Case técnico de processo seletivo (2026) | Databricks Free Edition · Unity Catalog · Delta Lake · PySpark · pytest |
 
 ### Padrões Técnicos
 
 | Padrão | Quando usar |
 |---|---|
-| [Controller-driven Architecture](./technical-notes/controller-driven-architecture.md) | Parametrizar 100% de uma pipeline via tabelas Delta de controle |
-| [Dynamic Partition Overwrite](./technical-notes/dynamic-partition-overwrite.md) | Lidar com duplicatas legítimas que quebram MERGE tradicional |
-| [Metodologia de Homologação](./technical-notes/homologacao-metodologia.md) | Validar migrações com zero amostragem + causa raiz documentada |
+| [Controller-driven Architecture](https://wilsonlucas.github.io/data-engineering-portfolio/technical-notes/controller-driven-architecture.html) | Parametrizar 100% de uma pipeline via tabelas Delta de controle |
+| [Dynamic Partition Overwrite](https://wilsonlucas.github.io/data-engineering-portfolio/technical-notes/dynamic-partition-overwrite.html) | Lidar com duplicatas legítimas que quebram MERGE tradicional |
+| [Metodologia de Homologação](https://wilsonlucas.github.io/data-engineering-portfolio/technical-notes/homologacao-metodologia.html) | Validar migrações com zero amostragem + causa raiz documentada |
 
 ---
 
