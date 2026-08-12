@@ -149,7 +149,7 @@ Os links abaixo abrem a versão renderizada via GitHub Pages (HTML estilizado co
 
 | Período | Empresa | Papel |
 |---|---|---|
-| Consultoria | **Dataside** (Consultoria) | Engenheiro de Dados Sênior — multi-cliente |
+| Consultoria | **Dataside** | Engenheiro de Dados Sênior — multi-cliente |
 | Jul/2023 | **Compass.UOL** | Engenheiro de Dados Sênior |
 | Jun/2021 – Jun/2023 | **VERT** | Engenheiro de Dados Sênior |
 | Fev/2019 – Fev/2023 | **Global Web** | DBA Pleno → Consultor DBA |
