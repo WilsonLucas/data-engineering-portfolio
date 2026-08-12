@@ -149,8 +149,8 @@ Os links abaixo abrem a versão renderizada via GitHub Pages (HTML estilizado co
 
 | Período | Empresa | Papel |
 |---|---|---|
-| Dez/2024 – Atual | **Dataside** (Consultoria) | Engenheiro de Dados Sênior — multi-cliente |
-| Jul/2023 – Atual | **Compass.UOL** | Engenheiro de Dados Sênior |
+| Consultoria | **Dataside** (Consultoria) | Engenheiro de Dados Sênior — multi-cliente |
+| Jul/2023 | **Compass.UOL** | Engenheiro de Dados Sênior |
 | Jun/2021 – Jun/2023 | **VERT** | Engenheiro de Dados Sênior |
 | Fev/2019 – Fev/2023 | **Global Web** | DBA Pleno → Consultor DBA |
 | Mai/2017 – Jan/2019 | **Stefanini** | Analista de Dados |
